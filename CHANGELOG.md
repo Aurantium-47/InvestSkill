@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **LLM checks in CI** (`.github/workflows/llm-eval.yml`), on every PR that touches a skill, prompt, cross-AI system prompt or the eval machinery:
-  - **Offline output-contract tests** (`scripts/test-llm-io.js`, now part of `npm test`, 213 checks): 12 unedited real model outputs from the demo runs (`tests/llm-golden/`) must get their expected verdict from the shared output parser; 12 mutations of a real output must fail with the right reason; every prompt must close with the standard signal block, keep a short skill description, and stay within 25% of `tests/prompt-budgets.json`; the ZEPH eval harness and the arithmetic scorer are checked.
+  - **Offline output-contract tests** (`scripts/test-llm-io.js`, now part of `npm test`, 213 checks): 12 unedited real model outputs from the demo runs (`tests/llm-golden/`) must get their expected verdict from the shared output parser; 12 mutations of a real output must fail with the right reason; every prompt must close with the standard signal block followed only by the guide lines, one note and the Disclaimer, keep a short skill description, and have an entry in `tests/prompt-budgets.json` within 25%; the ZEPH eval harness and the arithmetic scorer are checked.
   - **Prompt diff** (`scripts/prompt-diff.js`): changed prompts, token deltas, description changes and contract status in the job summary.
-  - **Live eval:** the changed skills run through Claude (`scripts/claude-complete.js`, an `EVAL_CMD` adapter on the official SDK: streaming, `claude-opus-5-5` at explicit `medium` effort, server-side refusal fallback) on the fictional ZEPH pack and fail the job on any hard contract violation. Skipped, not failed, when the `ANTHROPIC_API_KEY` secret is unavailable.
+  - **Live eval:** the changed skills run through Claude (`scripts/claude-complete.js`, an `EVAL_CMD` adapter on the official SDK: streaming, `claude-opus-5-5` at explicit `medium` effort, server-side refusal fallback) on the fictional ZEPH pack and fail the job on any hard contract violation. The `ANTHROPIC_API_KEY` secret reaches the eval step only; the job is skipped, not failed, when it is unavailable.
   - npm scripts: `test:llm-io`, `prompt:diff`, `prompt:budgets`, `eval:claude`.
 
 ### Fixed

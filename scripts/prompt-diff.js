@@ -28,7 +28,9 @@ const argv = process.argv.slice(2);
 const flag = (k, d) => { const i = argv.indexOf(`--${k}`); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : d; };
 const has = k => argv.includes(`--${k}`);
 
-const EVAL_INFRA = ['scripts/lib/signal-block.js', 'scripts/eval-skills.js', 'scripts/claude-complete.js', 'data/fixtures/ZEPH.md', '.github/workflows/llm-eval.yml'];
+const EVAL_INFRA = ['scripts/lib/signal-block.js', 'scripts/eval-skills.js', 'scripts/claude-complete.js',
+  'scripts/prompt-diff.js', 'scripts/lib/prompt-metrics.js', 'scripts/lib/skill-registry.js',
+  'data/fixtures/ZEPH.md', '.github/workflows/llm-eval.yml'];
 
 const git = (...args) => execFileSync('git', args, { cwd: reg.ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 

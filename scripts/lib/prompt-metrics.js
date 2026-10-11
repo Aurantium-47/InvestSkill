@@ -47,6 +47,27 @@ function signalFields(text) {
   return { present, missing: SIGNAL_FIELDS.filter(f => !present.includes(f)) };
 }
 
+/**
+ * What follows the last Investment Signal block. CLAUDE.md: the block is followed
+ * only by the Score Guide / Confidence / Horizon lines, an optional one-paragraph
+ * mapping note, and the **Disclaimer:** line — nothing else. Returns
+ * { ok, problem } where problem explains the first violation.
+ */
+function closingOrder(text) {
+  const boxes = sb.extractBoxes(text || '').filter(b => /INVESTMENT SIGNAL/i.test(b));
+  if (!boxes.length) return { ok: false, problem: 'no Investment Signal block' };
+  const last = boxes[boxes.length - 1];
+  const tail = text.slice(text.lastIndexOf(last) + last.length).replace(/^\s*```/, '');
+  const paras = tail.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  const kinds = paras.map(p => (/^Score Guide:/.test(p) ? 'guide' : /^\*\*Disclaimer:?\*\*/.test(p) ? 'disclaimer' : 'note'));
+  if (kinds[kinds.length - 1] !== 'disclaimer') return { ok: false, problem: `does not end with the **Disclaimer:** line (last paragraph: "${(paras[paras.length - 1] || '').slice(0, 60)}")` };
+  if (kinds.filter(k => k === 'disclaimer').length > 1) return { ok: false, problem: 'more than one Disclaimer paragraph after the block' };
+  if (kinds.filter(k => k === 'guide').length > 1) return { ok: false, problem: 'Score Guide lines repeated after the block' };
+  if (kinds.filter(k => k === 'note').length > 1) return { ok: false, problem: `${kinds.filter(k => k === 'note').length} paragraphs between the block and the Disclaimer (one mapping note allowed)` };
+  if (kinds.indexOf('guide') > 0) return { ok: false, problem: 'Score Guide lines must come straight after the block' };
+  return { ok: true, problem: null };
+}
+
 /** Contract facts for a skill/prompt body (structure, not behaviour). */
 function contract(text) {
   return {
@@ -75,4 +96,4 @@ function allPromptFiles() {
   return [...skills, ...prompts, ...SYSTEM_PROMPT_FILES.filter(f => fs.existsSync(path.join(reg.ROOT, f)))];
 }
 
-module.exports = { SYSTEM_PROMPT_FILES, SIGNAL_FIELDS, MAX_DESCRIPTION_CHARS, estimateTokens, description, signalFields, contract, classify, allPromptFiles };
+module.exports = { SYSTEM_PROMPT_FILES, SIGNAL_FIELDS, MAX_DESCRIPTION_CHARS, estimateTokens, description, signalFields, closingOrder, contract, classify, allPromptFiles };

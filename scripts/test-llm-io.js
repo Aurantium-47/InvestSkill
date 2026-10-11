@@ -20,6 +20,7 @@
  *
  *   node scripts/test-llm-io.js                    # run
  *   node scripts/test-llm-io.js --update-budgets   # rewrite tests/prompt-budgets.json
+ *   node scripts/test-llm-io.js --update-budgets --add-missing   # add entries for new prompts only
  */
 const fs = require('fs');
 const path = require('path');
@@ -52,7 +53,12 @@ function currentSizes() {
 }
 
 if (process.argv.includes('--update-budgets')) {
-  const sizes = currentSizes();
+  let sizes = currentSizes();
+  if (process.argv.includes('--add-missing') && fs.existsSync(BUDGETS)) {
+    // Keep every existing entry (so growth elsewhere stays visible); add new files only.
+    const old = JSON.parse(fs.readFileSync(BUDGETS, 'utf8')).budgets;
+    sizes = Object.fromEntries(Object.entries(sizes).map(([f, t]) => [f, old[f] !== undefined ? old[f] : t]));
+  }
   const body = { _about: 'Estimated token size of every prompt a model receives (scripts/lib/prompt-metrics.js). test-llm-io.js fails when a file grows more than 25% past its entry. If the growth is intended, run `node scripts/test-llm-io.js --update-budgets` and commit the result so the reviewer sees it.', budgets: sizes };
   fs.writeFileSync(BUDGETS, `${JSON.stringify(body, null, 2)}\n`);
   process.stdout.write(`  wrote ${path.relative(ROOT, BUDGETS)} (${Object.keys(sizes).length} files)\n`);
@@ -116,6 +122,14 @@ for (const f of pm.allPromptFiles()) {
   if (reg.CONTRACT_EXEMPT.signalBlock.includes(c.name)) continue;
   const { missing } = pm.signalFields(read(f));
   check(!missing.length, `${f}: closes with the standard six-field signal block`, missing);
+  const closing = pm.closingOrder(read(f));
+  check(closing.ok, `${f}: nothing but guide lines, one note and the Disclaimer after the block`, closing.problem);
+}
+{
+  const t = read('prompts/stock-eval.md');
+  check(!pm.closingOrder(`${t}\n\n## Extra section\nAppended after the disclaimer.`).ok, 'closing-order check: content after the Disclaimer fails');
+  check(!pm.closingOrder(t.replace('**Disclaimer:**', '**Note:**')).ok, 'closing-order check: a missing Disclaimer fails');
+  check(!pm.closingOrder(t.replace(/(\n\*\*Disclaimer)/, '\n\nFirst extra paragraph.\n\nSecond extra paragraph.\n$1')).ok, 'closing-order check: more than one note paragraph fails');
 }
 for (const n of reg.listSkillDirs()) {
   const d = pm.description(read(`plugins/us-stock-analysis/skills/${n}/SKILL.md`));
@@ -132,7 +146,7 @@ else {
   const sizes = currentSizes();
   let over = 0;
   for (const [f, tokens] of Object.entries(sizes)) {
-    if (budgets[f] === undefined) { warn(`${f}: no budget entry (${tokens} tokens) — run --update-budgets`); continue; }
+    if (budgets[f] === undefined) { over++; fail(`${f}: no budget entry (${tokens} tokens) — run \`npm run prompt:budgets -- --add-missing\` and commit tests/prompt-budgets.json`); continue; }
     if (tokens > budgets[f] * BUDGET_SLACK) { over++; fail(`${f}: ${tokens} tokens, more than ${Math.round((BUDGET_SLACK - 1) * 100)}% over its budget of ${budgets[f]} — trim it, or run --update-budgets and commit if intended`); }
   }
   for (const f of Object.keys(budgets)) if (sizes[f] === undefined) warn(`${f}: budget entry for a file that no longer exists — run --update-budgets`);
@@ -204,6 +218,9 @@ check(/prompt-diff\.js[^\n]*--select/.test(wf) && wf.includes('scripts/claude-co
 check(/ANTHROPIC_API_KEY/.test(wf) && /no ANTHROPIC_API_KEY|skipp/i.test(wf), 'llm-eval.yml: skips cleanly when the API key secret is unavailable (forks)');
 check(wf.includes('npm install --no-save @anthropic-ai/sdk'), 'llm-eval.yml: installs the SDK without adding a dependency');
 check(!/pull_request_target/.test(wf), 'llm-eval.yml: never uses pull_request_target (no secrets for untrusted code)');
+check((wf.match(/ANTHROPIC_API_KEY: \$\{\{ secrets\.ANTHROPIC_API_KEY \}\}/g) || []).length === 1 && /- name: Run the eval[\s\S]{0,200}ANTHROPIC_API_KEY: \$\{\{ secrets/.test(wf), 'llm-eval.yml: the API key is exposed to the eval step only, not the job (SDK install never sees it)');
+check(wf.includes("scripts/lib/skill-registry.js"), 'llm-eval.yml: runs when the skill registry changes');
+check(['scripts/prompt-diff.js', 'scripts/lib/prompt-metrics.js', 'scripts/lib/skill-registry.js'].every(f => pd.EVAL_INFRA.includes(f)), 'prompt-diff: prompt tooling and the registry count as eval machinery');
 
 // ════════════════════════════════════════════════════════════════════════════
 process.stdout.write('\n' + '═'.repeat(60) + '\n  LLM I/O TEST RESULTS\n' + '═'.repeat(60) + '\n');
