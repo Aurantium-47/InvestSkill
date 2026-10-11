@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Demos re-run for real, with screenshots.** Every demo page (META, NVDA, AMD, PLTR, RKLB) was re-run on 2026-10-11 against fresh SEC filings (`fetch:edgar` / `fetch:fundamentals`) and the 2026-10-09 close, and rebuilt in the Live Walkthrough format: command → screenshot of the real output → what to notice → result, with the full unedited outputs at the bottom. The 10-K demos read files only; the full demos (PLTR in English, RKLB in Traditional Chinese) may browse for market data and end with a `fact-check`. The 4,000-line single-report PLTR/RKLB pages are replaced by ten-skill walkthroughs using current (non-alias) skills.
+- **Demo Overview is now a hub in both languages** (`full-demo.html` ⇄ new `full-demo-zh-tw.html`): demo picker, how the demos were made, and what they have in common. The stale technical-analysis previews are gone. PLTR ⇄ RKLB are now language counterparts; the zh nav, tabs, footer and landing page point at the zh overview.
+
 ### Added
 - **Live Walkthrough** (`walkthrough.html` / `walkthrough-zh-tw.html`, under Guides): a step-by-step post that runs four real skills on Microsoft — `stock-eval` → `bear-case` → `fact-check` → `learning-coach` — on an SEC EDGAR data pack built with `fetch:fundamentals`. Each step shows the command, screenshots of the real output, what to notice, and the result; the full unedited outputs are included. English and Traditional Chinese (the Chinese post shows the `--lang zh-TW` coach run).
 - The site build now copies `site/assets/` to `_site/assets/`, and content pages can reference images as `../assets/…` so they render both on GitHub and on the site.
