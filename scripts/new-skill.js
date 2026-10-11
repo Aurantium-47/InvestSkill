@@ -300,7 +300,8 @@ process.stdout.write(`\n  Next:\n`);
 process.stdout.write(`   1. Write the analysis — replace every TODO in skills/${name}/SKILL.md\n`);
 process.stdout.write(`   2. node scripts/sync-prompts.js ${name}        # regenerate the universal prompt\n`);
 process.stdout.write(`   3. Update the skill counts in site/content/COOKBOOK(.md|-zh-TW.md) ("N available skills")\n`);
-process.stdout.write(`   4. npm test && npm run build:site             # counts, contract, category placement\n\n`);
+process.stdout.write(`   4. npm run prompt:budgets -- --add-missing    # record the new prompts' size budget (tests/prompt-budgets.json)\n`);
+process.stdout.write(`   5. npm test && npm run build:site             # counts, contract, category placement\n\n`);
 
 if (!has('no-test')) {
   try {

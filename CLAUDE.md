@@ -13,6 +13,10 @@ npm run pre-release         # Full pre-release check: pre-release-check + valida
 npm run verify              # Verify local setup is correct
 npm run release:dry-run     # Preview release without making changes
 npm run integration-tests   # Run integration tests
+npm run test:llm-io         # Offline output-contract, prompt and eval-harness checks (part of npm test)
+npm run prompt:diff         # What this branch changed in the prompts (tokens, description, contract)
+npm run prompt:budgets      # Rewrite tests/prompt-budgets.json after an intended prompt-size change
+npm run eval:claude -- --skills stock-eval   # Live eval through the Claude API (needs ANTHROPIC_API_KEY + the SDK)
 ```
 
 Validate JSON manifests manually:
@@ -102,6 +106,20 @@ InvestSkill has **no runtime**: the skills fetch nothing. Two optional, zero-dep
 - Save text, not PDFs — the skills consume text. No Playwright / headless-browser dependency.
 - Honour SEC fair access: an identifying `User-Agent` (`EDGAR_USER_AGENT` env) and paced requests (`edgar.js` enforces the interval).
 - **Tests:** `scripts/test-edgar.js` (`npm run test:edgar`, part of `npm test` and the `test.yml` / `pr-check.yml` / `validate.yml` workflows) covers the library in-process and runs both CLIs as subprocesses against the fetch double `scripts/lib/edgar-mock-fetch.js` — no network. Add a route to the double when you add an endpoint; keep the synthetic AAPL facts equal to the real FY2025 figures so the pack stays sanity-checkable. When you change what the helpers fetch, also run them once against a real ticker.
+
+## LLM Eval Rule
+
+Prompts are the product, so CI checks both what goes into a model and what must come out. `.github/workflows/llm-eval.yml` runs on every PR that touches a skill, a prompt, a cross-AI system-prompt file, or the eval machinery:
+
+1. **Offline (always, also in `npm test`)** — `scripts/test-llm-io.js`:
+   - **Real outputs:** `tests/llm-golden/*.md` are unedited model outputs from the demo runs. Each must get the verdict in `manifest.json` from `scripts/lib/signal-block.js`, the same parser that grades live runs. When a real run exposes a parser gap, add it as a case.
+   - **Broken outputs:** mutations of a real output (no signal box, score↔signal mismatch, model memory at HIGH confidence, missing disclaimer, …) must fail with the expected reason.
+   - **Prompts:** every skill/prompt closes with the standard six-field signal block (this caught `catalyst-calendar` and `stock-screener`), followed only by the guide lines, at most one note paragraph and the Disclaimer; skill descriptions stay ≤ 1024 chars; the cross-AI system prompts reference every skill; every prompt has an entry in `tests/prompt-budgets.json` and stays within 25% of it. If a prompt grows on purpose, run `npm run prompt:budgets` and commit the change so the reviewer sees it; for a new skill, `npm run prompt:budgets -- --add-missing` adds its entries without resetting the others.
+   - **Eval harness and runner:** the ZEPH fixture, assembled eval prompts, the arithmetic scorer, `scripts/claude-complete.js --dry-run`, and `prompt-diff --select`.
+2. **Prompt diff** — `scripts/prompt-diff.js` writes changed prompts, token deltas, description changes and contract status to the job summary.
+3. **Live eval** — the changed single-ticker skills (max 4; the eval defaults if only the eval machinery changed) run through Claude on the fictional ZEPH pack via `scripts/claude-complete.js`, scored by `scripts/eval-skills.js`; any hard contract failure fails the job. It needs the `ANTHROPIC_API_KEY` repository secret, which is exposed to the eval step only, and is **skipped, not failed**, without it (fork PRs). It defaults to `claude-opus-5-5` at `medium` effort; `workflow_dispatch` takes `skills`, `all` and `model`.
+
+Skill-specific output rules live in `signal-block.js` (e.g. `fact-check`'s Score is the Verification Score, so it is checked against its own confidence and failed-verification rules instead of the Score Guide). The Anthropic SDK is installed with `npm install --no-save` in CI only. The plugin itself still has no runtime dependency.
 
 ## Version Consistency Rule
 

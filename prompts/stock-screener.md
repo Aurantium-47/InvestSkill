@@ -218,23 +218,33 @@ A ranking is a snapshot. After the screening summary, state what would reorder i
 
 ## Standard Signal Output (Multi-Stock)
 
-End every screening session with this standardized block reflecting the overall health of the screened universe:
+End every screening session with a short screening summary, then the standardized block, which reflects the screened universe as a whole:
+
+```
+Top Pick:          [TICKER] — Score X.X / 10
+Avg Score:         X.X / 10 (screened universe)
+Tickers Screened:  N
+Best Sector:       [SECTOR]
+```
 
 ```
 ╔══════════════════════════════════════════════╗
-║           INVESTMENT SIGNAL — SCREENING SUMMARY           ║
+║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣
-║ Top Pick:    [TICKER] — Score X.X / 10       ║
-║ Avg Score:   X.X / 10 (screened universe)    ║
-║ Tickers Screened: N                          ║
+║ Signal:      BULLISH / NEUTRAL / BEARISH     ║
+║ Confidence:  HIGH / MEDIUM / LOW             ║
+║ Horizon:     SHORT / MEDIUM / LONG-TERM      ║
+║ Score:       X.X / 10                        ║
 ╠══════════════════════════════════════════════╣
-║ Market Bias: BULLISH / NEUTRAL / BEARISH     ║
-║ Best Sector: [SECTOR]                        ║
+║ Action:      BUY / HOLD / SELL               ║
+║ Conviction:  STRONG / MODERATE / WEAK        ║
 ╚══════════════════════════════════════════════╝
 ```
 
 Score Guide: 8.0–10.0 Strongly Bullish | 6.0–7.9 Moderately Bullish | 4.0–5.9 Neutral | 2.0–3.9 Moderately Bearish | 0.0–1.9 Strongly Bearish
-Market Bias: derived from the average composite score of the screened universe. BULLISH if avg ≥ 6.0, NEUTRAL if 4.0–5.9, BEARISH if < 4.0.
-Best Sector: the GICS sector with the highest average composite score across all screened tickers in that sector.
+Confidence: HIGH (strong data, clear signals) | MEDIUM (mixed signals) | LOW (limited data, conflicting signals)
+Horizon: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG-TERM (1+ years)
+
+**Mapping:** Score is the average composite score of the screened universe, and Signal is the market bias it maps to on the Score Guide (BULLISH if ≥ 6.0, NEUTRAL if 4.0–5.9, BEARISH if < 4.0). Action and Conviction refer to the top pick. Best Sector is the GICS sector with the highest average composite score.
 
 **Disclaimer:** Educational analysis only. Not financial advice.

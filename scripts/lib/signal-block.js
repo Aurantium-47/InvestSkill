@@ -40,6 +40,18 @@ const CONVICTIONS = ['STRONG', 'MODERATE', 'WEAK'];
 const RETRIEVALS = ['pasted by user', 'web/tool retrieval', 'model memory'];
 
 const DATA_SOURCES_FIELDS = ['As of', 'Source', 'Retrieval', 'Confidence'];
+// Traditional Chinese runs keep the English field labels but often write the
+// Retrieval value in Chinese; map those phrases onto the three kinds.
+const RETRIEVAL_SYNONYMS = {
+  'pasted by user': [/pasted/i, /使用者提供/],
+  'web/tool retrieval': [/web|tool/i, /網路|網頁/],
+  'model memory': [/memory/i, /模型記憶|記憶/],
+};
+// Skills whose Score is *not* a bullish/bearish rating, so the Score Guide's
+// score→signal mapping does not apply. fact-check: Score is the Verification
+// Score and Signal mirrors the verified report (fact-check/SKILL.md § Standard
+// Signal Output); validateOutput applies that skill's own rules instead.
+const VERIFICATION_SCORE_SKILLS = ['fact-check'];
 
 /** Score → the signal the Score Guide says it maps to. */
 function expectedSignalForScore(score) {
@@ -75,19 +87,24 @@ function parseSignalBlock(text) {
   }
   const pick = k => (fields[k] || '').toUpperCase();
   const first = v => v.split(/[\/|]/)[0].trim();     // "BULLISH / NEUTRAL" → BULLISH
+  // "BUY (ON PULLBACK TO ~$195)" → BUY, with the qualifier reported separately
+  const lead = v => { const m = first(v).match(/^([A-Z-]+)\b\s*(.*)$/); return m ? { value: m[1], qualifier: m[2] || '' } : { value: first(v), qualifier: '' }; };
   const scoreRaw = fields['score'] || '';
   const scoreMatch = scoreRaw.match(/(-?\d+(?:\.\d+)?)\s*\/\s*10/);
   const isTemplate = /BULLISH\s*\/\s*NEUTRAL/i.test(fields['signal'] || '') || /X\.X/i.test(scoreRaw);
 
+  const qualifiers = {};
+  const enumField = k => { const r = lead(pick(k)); if (r.qualifier) qualifiers[k] = r.qualifier; return r.value || null; };
   return {
     raw: box,
     isTemplate,
-    signal: first(pick('signal')) || null,
-    confidence: first(pick('confidence')) || null,
+    signal: enumField('signal'),
+    confidence: enumField('confidence'),
     horizon: pick('horizon') || null,
     score: scoreMatch ? parseFloat(scoreMatch[1]) : null,
-    action: first(pick('action')) || null,
-    conviction: first(pick('conviction')) || null,
+    action: enumField('action'),
+    conviction: enumField('conviction'),
+    qualifiers,
     fields,
   };
 }
@@ -112,7 +129,7 @@ function parseDataSources(text) {
     retrieval,
     confidence: confidence ? confidence.toUpperCase().split(/[\s—-]/)[0] : null,
     retrievalKind: retrieval
-      ? (RETRIEVALS.find(r => retrieval.toLowerCase().includes(r.split(' ')[0])) || 'other')
+      ? (RETRIEVALS.find(r => RETRIEVAL_SYNONYMS[r].some(re => re.test(retrieval))) || 'other')
       : null,
   };
 }
@@ -128,7 +145,7 @@ function hasSignalBlockTemplate(text) {
 }
 
 function hasThesisInvalidation(text) {
-  return /Thesis Invalidation/i.test(text || '');
+  return /Thesis Invalidation/i.test(text || '') || /論點失效條件/.test(text || '');
 }
 
 function hasDataVerification(text) {
@@ -136,11 +153,21 @@ function hasDataVerification(text) {
 }
 
 function hasDisclaimer(text) {
-  return /not financial advice/i.test(text || '');
+  // English, or the Traditional Chinese wording the zh-TW runs use.
+  return /not financial advice/i.test(text || '') || /非投資建議|不構成投資建議/.test(text || '');
+}
+
+/** The confidence tier a Verification Score supports (fact-check/SKILL.md). */
+function confidenceTierForScore(score) {
+  if (score >= 8.0) return 'HIGH';
+  if (score >= 6.0) return 'MEDIUM';
+  return 'LOW';
 }
 
 /**
  * Validate a *model output* (not a skill file) against the contract.
+ * `opts.skill` selects skill-specific rules (see VERIFICATION_SCORE_SKILLS);
+ * `opts.expectRetrieval` turns a different Retrieval kind into a warning.
  * Returns { ok, issues[], warnings[], signal, dataSources }.
  */
 function validateOutput(text, opts = {}) {
@@ -158,10 +185,18 @@ function validateOutput(text, opts = {}) {
     if (signal.conviction && !CONVICTIONS.includes(signal.conviction)) issues.push(`Conviction "${signal.conviction}" not in ${CONVICTIONS.join('/')}`);
     if (signal.score === null) issues.push('Score missing or not "X.X / 10"');
     else if (signal.score < 0 || signal.score > 10) issues.push(`Score ${signal.score} outside 0–10`);
-    else if (signal.signal && SIGNALS.includes(signal.signal)) {
+    else if (VERIFICATION_SCORE_SKILLS.includes(opts.skill)) {
+      // Score is the Verification Score: Confidence may not exceed the tier it
+      // supports, and a failed verification (< 4.0) must not carry a call forward.
+      const order = ['LOW', 'MEDIUM', 'HIGH'];
+      const tier = confidenceTierForScore(signal.score);
+      if (signal.confidence && order.indexOf(signal.confidence) > order.indexOf(tier)) issues.push(`Verification Score ${signal.score} supports at most ${tier} confidence, box says ${signal.confidence}`);
+      if (signal.score < 4.0 && (signal.signal !== 'NEUTRAL' || signal.action !== 'HOLD')) issues.push(`Verification failed (${signal.score} < 4.0) but the box carries ${signal.signal} / ${signal.action} forward instead of NEUTRAL / HOLD`);
+    } else if (signal.signal && SIGNALS.includes(signal.signal)) {
       const expected = expectedSignalForScore(signal.score);
       if (expected !== signal.signal) issues.push(`Score ${signal.score} maps to ${expected} but Signal says ${signal.signal}`);
     }
+    for (const [k, q] of Object.entries(signal.qualifiers || {})) warnings.push(`${k[0].toUpperCase() + k.slice(1)} carries a qualifier ("${q.toLowerCase()}"); parsers read only "${signal[k]}"`);
   }
 
   if (!ds) issues.push('missing Data & Sources header');
@@ -184,7 +219,8 @@ function validateOutput(text, opts = {}) {
 }
 
 module.exports = {
-  SIGNAL_BLOCK_TOP, SIGNALS, CONFIDENCES, ACTIONS, CONVICTIONS, RETRIEVALS, DATA_SOURCES_FIELDS,
+  SIGNAL_BLOCK_TOP, SIGNALS, CONFIDENCES, ACTIONS, CONVICTIONS, RETRIEVALS, DATA_SOURCES_FIELDS, VERIFICATION_SCORE_SKILLS,
+  confidenceTierForScore,
   expectedSignalForScore, extractBoxes, parseSignalBlock, parseDataSources,
   hasDataSourcesTemplate, hasSignalBlockTemplate, hasThesisInvalidation, hasDataVerification, hasDisclaimer,
   validateOutput,

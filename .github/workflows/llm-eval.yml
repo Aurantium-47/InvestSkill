@@ -1,0 +1,154 @@
+name: LLM Eval
+
+# Checks the prompts a model receives and the output it must produce.
+#   prompt-checks — every PR touching prompts or the eval machinery: offline output-contract
+#                   tests (scripts/test-llm-io.js) and a prompt-diff report in the job summary.
+#   live-eval     — runs the changed skills through Claude on the fictional ZEPH data pack
+#                   (scripts/eval-skills.js) and fails on any hard contract violation.
+#                   Needs the ANTHROPIC_API_KEY repository secret; skipped (not failed) when
+#                   it is unavailable, e.g. on pull requests from forks.
+on:
+  pull_request:
+    paths:
+      - 'plugins/us-stock-analysis/skills/**'
+      - 'prompts/**'
+      - 'GEMINI.md'
+      - '.github/copilot-instructions.md'
+      - '.cursor/rules/**'
+      - 'scripts/eval-skills.js'
+      - 'scripts/claude-complete.js'
+      - 'scripts/prompt-diff.js'
+      - 'scripts/test-llm-io.js'
+      - 'scripts/lib/signal-block.js'
+      - 'scripts/lib/prompt-metrics.js'
+      - 'scripts/lib/skill-registry.js'
+      - 'data/fixtures/ZEPH.md'
+      - 'tests/**'
+      - '.github/workflows/llm-eval.yml'
+  workflow_dispatch:
+    inputs:
+      skills:
+        description: 'Comma-separated skills (empty = the eval defaults)'
+        required: false
+        default: ''
+      all:
+        description: 'Run every skill the fixture can feed (overrides skills)'
+        type: boolean
+        default: false
+      model:
+        description: 'Model ID'
+        required: false
+        default: 'claude-opus-5-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: llm-eval-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prompt-checks:
+    name: Prompt & output-contract checks (offline)
+    runs-on: ubuntu-latest
+    outputs:
+      skills: ${{ steps.select.outputs.skills }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Output contract, prompts, eval harness
+        run: node scripts/test-llm-io.js
+
+      - name: Prompt diff → job summary
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: node scripts/prompt-diff.js --base "origin/$BASE_REF" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Select skills for the live eval
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          INPUT_ALL: ${{ inputs.all }}
+          INPUT_SKILLS: ${{ inputs.skills }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            skills=$(node scripts/prompt-diff.js --base "origin/$BASE_REF" --select --max 4)
+          elif [ "$INPUT_ALL" = "true" ]; then
+            skills=ALL
+          else
+            # keep only skill-name characters from the manual input
+            skills=$(printf '%s' "$INPUT_SKILLS" | tr -cd 'a-z0-9,-')
+            [ -n "$skills" ] || skills=stock-eval,bear-case,stock-valuation,dividend-analysis
+          fi
+          echo "skills=$skills" >> "$GITHUB_OUTPUT"
+          echo "Live eval selection: ${skills:-<none>}"
+
+  live-eval:
+    name: Live eval (Claude)
+    needs: prompt-checks
+    if: needs.prompt-checks.outputs.skills != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # Only whether the secret exists — the key itself is passed to the eval step alone.
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      EVAL_MODEL: ${{ inputs.model || 'claude-opus-5-5' }}
+      EVAL_CMD: node scripts/claude-complete.js
+      SKILLS: ${{ needs.prompt-checks.outputs.skills }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Check for the API key
+        id: key
+        run: |
+          if [ "$HAS_KEY" != "true" ]; then
+            echo "::notice title=LLM eval skipped::no ANTHROPIC_API_KEY secret available (fork PR or secret not configured) — offline checks still ran."
+            echo "### Live eval skipped" >> "$GITHUB_STEP_SUMMARY"
+            echo "No \`ANTHROPIC_API_KEY\` secret is available to this run, so only the offline checks ran." >> "$GITHUB_STEP_SUMMARY"
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install the Anthropic SDK (not a project dependency)
+        if: steps.key.outputs.present == 'true'
+        run: npm install --no-save @anthropic-ai/sdk
+
+      - name: Run the eval
+        if: steps.key.outputs.present == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ "$SKILLS" = "ALL" ]; then
+            node scripts/eval-skills.js --all
+          else
+            node scripts/eval-skills.js --skills "$SKILLS"
+          fi
+
+      - name: Report → job summary
+        if: always() && steps.key.outputs.present == 'true'
+        run: |
+          report=$(find qa -maxdepth 1 -name 'eval_*.md' | sort | tail -1)
+          if [ -n "$report" ]; then cat "$report" >> "$GITHUB_STEP_SUMMARY"; else echo "No eval report was written." >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload report and raw completions
+        if: always() && steps.key.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: llm-eval-${{ github.run_id }}
+          path: |
+            qa/eval_*.md
+            qa/eval-output/
+          if-no-files-found: ignore
