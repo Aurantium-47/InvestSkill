@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Four more `fetch-fundamentals` data-pack mislabels** the demo skills had to correct by hand:
+  - **SG&A that was really G&A.** The SG&A chain fell back to `GeneralAndAdministrativeExpense`, so META ($12,152M) and MSFT ($7,956M) packs showed G&A only. SG&A is now rebuilt from separate selling and G&A lines when tagged that way (META $24,143M, MSFT $34,666M), and a G&A-only filer gets a "G&A (SG&A not tagged)" row instead.
+  - **FCF that included discontinued operations.** Operating cash flow now prefers the continuing-operations tag (AMD: FCF $5,519M, not $6,735M), with the total stated in the Notes.
+  - **Net debt that ignored securities.** Packs add `short_term_investments_m` and `net_debt_incl_investments_m` and a matching table row (AMD net cash $7,330M, MSFT $36,549M). When nothing narrower is tagged, short-term investments fall back to all available-for-sale debt securities, flagged in the Notes (NVDA).
+  - **A share count labelled "cover page" of the wrong filing.** The count often comes from a 10-Q filed after the 10-K; the label now names the form, filing date and as-of date.
+  The offline `CNV` / `LTD` test doubles cover each case.
+
+### Fixed
 - **`fetch-fundamentals` missed debt tagged only in `LongTermDebt`.** It took `LongTermDebtNoncurrent` (+ current) whenever that tag existed, so Rocket Lab's FY2025 pack showed $2M of debt and missed $152M of convertible notes, overstating net cash by $150M (two RKLB demo skills caught it by hand). The pack now reads both the current + non-current split and the `LongTermDebt` total; when the total is more than 5% larger it uses the total and says why in the Notes. Commercial paper and short-term borrowings that are tagged but not in total debt are now named in the Notes (AAPL: $7,979M of commercial paper), not added, because some filers tag the same amount twice (AMD). AAPL, MSFT, NVDA, AMD, META and TSLA packs are unchanged. New offline test double `CNV` reproduces the RKLB tags; the synthetic AAPL facts gain the real `LongTermDebt` and `CommercialPaper` values.
 
 ### Changed

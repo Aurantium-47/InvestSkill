@@ -102,6 +102,8 @@ Set `EDGAR_USER_AGENT="Your Name your@email"` first — the SEC asks every clien
 
 **How the pack builds total debt.** Companies split their debt across XBRL tags differently, so the pack reads both the current + non-current split and the `LongTermDebt` total (which already includes current maturities). When the total is more than 5% larger, debt is tagged only there (Rocket Lab's convertible notes, for example), and the pack uses the total and says so in its Notes. Commercial paper and short-term borrowings are listed in the Notes when tagged, but not added: some filers tag the same amount twice. Leases are never included.
 
+**Other labels the pack gets right for you.** SG&A tagged as separate selling and G&A lines (META, MSFT) is added up and noted; G&A alone is never presented as SG&A. Operating cash flow and FCF use continuing operations when the company tags them (AMD), with the total in the Notes. Next to net debt (debt − cash) the pack gives net debt *including* short-term investments, the figure most analyses use. And the share count names the filing it came from; it is often a 10-Q filed after the 10-K.
+
 ### 3. Paste what you already have
 
 A 10-K PDF from the company's IR site, a broker statement, a spreadsheet export: paste the sections, or upload the file where your assistant supports it. Label it `Retrieval: pasted by user`; the skills treat it as a Tier-1 *user-supplied* source and stop verification at your document.
