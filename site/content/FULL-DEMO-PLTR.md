@@ -23,7 +23,7 @@ Everything below was run for real on **2026-10-11**. Each skill started from two
 | | 7 | `insider-trading` | $869M sold, almost all automatic → NEUTRAL · 4.6 |
 | | 8 | `short-interest` | 2.6% of float, no squeeze → NEUTRAL · 5.0 |
 | 4 · Challenge | 9 | `bear-case` | Bear strength **5.0 / 10** → NEUTRAL · 5.0 |
-| | 10 | `fact-check` | ⏳ in progress |
+| | 10 | `fact-check` | Verification **7.8 / 10**; 3 mismatches, all in entry-zone guidance |
 
 ---
 
@@ -209,7 +209,17 @@ Everything below was run for real on **2026-10-11**. Each skill started from two
 /us-stock-analysis:fact-check output/pltr/01-stock-eval.md — verify every figure against data/fixtures/PLTR.md and the 10-Q; mark web-only figures unverifiable
 ```
 
-> ⏳ **This step is still running** — its screenshot and notes will be added to this page shortly.
+![fact-check: 103 claims, 47 of 50 recomputations agree, and three mismatches in the entry-zone guidance](../assets/demos/pltr/12-fact-check.webp)
+
+*Run offline against the two SEC files only. Anything step 1 found on the web is marked ❓ unverifiable, which means unchecked, not false.*
+
+**What to notice**
+
+- **The arithmetic holds.** Step 1 warned that it had calculated everything by hand and asked for this check. Every TTM figure, margin and multiple rebuilds, and the DCF reproduces exactly ($231 / $84 / $36).
+- **The errors are where a sales multiple becomes a share price.** The entry zone of $150–175 was described as "about 25× FY27 sales", but the report's own numbers put 25× at about **$127**; $150–175 is really 30–35×. A bullish trigger has the same slip.
+- **24 of 103 claims are unverifiable offline**, because they came from the web (consensus, Form 4s, peer multiples). That's the honest cost of letting skills browse.
+
+**Result of step 10:** **Verification Score 7.8 / 10.** The NEUTRAL 4.5 / HOLD stands; fix the two entry-zone conversions before using them.
 
 ---
 
@@ -226,7 +236,7 @@ Everything below was run for real on **2026-10-11**. Each skill started from two
 | `insider-trading` | NEUTRAL · HOLD | 4.6 |
 | `short-interest` | NEUTRAL · HOLD | 5.0 |
 | `bear-case` | NEUTRAL · HOLD | 5.0 |
-| `fact-check` | ⏳ in progress | — | — |
+| `fact-check` | (copied) NEUTRAL · HOLD | Verification 7.8 |
 
 **What this demo shows**
 
@@ -2808,6 +2818,192 @@ Horizon: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG
 - **No new transcript reading.** Guidance and Karp's remarks come from the 8-K and news summaries, not from reading the full earnings-call transcript.
 
 I printed the report here only and saved nothing to disk. If you want it next to the other demos, I can write it to `output/`.
+~~~~
+
+</details>
+
+<details>
+<summary><strong><code>fact-check</code> — full output</strong></summary>
+
+~~~~text
+I couldn't save this: both the file copy and the file write needed permission that wasn't granted. So the full fact-check is below rather than in `output/pltr/`.
+
+**Data & Sources**
+- **As of:** latest quarter 2026-06-30 (10-Q, filed 2026-08-04, acc. 0001321655-26-000041). FY2025/FY2024 annual figures 2025-12-31 (10-K data pack, acc. 0001321655-26-000011, filed 2026-02-17). Price $209.05, NASDAQ close 2026-10-09, as given in the pack.
+- **Source:** SEC EDGAR 10-Q (local text) and SEC XBRL companyfacts for the FY2025 10-K (the data pack).
+- **Retrieval:** pasted by user (`data/filings/PLTR/PLTR_2026-06-30_10-Q.txt`, `data/fixtures/PLTR.md`). No browsing.
+- **Confidence:** HIGH for figures checked against the 10-Q and 10-K pack. Web-sourced figures are not rated; they are marked ❓.
+
+> **Inputs used.** Every verdict comes from your two primary documents; I used no training-data estimates. Anything sourced from the web, an 8-K, a Form 4 or FRED is marked ❓ **unverifiable offline**, which means unchecked, not false.
+
+## 1. Summary
+
+**103 claims · 29 verified · 50 recomputed (47 agree, 3 disagree) · 24 unverifiable · 0 stale · Verification Score 7.8 / 10 · Caps fired: none**
+
+- **The report's arithmetic holds.** It warned that its figures were calculated by hand and asked for this check. Every TTM figure, margin, multiple and return ratio rebuilds from the filings.
+- **The DCF reproduces exactly:** bull $231.0, base $83.97 and bear $36.2, plus the $44 CAPM case and three cells I spot-checked in the sensitivity grid.
+- **The errors are all in the entry-zone and trigger guidance**, where a sales multiple is translated into a share price. One qualitative claim is also overstated. None of them touches the signal.
+
+## 2. Signal-driving claims
+
+The report's NEUTRAL 4.5 balances a near-top quality reading against a bottom-decile valuation reading. Six figures carry that conclusion:
+
+| # | Claim | Verdict | Source / arithmetic |
+|---|---|---|---|
+| S1 | Q2-26 revenue +93% | ✅ | 10-Q p.4: 1,935.5 ÷ 1,003.7 = +92.8%. MD&A p.23 says "93%" |
+| S2 | GAAP operating margin 47% | ✅ | 10-Q p.4: 912.0 ÷ 1,935.5 = 47.1% |
+| S3 | $9.4B cash and securities, no debt | ✅ | 10-Q p.3: 2,030.0 + 7,379.1 = 9,409. Note 6: revolver undrawn |
+| S4 | ~179× TTM EPS | 🔁 agrees | 209.05 ÷ (0.63 − 0.21 + 0.75 = 1.17) = 178.7× |
+| S5 | ~60× FY26 guided sales | 🔁 agrees | 492.9B ÷ 8.154B = 60.5×. The **guide itself is ❓** (8-K not supplied). The TTM figure of 80.1× is fully verified |
+| S6 | Base DCF $84; reverse DCF ~36% CAGR to ~$176B | 🔁 agrees | Rebuilt from the stated assumptions with a flat 40% margin: $83.97, terminal value 61.6% of EV. 36% growth at 10%/3% gives ≈$213; 8,154 × 1.36¹⁰ = $176.5B |
+
+**No signal-driving figure is off.**
+
+## 3. Claim ledger (condensed)
+
+**✅ Verified against the 10-Q or the 10-K pack (29):**
+- **Segments and customers:** customers 1,049 vs 849 (+24%); top-20 average $124M (+67%); Government $990.0M (+79%, contribution margin 71%); Commercial $945.4M (+110%, 78%).
+- **Geography:** US $1,573.0M (81%, +115%); rest of world $362.4M (19%, +34%).
+- **Sub-lines:** US commercial $764M, +149%. The 10-Q p.30 states this, so it doesn't need the 8-K citation. US government $809M vs $426M (+89.9%).
+- **Concentration and backlog:** Customer I holds 27%/25% of receivables and is not named. No customer is ≥10% of revenue. RPO is $4.9B with 43% due in 12 months, and contracts allow termination for convenience. CEO aircraft cost $6M.
+- **Annual figures:** the FY24 and FY25 rows (revenue, EBIT, net income, EPS, 56.2% growth); the FY25 cash-flow waterfall; buybacks of $1.5M in H1-26 and $75M in FY25; dividend yield 0%.
+- **Balance sheet:** total equity $9,885M; AP ≈ $8M at Dec-25; contract liabilities $0.8B → $1.1B; adjusted operating margin 62%.
+- **Narrative items:**
+  - effective tax rate ~1.4% with a valuation allowance (Note 10)
+  - $160M other income including $64M of mostly sale-restricted gains
+  - pilots run at the company's own cost
+  - securities accepted as noncash consideration (L2386)
+  - FASA (L2804) and the Iran strikes (L1256)
+  - litigation not material (L1788)
+  - $167M of private equity stakes
+  - Class B/F founder control
+  - revenue ~80% US
+
+**🔁 Recomputed and agree (47):**
+- **TTM:** revenue 6,155.5, EBIT 2,634.6, net income 3,016.7, diluted EPS 1.17, operating cash flow 3,399.8, capex 42.1, FCF 3,357.7, stock comp 835.5 (13.6% of revenue).
+- **Margins:** all 12 cells in the margin table, incremental margin 69%, and the FY25/H1/Q2 operating-leverage figures.
+- **Balance sheet and working capital:** current ratio 7.23×, quick ratio 7.09×, Dec-25 current ratio 7.11×; days sales outstanding 73/85/88; operating working capital $5M/$155M; receivables +42.5% in six months.
+- **Valuation:** market cap $502.3B (basic) and $537.0B (diluted); EV $492.9B; P/E 178.7×, ~226× normalized, ~125× forward; PEG 2.1; P/B 51.4×; P/S 81.6×; EV/sales 80.1×/60.5×; EV/EBITDA 185×; EV/FCF 147× and 117×; FCF yield 0.67%/0.50%.
+- **Returns:** ROE 35.2% (FY25 26.2%); ROA 29.3% (21.3%); both DuPont decompositions; ROIC 367%/296%; EVA ≈ $2.0B; cost of equity 15.6%, though its inputs are ❓.
+- **Earnings quality:** accruals −6.7%; cash conversion 1.31× and 1.13×; the Piotroski inputs; Rule of 40 = 93 + 62 = 155.
+- **Smaller derivations:** international commercial growth ≈ +25.4% (the report says ~26%); US government ≈ 41.8% of revenue; the FY25 cash decline is matched by a +$2.62B rise in short-term investments.
+- **DCF outputs:** FY36 revenue of $118B/$55B/$31B, the three scenario values, the CAPM case, the 149% premium, the $99 probability-weighted value, and the −9%/2.5×/5.8× risk table.
+- **Price scenarios:** de-rating to $127 (−39%); weighted 12-month target $178 (−15%); re-run triggers at $178/$240 and 2026-12-10.
+
+**❓ Unverifiable offline (24):**
+- **Market and macro:** 10-yr Treasury 5.22% (FRED); 52-week high, the +97% run and the price-date note; raw beta ~2.6 (from memory).
+- **History from memory:** FY21–23 figures, FY24 growth of 29%, the 3- and 5-year CAGRs, FY24 operating leverage, and the Alphabet-2020 comparison.
+- **8-K items:** TCV $3.37B; the FY26 guide and the FY26 adjusted-FCF guide; the Q3 guide and Q2 beat vs. guide (their arithmetic agrees); "no EPS guidance"; the 8/8 beat record (the actuals that can be checked do agree).
+- **Third-party data:** all peer and third-party multiples; "2–4× faster growth"; 157% NDR (the report flags it as secondary; it is absent from the 10-Q).
+- **Insider and market sentiment:** the Karp Form 4 and holdings; consensus targets and the Goldman upgrade; short interest, options volatility and the earnings date.
+- **Other:** "no pension obligations"; the history of moves on guide-meets; the 12× FY36 EBITDA cross-check, which has no margin stated.
+- **Piotroski F-Score 8/9:** criterion 6 compares Jun-26 to Dec-25 instead of FY25 to FY24. The report says so, but FY24 data isn't in the pack, so the confirmed score is **7–8 out of 9**.
+
+## 4. Mismatches
+
+| # | Original | What the numbers support | Fix |
+|---|---|---|---|
+| 101 | Entry zone **$150–175** "matches ~25× FY27 sales" (§14) | The report's own §13 puts 25× FY27 sales at **~$127**. $150–175 is **~30–35×** EV / FY27 sales | Restate as ~30–35×, or rely only on the other two anchors |
+| 102 | "≤$160 … about **20× FY27 sales**" (BULLISH trigger) | 20× ≈ **$103**: (20 × 12.6B + 11.7B) ÷ 2.569B. $160 ≈ **~32×** | Keep $160 and call it ~32×, or keep 20× and use ~$103 |
+| 64 | "Most expensive … on every sales **and earnings** multiple" (§4) | The report's own peer line gives CRWD a forward P/E of ~215× [?], above PLTR's ~125× | Drop "and earnings" → `[unsupported]` as worded |
+
+**Definition notes.** These figures agree, but the wording could mislead:
+- **Normalized net income ($2.38B):** it also strips out the $64M of equity gains. On the tax adjustment alone it would be $2.43B.
+- **P/B (51.4×):** it is computed on Palantir stockholders' equity. §3 shows total equity, which includes the noncontrolling interest; on that basis P/B is 50.8×.
+- **EV:** it pairs the Oct-9 price with Jun-30 cash. That is standard until the Q3 filing.
+
+## 5. Consistency of the report itself
+- **The narrative matches the tables:** growth is accelerating (56% → 89% → 93%), margins are expanding, and operating leverage is falling.
+- **Score 4.5 sits in the NEUTRAL band**, so the signal box is consistent with the action (HOLD).
+- **The report's own header is supported.** It claims "HIGH for reported financials", and every reported figure verified. Items from memory are marked ⓜ consistently. The header doesn't overstate, so no cap applies.
+- **Citations:**
+  - References 1–2 match the pack and the 10-Q accession and index URLs exactly.
+  - References 3–6 and the web list couldn't be opened offline. They are unverified, not fabricated, and the 0.0 cap for fabricated citations was neither tested nor applied.
+
+## 6. Verification Score
+
+| Component | Weight | Score | Basis |
+|---|---|---|---|
+| Coverage | 30% | 6.1 | 76 of 103 claims verified or agreeing (73.8%) |
+| Signal-driving accuracy | 30% | 9.0 | All six within tolerance; S5's FY26 figure relies on a guide that wasn't supplied |
+| Recomputation | 15% | 8.5 | 47 of the 50 recomputed figures agree; the 3 that don't are non-signal |
+| Source quality | 15% | 7.0 | Primary sources with page/line locations; 24 claims have no source offline |
+| Freshness | 10% | 9.0 | The price is 2 days old; the options-volatility data is stale (May 29), as the report itself says |
+
+**Score: 7.8 out of 10. Caps fired: none.** For `result-validator`, Data Quality should be no higher than about 7.5–8.
+
+## 7. Corrected passages
+
+Anything not listed here stands as written. Bracketed numbers are citations from the References list below.
+- **§4:** "…most expensive … on every sales ~~and earnings~~ multiple **and on trailing GAAP P/E** [2][19]."
+- **§14:** "…and ~~~25× FY27 sales~~ **~30–35× EV / FY27 sales (25× ≈ $127, §13)** (recomputed)."
+- **Thesis Invalidation:** "≤$160 … about ~~20×~~ **~32× EV /** FY27 sales **(20× ≈ $103)** (recomputed)."
+- **§1/§8:** "F-Score 8/9 **(7/9 confirmed; criterion 6 not tested on FY25 vs FY24)**."
+- **§6:** "At ~21% tax **and excluding the $64M equity gains**, TTM net income ≈ $2.38B [2][7] (recomputed)."
+- **§2:** "US commercial $764M, +149% ~~(8-K)~~ [16] · TCV $3.37B [?]."
+
+**References**
+- **[1]–[18]** PLTR Form 10-Q for the quarter ended 2026-06-30, acc. 0001321655-26-000041, filed 2026-08-04, user-supplied local text:
+  - [1] Balance Sheet, p.3
+  - [2] Statement of Operations, p.4
+  - [3] Statement of Equity, pp.6–7
+  - [4] Cash Flows, p.8
+  - [5] Note 2, credit risk, p.10
+  - [6] Note 3, contract liabilities and RPO, p.11
+  - [7] Note 4, investments, pp.11–13
+  - [8] Notes 5–7, AP / debt / commitments, pp.13–14
+  - [9] Note 8, stockholders' equity, p.15
+  - [10] Note 9, stock comp, pp.15–17
+  - [11] Note 10, income taxes, p.17
+  - [12] Note 12, segments and geography, p.19
+  - [13] Note 13, related party, p.19
+  - [14] MD&A, business and customers, p.23
+  - [15] MD&A, non-GAAP reconciliations, p.26
+  - [16] MD&A, revenue comparison, p.30
+  - [17] MD&A, liquidity, pp.32–33
+  - [18] Part II, Items 1, 1A and 5 (L1788, L2386, L2804, L1256, L3122)
+- **[19]** `data/fixtures/PLTR.md`: FY2025 10-K via XBRL companyfacts, acc. 0001321655-26-000011, filed 2026-02-17 (pasted by user).
+- **[20]** Price $209.05, NASDAQ close 2026-10-09, from the pack (user-supplied, not independently verified).
+
+## 8. Thesis Invalidation
+
+**These verdicts would break if:**
+- The Q3-26 10-Q or an 8-K restates any H1-26 figure.
+- The Q2 8-K shows a FY26 guide other than $8,150–8,158M.
+- Any of the web, Form 4 or FRED citations turns out to be fabricated. That would cap the score at 0.0.
+- 90 days pass on the price (after 2027-01-07).
+
+**To raise coverage toward about 85%,** paste:
+- the Q1-26 and Q2-26 8-K releases
+- the Karp Form 4
+- FRED DGS10 for 2026-10-08
+- the FY2024 balance sheet
+
+**Re-run when:**
+- [ ] The Q3-26 10-Q or earnings 8-K is filed
+- [ ] `01-stock-eval.md` is edited
+- [ ] 90 days pass on the price (2027-01-07)
+- [ ] Before the report is shared or used to size a position
+
+╔══════════════════════════════════════════════╗
+║              INVESTMENT SIGNAL               ║
+╠══════════════════════════════════════════════╣
+║ Signal:      NEUTRAL                         ║
+║ Confidence:  MEDIUM                          ║
+║ Horizon:     MEDIUM-TERM                     ║
+║ Score:       7.8 / 10                        ║
+╠══════════════════════════════════════════════╣
+║ Action:      HOLD                            ║
+║ Conviction:  MODERATE                        ║
+╚══════════════════════════════════════════════╝
+
+Score Guide: 8.0–10.0 Strongly Bullish | 6.0–7.9 Moderately Bullish | 4.0–5.9 Neutral | 2.0–3.9 Moderately Bearish | 0.0–1.9 Strongly Bearish
+Confidence: HIGH (strong data, clear signals) | MEDIUM (mixed signals) | LOW (limited data, conflicting signals)
+Horizon: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG-TERM (1+ years)
+
+Mirrors the report's signal — quoted, not re-derived. The Score is the Verification Score: how much of the report is demonstrably true. It is not a view on PLTR. The report's own NEUTRAL 4.5 / HOLD stands. Fix #101 and #102 before relying on its entry-zone guidance.
+
+**Disclaimer:** Educational analysis only. Not financial advice. Verification is limited to the sources available at run time; an unverifiable claim is neither confirmed nor refuted.
 ~~~~
 
 </details>

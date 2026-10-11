@@ -17,7 +17,7 @@ These demos show InvestSkill working on real stocks. Every one was run for real 
 | [**NVDA 10-K Deep Dive**](FULL-DEMO-NVDA.md) | English | Read the filing, then fact-check the reading | 2 | BULLISH · 6.8 · HOLD |
 | [**AMD 10-K 深度解析**](FULL-DEMO-AMD.md) | 繁體中文 | The same two steps on AMD, in Traditional Chinese | 2 | NEUTRAL · 5.5 · HOLD |
 | [**PLTR Full Demo**](FULL-DEMO-PLTR.md) | English | Ten skills across four questions: business, price, market, risk | 10 | NEUTRAL · 4.5 · HOLD (stock-eval) |
-| [**RKLB 完整示範**](FULL-DEMO-RKLB.md) | 繁體中文 | The same ten skills on Rocket Lab, in Traditional Chinese | 10 | ⏳ in progress |
+| [**RKLB 完整示範**](FULL-DEMO-RKLB.md) | 繁體中文 | The same ten skills on Rocket Lab, in Traditional Chinese | 10 | NEUTRAL · 4.2 · HOLD (stock-eval) |
 
 **Which one should I read?**
 

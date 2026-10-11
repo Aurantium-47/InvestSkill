@@ -13,7 +13,7 @@
 | 示範 | 語言 | 內容 | 技能數 | 主要結果 |
 |------|------|------|--------|----------|
 | [**實機演練：MSFT**](WALKTHROUGH-zh-TW.md) | 繁體中文 · [English](WALKTHROUGH.md) | 方法教學：資料 → 評估 → 唱反調 → 驗證 → 讀懂 | 4 | NEUTRAL · 5.5 · HOLD |
-| [**RKLB 完整示範**](FULL-DEMO-RKLB.md) | 繁體中文 | 對 Rocket Lab 跑十個技能，涵蓋公司、價格、市場、風險四個問題 | 10 | ⏳ 執行中 |
+| [**RKLB 完整示範**](FULL-DEMO-RKLB.md) | 繁體中文 | 對 Rocket Lab 跑十個技能，涵蓋公司、價格、市場、風險四個問題 | 10 | NEUTRAL · 4.2 · HOLD（stock-eval） |
 | [**AMD 10-K 深度解析**](FULL-DEMO-AMD.md) | 繁體中文 | 先深度解讀年報，再逐一驗證數字 | 2 | NEUTRAL · 5.5 · HOLD |
 | [**META 10-K Deep Dive**](FULL-DEMO-META.md) | 英文 | 六個技能串接分析同一份年報 | 6 | NEUTRAL · 5.6 · HOLD |
 | [**NVDA 10-K Deep Dive**](FULL-DEMO-NVDA.md) | 英文 | 與 AMD 相同的兩個步驟，分析 NVIDIA | 2 | BULLISH · 6.8 · HOLD |

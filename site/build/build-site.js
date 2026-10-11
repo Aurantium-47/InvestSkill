@@ -734,14 +734,14 @@ const PAGES = [
     outFile: 'full-demo-pltr.html',
     srcFile: 'site/content/FULL-DEMO-PLTR.md',
     title: 'PLTR Full Demo',
-    subtitle: '15 skills run for real on Palantir Technologies, step by step with screenshots (English)',
+    subtitle: 'Ten skills run for real on Palantir Technologies, step by step with screenshots (English)',
   },
   {
     key: 'full-demo-rklb',
     outFile: 'full-demo-rklb.html',
     srcFile: 'site/content/FULL-DEMO-RKLB.md',
     title: 'RKLB 完整示範',
-    subtitle: 'Rocket Lab USA — 15 項技能真實執行，逐步截圖解說（繁體中文）',
+    subtitle: 'Rocket Lab — 10 項技能真實執行，逐步截圖解說（繁體中文）',
   },
   {
     key: 'walkthrough',
