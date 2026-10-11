@@ -40,6 +40,11 @@ Data & Sources
 
 > **Rule of thumb:** if the Retrieval line says "model memory," treat every number as a placeholder until you confirm it against a primary source. Composite reports (`full-report`, `research-bundle`) should always carry this header **and** end with a [`result-validator`](#validating-ai-output) pass.
 
+**When sources disagree.** Two sources can give different values for the same figure. The skills follow one rule: prefer the primary source (SEC filing, company release, exchange data) over an aggregator, then the most recent dated one; show both values with their sources and dates; say which one was used; never average them. Two real cases from the [RKLB demo](full-demo-rklb.html):
+
+- *Closing price.* One quote site showed $67.38 for RKLB on 2026-10-09; Yahoo Finance, CNBC and Morningstar all show the official close of **$68.21**. The odd one out was not labelled as the close (likely an after-hours print).
+- *Deal financing.* One run said the Iridium acquisition was backed by a $3.6B bridge loan; another found it had been repaid. Rocket Lab's own 8-K settles it: the bridge was **terminated on 2026-09-15** after a $1.944B equity raise. The first run was quoting the June 30 10-Q, accurate on its date but stale by October.
+
 ---
 
 ## Recommended Data Sources
@@ -94,6 +99,8 @@ node scripts/fetch-fundamentals.js AAPL                 # → data/fixtures/AAPL
 ```
 
 Set `EDGAR_USER_AGENT="Your Name your@email"` first — the SEC asks every client to identify itself. Downloads land in `data/filings/` and generated packs in `data/fixtures/`, both git-ignored: they are *your* working data, and real numbers go stale. The XBRL pack deliberately has **no price line** — the SEC publishes no quotes — so add today's price from your broker before asking for P/E, market cap or yield.
+
+**How the pack builds total debt.** Companies split their debt across XBRL tags differently, so the pack reads both the current + non-current split and the `LongTermDebt` total (which already includes current maturities). When the total is more than 5% larger, debt is tagged only there (Rocket Lab's convertible notes, for example), and the pack uses the total and says so in its Notes. Commercial paper and short-term borrowings are listed in the Notes when tagged, but not added: some filers tag the same amount twice. Leases are never included.
 
 ### 3. Paste what you already have
 

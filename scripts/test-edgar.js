@@ -392,6 +392,20 @@ async function main() {
   includes(ltd && ltd.body, 'already includes current maturities', 'pack LTD: the note explains which debt tag was used');
   const aaplNote = body.match(/Total debt = ([^;]+);/);
   check(aaplNote && /current \+ non-current/.test(aaplNote[1]), 'pack AAPL: with the Noncurrent tag, total debt = current + non-current', aaplNote && aaplNote[1]);
+  check(ltd && !/Short-term borrowings of/.test(ltd.body), 'pack LTD: ShortTermBorrowings equal to the current portion is the same debt — not flagged, not added');
+
+  // Convertible notes tagged only in LongTermDebt (RKLB FY2025: the split saw $2M, the total $152M)
+  r = run(FETCH_FUND, fundArgs(['CNV']));
+  eq(r.status, 0, 'fetch-fundamentals CNV: exit 0');
+  const cnv = parseFixture(fs.readFileSync(path.join(FIX, 'CNV.md'), 'utf8'));
+  eq(cnv && cnv.meta.total_debt_m, 152, 'pack CNV: total_debt_m = LongTermDebt (152), not Noncurrent + current (2)');
+  eq(cnv && cnv.meta.net_debt_m, -675, 'pack CNV: net_debt_m = 152 − 827 cash (net cash 675, not 825)');
+  includes(cnv && cnv.body, '| Long-term debt | 152 |', 'pack CNV: long-term line restated so current + long-term = total');
+  includes(cnv && cnv.body, 'often convertible notes', 'pack CNV: a note explains why the tagged total was used');
+  // AAPL tags LongTermDebt equal to the split, so the split stays; its commercial paper is flagged, not added
+  eq(m2.total_debt_m, 90678, 'pack AAPL: LongTermDebt within 5% of the split → split kept (commercial paper not added)');
+  includes(body, 'Commercial paper of 7,979M is tagged but not included in total debt', 'pack AAPL: commercial paper flagged in the notes');
+  check(!/long_term_debt_total|commercial_paper|short_borrowings/.test((body.match(/Not tagged for [^\n]*/) || [''])[0]), 'pack AAPL: helper debt facts never listed as "not tagged"');
 
   // Non-GAAP filers and 404s are clean no-ops
   r = run(FETCH_FUND, fundArgs(['TSM']));
