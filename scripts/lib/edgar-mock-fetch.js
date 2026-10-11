@@ -26,9 +26,16 @@
  *                          double-counting trap for total debt; also tags
  *                          ShortTermBorrowings equal to the current portion
  *                          (AMD does this), which must not be flagged or added
+ *                          and GeneralAndAdministrativeExpense with no SG&A or
+ *                          selling line: G&A must not be presented as SG&A
  *   CNV     (CIK 888)     — RKLB's FY2025 pattern: convertible notes tagged only
  *                          in LongTermDebt ($152M) while LongTermDebtNoncurrent
- *                          carries a $2M term loan; total debt must use the total
+ *                          carries a $2M term loan; total debt must use the total.
+ *                          Also: SG&A tagged as selling + G&A lines (META/MSFT),
+ *                          operating cash flow tagged for continuing operations
+ *                          and in total (AMD), only all-AFS debt securities as
+ *                          investments (NVDA), and a share count from a 10-Q
+ *                          filed after the 10-K
  * The numbers for AAPL are the FY2025 figures as reported, so a reader can
  * sanity-check the pack the generator produces against the real 10-K.
  */
@@ -177,6 +184,7 @@ const LTD_FACTS = {
       LongTermDebt: usd([inst('2025-12-31', M(1000), ...LTD_K)]),
       LongTermDebtCurrent: usd([inst('2025-12-31', M(200), ...LTD_K)]),
       ShortTermBorrowings: usd([inst('2025-12-31', M(200), ...LTD_K)]),
+      GeneralAndAdministrativeExpense: usd([dur('2025-01-01', '2025-12-31', M(300), ...LTD_K)]),
       CashAndCashEquivalentsAtCarryingValue: usd([inst('2025-12-31', M(100), ...LTD_K)]),
     },
   },
@@ -188,9 +196,15 @@ const CNV_K = ['10-K', '2026-02-26', '0000000888-26-000013', 2025];
 const CNV_FACTS = {
   cik: 888, entityName: 'Convertible Test Corp',
   facts: {
-    dei: {},
+    dei: { EntityCommonStockSharesOutstanding: { units: { shares: [{ end: '2026-08-05', val: 598_000_000, form: '10-Q', filed: '2026-08-10', accn: '0000000888-26-000062', fy: 2026, fp: 'Q2' }] } } },
     'us-gaap': {
       Revenues: usd([dur('2025-01-01', '2025-12-31', M(602), ...CNV_K)]),
+      SellingAndMarketingExpense: usd([dur('2025-01-01', '2025-12-31', M(50), ...CNV_K)]),
+      GeneralAndAdministrativeExpense: usd([dur('2025-01-01', '2025-12-31', M(115), ...CNV_K)]),
+      NetCashProvidedByUsedInOperatingActivitiesContinuingOperations: usd([dur('2025-01-01', '2025-12-31', M(-166), ...CNV_K)]),
+      NetCashProvidedByUsedInOperatingActivities: usd([dur('2025-01-01', '2025-12-31', M(-150), ...CNV_K)]),
+      PaymentsToAcquirePropertyPlantAndEquipment: usd([dur('2025-01-01', '2025-12-31', M(156), ...CNV_K)]),
+      AvailableForSaleSecuritiesDebtSecurities: usd([inst('2025-12-31', M(1013), ...CNV_K)]),
       NetIncomeLoss: usd([dur('2025-01-01', '2025-12-31', M(-198), ...CNV_K)]),
       LongTermDebtNoncurrent: usd([inst('2025-12-31', M(2), ...CNV_K)]),
       LongTermDebtCurrent: usd([inst('2025-12-31', 0, ...CNV_K)]),

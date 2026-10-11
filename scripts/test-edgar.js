@@ -402,6 +402,24 @@ async function main() {
   eq(cnv && cnv.meta.net_debt_m, -675, 'pack CNV: net_debt_m = 152 − 827 cash (net cash 675, not 825)');
   includes(cnv && cnv.body, '| Long-term debt | 152 |', 'pack CNV: long-term line restated so current + long-term = total');
   includes(cnv && cnv.body, 'often convertible notes', 'pack CNV: a note explains why the tagged total was used');
+  // SG&A rebuilt from separate selling + G&A lines; G&A alone is never shown as SG&A
+  includes(cnv && cnv.body, '| SG&A | 165 |', 'pack CNV: SG&A = selling & marketing (50) + G&A (115)');
+  includes(cnv && cnv.body, 'SG&A = selling & marketing (50M) + G&A (115M)', 'pack CNV: a note says SG&A was rebuilt from two tags');
+  includes(ltd && ltd.body, '| G&A (SG&A not tagged) | 300 |', 'pack LTD: G&A-only filer gets a G&A row, not an SG&A figure');
+  check(ltd && /\| SG&A \| n\/a \|/.test(ltd.body), 'pack LTD: the SG&A row stays n/a when only G&A is tagged');
+  // Operating cash flow and FCF from continuing operations, total disclosed in the notes
+  eq(cnv && cnv.meta.ocf_m, -166, 'pack CNV: ocf_m = continuing operations (−166), not the total (−150)');
+  eq(cnv && cnv.meta.fcf_m, -322, 'pack CNV: fcf_m = continuing OCF − capex');
+  includes(cnv && cnv.body, 'total operating cash flow including discontinued operations was -150M', 'pack CNV: the total OCF is stated in the notes');
+  // Net debt also shown net of short-term investments; an all-AFS fallback is labelled
+  eq(cnv && cnv.meta.short_term_investments_m, 1013, 'pack CNV: short_term_investments_m falls back to all AFS debt securities');
+  eq(cnv && cnv.meta.net_debt_incl_investments_m, -1688, 'pack CNV: net_debt_incl_investments_m = 152 − 827 − 1,013');
+  includes(cnv && cnv.body, 'can include non-current holdings', 'pack CNV: the AFS fallback is flagged in the notes');
+  eq(m2.net_debt_incl_investments_m, 35981, 'pack AAPL: net debt incl. short-term investments = 90,678 − 35,934 − 18,763');
+  includes(body, '| Net debt (cash) incl. short-term investments | 35,981 |', 'pack AAPL: net debt incl. investments row');
+  // The share count names the filing it came from
+  includes(body, 'cover page of the 10-K filed 2025-10-31, as of 2025-10-17', 'pack AAPL: share count labelled with its filing');
+  includes(cnv && cnv.body, 'cover page of the 10-Q filed 2026-08-10 (later than the 10-K), as of 2026-08-05', 'pack CNV: a later 10-Q share count says so');
   // AAPL tags LongTermDebt equal to the split, so the split stays; its commercial paper is flagged, not added
   eq(m2.total_debt_m, 90678, 'pack AAPL: LongTermDebt within 5% of the split → split kept (commercial paper not added)');
   includes(body, 'Commercial paper of 7,979M is tagged but not included in total debt', 'pack AAPL: commercial paper flagged in the notes');

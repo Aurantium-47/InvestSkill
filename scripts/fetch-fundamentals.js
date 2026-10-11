@@ -64,7 +64,11 @@ const DURATION = {
   cost_of_revenue: ['CostOfRevenue', 'CostOfGoodsAndServicesSold', 'CostOfGoodsSold', 'CostOfServices'],
   gross_profit: ['GrossProfit'],
   rnd_expense: ['ResearchAndDevelopmentExpense', 'ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost'],
-  sga_expense: ['SellingGeneralAndAdministrativeExpense', 'GeneralAndAdministrativeExpense'],
+  sga_expense: ['SellingGeneralAndAdministrativeExpense'],
+  // When SG&A isn't tagged as one line it is rebuilt from these two (META, MSFT tag
+  // marketing and G&A separately); G&A alone is never presented as SG&A.
+  selling_expense: ['SellingAndMarketingExpense', 'SellingExpense'],
+  ga_expense: ['GeneralAndAdministrativeExpense'],
   operating_income: ['OperatingIncomeLoss'],
   interest_expense: ['InterestExpense', 'InterestExpenseNonoperating', 'InterestExpenseDebt'],
   pretax_income: ['IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest', 'IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments'],
@@ -74,14 +78,19 @@ const DURATION = {
   shares_diluted: ['WeightedAverageNumberOfDilutedSharesOutstanding', 'WeightedAverageNumberOfSharesOutstandingBasicAndDiluted'],
   dep_amort: ['DepreciationDepletionAndAmortization', 'DepreciationAmortizationAndAccretionNet', 'DepreciationAndAmortization'],
   sbc: ['ShareBasedCompensation', 'AllocatedShareBasedCompensationExpense'],
-  ocf: ['NetCashProvidedByUsedInOperatingActivities', 'NetCashProvidedByUsedInOperatingActivitiesContinuingOperations'],
+  // Continuing operations first, so FCF excludes cash from businesses being sold
+  // (AMD FY2025: 6,493 continuing vs 7,709 total). ocf_total is kept for the note.
+  ocf: ['NetCashProvidedByUsedInOperatingActivitiesContinuingOperations', 'NetCashProvidedByUsedInOperatingActivities'],
+  ocf_total: ['NetCashProvidedByUsedInOperatingActivities'],
   capex: ['PaymentsToAcquirePropertyPlantAndEquipment', 'PaymentsToAcquireProductiveAssets'],
   dividends_paid: ['PaymentsOfDividendsCommonStock', 'PaymentsOfDividends', 'PaymentsOfOrdinaryDividends'],
   buybacks: ['PaymentsForRepurchaseOfCommonStock'],
 };
 const INSTANT = {
   cash: ['CashAndCashEquivalentsAtCarryingValue', 'CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents'],
-  short_term_investments: ['ShortTermInvestments', 'AvailableForSaleSecuritiesDebtSecuritiesCurrent', 'MarketableSecuritiesCurrent'],
+  // Last resort: all available-for-sale debt securities (NVDA tags nothing narrower);
+  // the Notes say so, since that total can include non-current holdings.
+  short_term_investments: ['ShortTermInvestments', 'AvailableForSaleSecuritiesDebtSecuritiesCurrent', 'MarketableSecuritiesCurrent', 'AvailableForSaleSecuritiesDebtSecurities'],
   receivables: ['AccountsReceivableNetCurrent'],
   inventory: ['InventoryNet'],
   ppe_net: ['PropertyPlantAndEquipmentNet'],
@@ -208,6 +217,16 @@ function totalDebt(r, concept) {
   return { total_debt: total, long_term_debt: longTerm, total_debt_note: how, debt_notes: notes };
 }
 
+/**
+ * Where the share count comes from. EDGAR's companyfacts carries the cover-page count
+ * of every filing, and the newest is often a 10-Q filed after the 10-K, so the label
+ * names the filing instead of implying it is the annual report's cover page.
+ */
+function sharesLabel(so, fy) {
+  const later = so.filed > fy.filed ? ` (later than the ${fy.form})` : '';
+  return `cover page of the ${so.form} filed ${so.filed}${later}, as of ${so.asOf}`;
+}
+
 /** Dollars -> whole millions (null passes through). */
 const M = v => (v === null || v === undefined ? null : Math.round(v / 1e6));
 /** Dollars -> "1,234" millions for a table cell, or "n/a". */
@@ -254,8 +273,23 @@ async function main() {
     for (const [m, chain] of Object.entries(INSTANT)) { const p = pick(gaap, m, chain, end, { duration: false }); r[m] = p ? p.val : null; concept[m] = p ? p.concept : null; }
     if (r.gross_profit === null && r.revenue !== null && r.cost_of_revenue !== null) r.gross_profit = r.revenue - r.cost_of_revenue;
     r.fcf = r.ocf !== null && r.capex !== null ? r.ocf - r.capex : null;
+    r.notes = [];
+    if (r.sga_expense === null && r.selling_expense !== null && r.ga_expense !== null) {
+      r.sga_expense = r.selling_expense + r.ga_expense;
+      r.notes.push(`SG&A = selling & marketing (${fmtM(r.selling_expense)}M) + G&A (${fmtM(r.ga_expense)}M), tagged as separate lines.`);
+    } else if (r.sga_expense === null && r.ga_expense !== null) {
+      r.notes.push('SG&A is not tagged as one line and no selling or marketing expense is tagged, so only G&A is shown; selling costs may sit elsewhere in operating expenses.');
+    }
+    if (concept.ocf === 'NetCashProvidedByUsedInOperatingActivitiesContinuingOperations' && r.ocf_total !== null && r.ocf_total !== r.ocf) {
+      r.notes.push(`Operating cash flow and FCF are from continuing operations (${fmtM(r.ocf)}M); total operating cash flow including discontinued operations was ${fmtM(r.ocf_total)}M.`);
+    }
+    if (concept.short_term_investments === 'AvailableForSaleSecuritiesDebtSecurities') {
+      r.notes.push('Short-term investments = all available-for-sale debt securities (no narrower tag); this can include non-current holdings.');
+    }
     Object.assign(r, totalDebt(r, concept));
     r.net_debt = r.total_debt !== null && r.cash !== null ? r.total_debt - r.cash : null;
+    // Most analyses count marketable securities as cash; give that view too.
+    r.net_debt_incl_sti = r.net_debt !== null && r.short_term_investments !== null ? r.net_debt - r.short_term_investments : null;
     return r;
   };
   const c = row(cur.end), p = prior ? row(prior.end) : {};
@@ -266,11 +300,12 @@ async function main() {
   if (so && so.length) {
     // Several share classes may be tagged for the same date; sum them.
     const latest = so.reduce((a, b) => (a.end > b.end ? a : b)).end;
-    sharesOut = { asOf: latest, value: so.filter(x => x.end === latest).reduce((s, x) => s + x.val, 0) };
+    const pts = so.filter(x => x.end === latest);
+    sharesOut = { asOf: latest, value: pts.reduce((s, x) => s + x.val, 0), form: pts[0].form, filed: pts[0].filed };
   }
 
   // Helper facts read only to build or annotate total debt aren't line items.
-  const HELPERS = new Set(['long_term_debt_total', 'short_borrowings', 'commercial_paper']);
+  const HELPERS = new Set(['long_term_debt_total', 'short_borrowings', 'commercial_paper', 'selling_expense', 'ga_expense', 'ocf_total', 'net_debt_incl_sti']);
   const missing = Object.entries(c).filter(([k, v]) => v === null && !HELPERS.has(k)).map(([k]) => k);
   const filingUrl = edgar.filingIndexUrl(company.cik, cur.accn);
   const factsUrl = `${edgar.DATA_URL}/api/xbrl/companyfacts/CIK${company.cik}.json`;
@@ -294,13 +329,14 @@ async function main() {
   front.push('price:');
   // Comments go on their own line: the eval-skills.js front-block parser keeps a
   // trailing "# …" numeric value as a string.
-  if (sharesOut) { front.push(`# shares_out_m is the cover-page count as of ${sharesOut.asOf}`); front.push(`shares_out_m: ${Math.round(sharesOut.value / 1e6)}`); }
+  if (sharesOut) { front.push(`# shares_out_m: ${sharesLabel(sharesOut, cur)}`); front.push(`shares_out_m: ${Math.round(sharesOut.value / 1e6)}`); }
   const num = (k, v, dp) => { if (v !== null && v !== undefined) front.push(`${k}: ${dp !== undefined ? Number(v).toFixed(dp) : M(v)}`); };
   num('revenue_m', c.revenue); num('revenue_prior_m', p.revenue);
   num('gross_profit_m', c.gross_profit); num('operating_income_m', c.operating_income); num('net_income_m', c.net_income);
   if (c.eps_diluted !== null) front.push(`eps: ${Number(c.eps_diluted).toFixed(2)}`);
   num('ocf_m', c.ocf); num('capex_m', c.capex); num('fcf_m', c.fcf);
   num('cash_m', c.cash); num('total_debt_m', c.total_debt); num('net_debt_m', c.net_debt);
+  num('short_term_investments_m', c.short_term_investments); num('net_debt_incl_investments_m', c.net_debt_incl_sti);
   num('dividends_paid_m', c.dividends_paid); num('buybacks_m', c.buybacks);
   front.push('expect:');
   front.push('  # label | regex the number must appear near | expected value | unit (m = $ millions, x = multiple, pct = percent) | tolerance');
@@ -331,7 +367,7 @@ async function main() {
   b.push('| Item | Value |');
   b.push('|------|-------|');
   b.push('| Price | *paste the current quote and its date* |');
-  b.push(`| Shares outstanding (cover page, ${sharesOut ? sharesOut.asOf : 'n/a'}) | ${sharesOut ? `${(sharesOut.value / 1e6).toLocaleString('en-US', { maximumFractionDigits: 0 })} M` : 'n/a'} |`);
+  b.push(`| Shares outstanding (${sharesOut ? sharesLabel(sharesOut, cur) : 'n/a'}) | ${sharesOut ? `${(sharesOut.value / 1e6).toLocaleString('en-US', { maximumFractionDigits: 0 })} M` : 'n/a'} |`);
   b.push(`| Diluted weighted-average shares (${fyLabel}) | ${c.shares_diluted !== null ? `${(c.shares_diluted / 1e6).toLocaleString('en-US', { maximumFractionDigits: 0 })} M` : 'n/a'} |`);
   b.push(`| Industry (SIC) | ${facts.sic ? `${facts.sic} — ${facts.sicDescription || ''}` : 'see filing cover page'} |`);
   b.push('');
@@ -341,7 +377,9 @@ async function main() {
   b.push('|------|------|------|');
   const is = [
     ['Revenue', 'revenue'], ['Cost of revenue', 'cost_of_revenue'], ['Gross profit', 'gross_profit'],
-    ['R&D', 'rnd_expense'], ['SG&A', 'sga_expense'], ['Operating income', 'operating_income'],
+    ['R&D', 'rnd_expense'], ['SG&A', 'sga_expense'],
+    ...(c.sga_expense === null && c.ga_expense !== null ? [['G&A (SG&A not tagged)', 'ga_expense']] : []),
+    ['Operating income', 'operating_income'],
     ['Interest expense', 'interest_expense'], ['Pre-tax income', 'pretax_income'], ['Income tax', 'income_tax'],
     ['Net income', 'net_income'],
   ];
@@ -361,6 +399,7 @@ async function main() {
     ['Inventory', 'inventory'], ['PP&E, net', 'ppe_net'], ['Goodwill', 'goodwill'], ['Total assets', 'total_assets'],
     ['Accounts payable', 'accounts_payable'], ['Short-term debt / current portion', 'short_term_debt'], ['Long-term debt', 'long_term_debt'],
     ['Total debt', 'total_debt'], ['Total liabilities', 'total_liabilities'], ["Shareholders' equity", 'total_equity'], ['Net debt (cash)', 'net_debt'],
+    ['Net debt (cash) incl. short-term investments', 'net_debt_incl_sti'],
   ];
   for (const [label, k] of bs) b.push(`| ${label} | ${fmtM(c[k])} | ${fmtM(p[k])} |`);
   b.push('');
@@ -381,6 +420,7 @@ async function main() {
   b.push('- Figures are US-GAAP as tagged by the company; "n/a" means the company did not tag that concept for the period (it may still appear in the filing under a different line).');
   b.push(`- Gross profit is the tagged value where available, otherwise revenue − cost of revenue. Total debt = ${c.total_debt_note}; leases are excluded unless the company tags them as debt.`);
   for (const n of c.debt_notes) b.push(`- ${n}`);
+  for (const n of c.notes) b.push(`- ${n}`);
   b.push('- Derived lines (FCF, net debt, margins) are arithmetic on reported figures, shown so the analysis can be reconciled.');
   if (missing.length) b.push(`- Not tagged for ${fyLabel}: ${missing.join(', ')}.`);
   b.push('');
