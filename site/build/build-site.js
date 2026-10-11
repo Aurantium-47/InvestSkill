@@ -138,11 +138,11 @@ const NAV = {
     {
       title: '示範',
       links: [
-        { label: 'AMD 10-K 深度解析',  href: 'full-demo-amd.html',   page: 'full-demo-amd' },
+        { label: '示範總覽',           href: 'full-demo-zh-tw.html', page: 'full-demo-zh-tw' },
         { label: 'RKLB 完整示範',      href: 'full-demo-rklb.html',  page: 'full-demo-rklb' },
+        { label: 'AMD 10-K 深度解析',  href: 'full-demo-amd.html',   page: 'full-demo-amd' },
         { label: 'META 10-K（英文）',  href: 'full-demo-meta.html',  page: 'full-demo-meta' },
         { label: 'NVDA 10-K（英文）',  href: 'full-demo-nvda.html',  page: 'full-demo-nvda' },
-        { label: '示範總覽（英文）',   href: 'full-demo.html',       page: 'full-demo' },
         { label: 'PLTR（英文）',       href: 'full-demo-pltr.html',  page: 'full-demo-pltr' },
       ],
     },
@@ -181,7 +181,9 @@ const LANG_PAIRS = [
   ['cookbook.html', 'cookbook-zh-tw.html'],
   ['walkthrough.html', 'walkthrough-zh-tw.html'],
   // The demo overview (English) pairs with the RKLB full demo (Traditional Chinese).
-  ['full-demo.html', 'full-demo-rklb.html'],
+  ['full-demo.html', 'full-demo-zh-tw.html'],
+  // The two full-coverage demos pair across languages: PLTR (English) ⇄ RKLB (Traditional Chinese).
+  ['full-demo-pltr.html', 'full-demo-rklb.html'],
   // The two 10-K deep dives pair across languages: NVDA (English) ⇄ AMD (Traditional Chinese).
   ['full-demo-nvda.html', 'full-demo-amd.html'],
 ];
@@ -229,6 +231,7 @@ const MD_TO_HTML = {
   'USE-CASES.md':       'use-cases.html',
   'DATA-AND-ACCURACY.md': 'data-and-accuracy.html',
   'FULL-DEMO.md':         'full-demo.html',
+  'FULL-DEMO-zh-TW.md':   'full-demo-zh-tw.html',
   'FULL-DEMO-PLTR.md':   'full-demo-pltr.html',
   'FULL-DEMO-RKLB.md':   'full-demo-rklb.html',
   'FULL-DEMO-NVDA.md':   'full-demo-nvda.html',
@@ -277,7 +280,7 @@ const SERVED = new Set(['index.html','cookbook.html','cookbook-zh-tw.html',
   'walkthrough.html','walkthrough-zh-tw.html',
   'contributing.html','changelog.html','zh-tw.html','style.css','main.js',
   'concepts.html','glossary.html','choose-a-skill.html','use-cases.html',
-  'data-and-accuracy.html','skills.html','full-demo.html','full-demo-pltr.html','full-demo-rklb.html','full-demo-nvda.html','full-demo-amd.html','full-demo-meta.html',
+  'data-and-accuracy.html','skills.html','full-demo.html','full-demo-zh-tw.html','full-demo-pltr.html','full-demo-rklb.html','full-demo-nvda.html','full-demo-amd.html','full-demo-meta.html',
   'concepts-zh-tw.html','glossary-zh-tw.html','choose-a-skill-zh-tw.html',
   'use-cases-zh-tw.html','data-and-accuracy-zh-tw.html',
   'learning.html','learning-foundations.html','learning-statements.html',
@@ -696,42 +699,49 @@ const PAGES = [
     outFile: 'full-demo.html',
     srcFile: 'site/content/FULL-DEMO.md',
     title: 'Demo Overview',
-    subtitle: 'All-skills analysis demos: META & NVDA 10-K deep dives · PLTR (English) · AMD & RKLB (繁體中文)',
+    subtitle: 'Real runs, real screenshots — 10-K deep dives (META · NVDA · AMD) and full-coverage demos (PLTR · RKLB)',
+  },
+  {
+    key: 'full-demo-zh-tw',
+    outFile: 'full-demo-zh-tw.html',
+    srcFile: 'site/content/FULL-DEMO-zh-TW.md',
+    title: '示範總覽',
+    subtitle: '真實執行、真實截圖——10-K 深度解析（META · NVDA · AMD）與完整示範（PLTR · RKLB）',
   },
   {
     key: 'full-demo-meta',
     outFile: 'full-demo-meta.html',
     srcFile: 'site/content/FULL-DEMO-META.md',
     title: 'META 10-K Deep Dive',
-    subtitle: 'Meta Platforms FY2025 annual report — a nine-skill walkthrough of one filing (English)',
+    subtitle: 'Meta Platforms FY2025 annual report — six skills chained over one filing, with real screenshots (English)',
   },
   {
     key: 'full-demo-nvda',
     outFile: 'full-demo-nvda.html',
     srcFile: 'site/content/FULL-DEMO-NVDA.md',
     title: 'NVDA 10-K Deep Dive',
-    subtitle: 'NVIDIA FY2026 annual report — a financial-report-analyst deep read (English)',
+    subtitle: 'NVIDIA FY2026 annual report — financial-report-analyst, then fact-check (English)',
   },
   {
     key: 'full-demo-amd',
     outFile: 'full-demo-amd.html',
     srcFile: 'site/content/FULL-DEMO-AMD.md',
     title: 'AMD 10-K 深度解析',
-    subtitle: 'Advanced Micro Devices FY2025 年報 — financial-report-analyst 深度解讀（繁體中文）',
+    subtitle: 'Advanced Micro Devices FY2025 年報 — financial-report-analyst 深度解讀，再逐一驗證（繁體中文）',
   },
   {
     key: 'full-demo-pltr',
     outFile: 'full-demo-pltr.html',
     srcFile: 'site/content/FULL-DEMO-PLTR.md',
     title: 'PLTR Full Demo',
-    subtitle: 'All 15 InvestSkill analyses — Palantir Technologies (English)',
+    subtitle: 'Ten skills run for real on Palantir Technologies, step by step with screenshots (English)',
   },
   {
     key: 'full-demo-rklb',
     outFile: 'full-demo-rklb.html',
     srcFile: 'site/content/FULL-DEMO-RKLB.md',
     title: 'RKLB 完整示範',
-    subtitle: 'Rocket Lab USA — 全部 15 項技能分析（繁體中文）',
+    subtitle: 'Rocket Lab — 10 項技能真實執行，逐步截圖解說（繁體中文）',
   },
   {
     key: 'walkthrough',
@@ -900,7 +910,7 @@ const TABS = {
     { label: '學習',       section: '學習',         href: 'learning-zh-tw.html' },
     { label: '學習資源',   section: '學習資源',     href: 'concepts-zh-tw.html' },
     { label: '指南',       section: '指南',         href: 'cookbook-zh-tw.html' },
-    { label: '示範',       section: '示範',         href: 'full-demo-rklb.html' },
+    { label: '示範',       section: '示範',         href: 'full-demo-zh-tw.html' },
     { label: '信任',       section: '信任',         href: 'data-and-accuracy-zh-tw.html' },
   ],
 };
@@ -1095,7 +1105,7 @@ const UI = {
     footerTag: '給任何 AI 助理的結構化投資分析框架。純 markdown——沒有 API 金鑰、沒有執行環境。',
     footerCols: [
       { title: '學習',   links: [['學習中心','learning-zh-tw.html'],['概念','concepts-zh-tw.html'],['術語表','glossary-zh-tw.html'],['選擇技能','choose-a-skill-zh-tw.html'],['使用情境','use-cases-zh-tw.html']] },
-      { title: '指南',   links: [['快速開始','zh-tw.html'],['操作手冊','cookbook-zh-tw.html'],['技能參考（英文）','skills.html'],['示範','full-demo-rklb.html'],['資料與準確性','data-and-accuracy-zh-tw.html']] },
+      { title: '指南',   links: [['快速開始','zh-tw.html'],['操作手冊','cookbook-zh-tw.html'],['技能參考（英文）','skills.html'],['示範','full-demo-zh-tw.html'],['資料與準確性','data-and-accuracy-zh-tw.html']] },
       { title: '專案',   links: [['GitHub','https://github.com/yennanliu/InvestSkill'],['更新紀錄（英文）','changelog.html'],['參與貢獻（英文）','contributing.html'],['回報問題','https://github.com/yennanliu/InvestSkill/issues'],['MIT 授權','https://github.com/yennanliu/InvestSkill/blob/main/LICENSE']] },
     ],
     disclaimer: '僅供教育用途的框架——不構成投資建議。',
@@ -1322,7 +1332,7 @@ function buildLandingSections(lang) {
     </section>`;
 
   const demoSection = NAV[lang].find(s => s.title === (zh ? '示範' : 'Demo'));
-  const demoLinks = demoSection.links.filter(l => l.page !== 'full-demo');
+  const demoLinks = demoSection.links.filter(l => l.page !== 'full-demo' && l.page !== 'full-demo-zh-tw');
   const demoCards = demoLinks.map(l => {
     const p = PAGES.find(pg => pg.key === l.page) || {};
     const ticker = (l.label.match(/\b[A-Z]{3,5}\b/) || [''])[0];
@@ -1334,7 +1344,7 @@ function buildLandingSections(lang) {
   }).join('\n        ');
   const demos = `
     <section class="landing-section" id="demos">
-      ${sectionHead(T.demoEyebrow, T.demoTitle, { href: 'full-demo.html', label: T.demoLink })}
+      ${sectionHead(T.demoEyebrow, T.demoTitle, { href: zh ? 'full-demo-zh-tw.html' : 'full-demo.html', label: T.demoLink })}
       <div class="demo-grid">
         ${demoCards}
       </div>

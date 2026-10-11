@@ -258,7 +258,7 @@ The **loop never changes**, but the emphasis does. For a young, unprofitable com
 | Trading plan | Scale in on weakness | Same, but wider bands; expect volatility |
 | Triggers | Margin/services | Runway shrinking, growth decelerating |
 
-The point: same disciplined loop, dialed to the risk. See a **real, full end-to-end run** across every skill in the [Demo](full-demo.html).
+The point: same disciplined loop, dialed to the risk. See **real, step-by-step runs** with screenshots of every output in the [Demos](full-demo.html).
 
 ---
 
