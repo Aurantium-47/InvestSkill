@@ -1,38 +1,23 @@
-## InvestSkill v1.12.0
+## InvestSkill v1.13.0
 
 **30 Professional Investment Analysis Frameworks** · 34 skills · 7 platforms · no API keys, no runtime, no telemetry
 
-Released 2026-09-25. The largest release since 1.0: six new frameworks plus the `fact-check` meta framework, an enforced output contract on every skill, Learning track Part II, a redesigned docs site, a one-command installer for any AI agent, and a keyless SEC EDGAR data path for users whose assistant cannot browse.
+Released 2026-10-11. Prompts are now tested like code, and every demo is a real, reproducible run with screenshots of the actual output.
 
 ## What's New
 
-**🧭 Six new analysis frameworks + `fact-check`** (advertised count 26 → **30**, with `fundamental-analysis` / `dcf-valuation` / `research-bundle` now counted as aliases):
-- `thesis-tracker` — write, save, and re-check an investment thesis; `--update` returns **INTACT / WEAKENED / BROKEN**
-- `etf-analysis` — ETF / index-fund due diligence with an ETF Fitness Score 0–10
-- `earnings-preview` — the *before*-earnings skill: consensus vs. whisper, implied vs. realized move, three-scenario grid with position rules
-- `tax-lens` — holding periods, wash sales, lot selection, harvesting, account placement; `--non-us` module (W-8BEN, withholding, estate tax, UCITS). Educational only
-- `risk-stress-test` — beta-weighted exposure, scenario replay (2008 · 2020 · 2022 · 2025), VaR / CVaR, liquidity; Risk Budget Score 0–10
-- `learning-coach` — explains any InvestSkill output like a mentor; `--quiz <lesson>` drills a Learning lesson
-- `fact-check` — claim-level verification against primary sources, recomputation, and a corrected report with inline citations; Verification Score 0–10 feeds `result-validator`
+**🧪 LLM checks in CI** — a new `LLM Eval` workflow runs on every PR that touches a skill, a prompt, a cross-AI system prompt, or the eval machinery:
+- **Offline, in `npm test`:** 12 unedited real model outputs must pass the output contract, broken variants must fail for the right reason, every prompt must close with the standard signal block (followed only by the guide lines, one note and the Disclaimer), skill descriptions stay short, and each prompt stays within 25% of its size budget (`scripts/test-llm-io.js`)
+- **Prompt diff in the job summary:** changed prompts, token deltas, description changes and contract status (`scripts/prompt-diff.js`)
+- **Live eval:** the changed skills run through Claude on the fictional ZEPH data pack and fail the job on any contract violation (`scripts/claude-complete.js`, on the official SDK). Needs an `ANTHROPIC_API_KEY` repository secret, scoped to the eval step; skipped, not failed, without it
 
-**📋 Output contract enforced on every analysis skill** — the `Data & Sources` header (As of · Source · Retrieval · Confidence), the Data Verification gate, and a Thesis Invalidation section are now present in all 30 frameworks and checked by `scripts/check-skill-contract.js` in `npm test`.
+**🎬 Real demos, step by step** — a new **Live Walkthrough** (English + 繁體中文) runs `stock-eval` → `bear-case` → `fact-check` → `learning-coach` on Microsoft. Every demo (META, NVDA, AMD, PLTR, RKLB) was re-run on 2026-10-11 against fresh SEC filings and rebuilt as command → screenshot → what to notice → result, with the full unedited outputs. The Demo Overview is now a hub in both languages.
 
-**🔎 Bring your own data — the keyless SEC EDGAR path**
-- `10k-digest`, `financial-report-analyst`, and `fact-check` carry a retrieval recipe a tool-enabled assistant can follow on its own: ticker → CIK → `data.sec.gov` submissions index → filing document → XBRL company facts, with the SEC's User-Agent and rate rules
-- Two optional, zero-dependency helpers for assistants that cannot browse: `node scripts/fetch-edgar.js AAPL --form 10-K` saves a filing as pasteable text; `node scripts/fetch-fundamentals.js AAPL` builds a reconciled statement pack from the XBRL facts. Outside the plugin; covered by a 194-check offline suite in CI
-- New **Bring Your Own Data** section on the Data & Accuracy page (EN + 繁體中文)
+**📊 More accurate SEC data packs** — `fetch-fundamentals` now counts debt tagged only in `LongTermDebt` (Rocket Lab's convertible notes), rebuilds SG&A from separate selling and G&A lines, uses continuing-operations cash flow for FCF, reports net cash including short-term investments, and labels where the share count came from. Commercial paper and short-term borrowings are named in the Notes.
 
-**⚡ One-command install for any AI agent**
-```bash
-curl -fsSL https://raw.githubusercontent.com/yennanliu/InvestSkill/main/install.sh | bash -s -- -a claude   # or cursor · copilot · gemini · codex · opencode · any
-```
-Existing instruction files are appended to, never overwritten; re-running is a no-op. 116 install checks run in CI, including live sandboxed installs.
+**⚖️ One rule for conflicting sources** — all 28 analysis skills now say what to do when two sources disagree: prefer the primary source, then the most recent; show both values with dates; say which was used; never average.
 
-**🎓 Learning track Part II** — Lessons 9–13 (Before Your First Trade · ETFs & Index Investing · Taxes & Account Types incl. a non-US section · Earnings Season · Psychology & Process), a "When the Answer Is No" case study, self-check quizzes, and a glossary grown to 76 terms.
-
-**🎨 Site redesign** — real landing pages (EN + zh-TW) with an animated terminal demo, a filterable Skill Reference grid, per-skill run boxes, dark mode, keyboard search, and an install picker. New META 10-K deep-dive demo and seven live Cookbook workflow runs.
-
-**🛠️ Tooling** — `scripts/sync-prompts.js` (prompts are now generated from `SKILL.md`), `scripts/new-skill.js` scaffolder, `scripts/eval-skills.js` opt-in behavioural eval, shared `signal-block.js` / `skill-registry.js` libraries, and a roadmap with progress tracking.
+**🔧 Contract fixes** — `catalyst-calendar` and `stock-screener` now close with the standard Investment Signal block; the output parser understands Traditional Chinese outputs and validates `fact-check` by its own rules; `full-report` no longer runs alias stubs as modules; and a prompt audit removed dated patterns written for older models.
 
 ## Quick Start
 
@@ -78,44 +63,23 @@ All releases include checksums for verification:
 
 ```bash
 # Download artifacts
-tar xzf invest-skill-marketplace-1.12.0.tar.gz
+tar xzf invest-skill-marketplace-1.13.0.tar.gz
 
 # Verify checksums
 sha256sum -c checksums.txt
 ```
 
 **Artifacts:**
-- `invest-skill-marketplace-1.12.0.tar.gz` — Full marketplace (all platforms)
-- `us-stock-analysis-1.12.0.tar.gz` — Claude Code plugin only
+- `invest-skill-marketplace-1.13.0.tar.gz` — Full marketplace (all platforms)
+- `us-stock-analysis-1.13.0.tar.gz` — Claude Code plugin only
 - `checksums.txt` — SHA-256 verification file
 
 ## Full Changelog
 
-See [CHANGELOG.md → 1.12.0](CHANGELOG.md#1120---2026-09-25) for every entry, including the review-driven fixes to the EDGAR helpers (filename collisions for same-day filings, `LongTermDebt` double counting, `--limit` validation, 13F-HR routed by manager rather than issuer).
+See [CHANGELOG.md → 1.13.0](CHANGELOG.md#1130---2026-10-11) for every entry.
 
 **Upgrade notes**
 - No breaking changes. Skill names, the signal block, and the plugin layout are unchanged.
-- `fundamental-analysis`, `dcf-valuation`, and `research-bundle` still work but are aliases; prefer `stock-eval`, `stock-valuation`, and `full-report`.
-- The EDGAR helpers need Node ≥ 18 and, per SEC fair-access rules, `EDGAR_USER_AGENT="Your Name your@email"`.
-- Two stale, unreferenced 10-K PDFs were removed from `data/`; `fetch-edgar.js` reproduces either as text on demand.
-
----
-
-## Documentation & Resources
-
-- 📖 [Complete README](README.md) — All platforms setup guide
-- 🌐 [Documentation site](https://yennanliu.github.io/InvestSkill/) — Skill Reference, Learning track, Cookbook, Data & Accuracy
-- 📊 [Platform Compatibility](PLATFORM-COMPATIBILITY.md) — Feature comparison
-- 📚 [Cookbook](site/content/COOKBOOK.md) — Examples and walkthroughs
-- 🔧 [CI/CD Guide](CI-CD-GUIDE.md) — Automated release pipeline
-- 💡 [30 Investment Frameworks](prompts/) — Universal prompt files
-
-## Support
-
-- 🐛 [Report Issues](https://github.com/yennanliu/InvestSkill/issues)
-- 💬 [Discussions](https://github.com/yennanliu/InvestSkill/discussions)
-- 📧 Feedback: [GitHub Issues](https://github.com/yennanliu/InvestSkill/issues/new)
-
----
-
-**Legal:** This toolkit provides educational analysis only and does NOT constitute financial advice. Always consult qualified financial advisors and do your own research.
+- `catalyst-calendar` and `stock-screener` outputs now end with the standard six-field signal block; their catalyst / screening summary moves to plain lines just above it.
+- Data packs gain `short_term_investments_m` and `net_debt_incl_investments_m`; regenerate existing packs to pick up the debt, SG&A and cash-flow fixes.
+- To enable the live eval on your fork, add an `ANTHROPIC_API_KEY` repository secret.

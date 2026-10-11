@@ -201,6 +201,12 @@ gemini
 | **元技能與輸出** (5 + 1 輸出工具) | full-report · chart-master · result-validator · **fact-check** · **learning-coach** · report-generator（輸出工具，不計入框架） | 自動化與綜合輸出 |
 | **別名** (3，不計入框架) | fundamental-analysis → stock-eval · dcf-valuation → stock-valuation · research-bundle → full-report | 舊名稱仍可用，會轉址到吸收它的技能 |
 
+> **v1.13.0 新功能：**
+> - **實機演練與全新示範** — 新增[實機演練](site/content/WALKTHROUGH-zh-TW.md)：對微軟一步一步跑四個真實技能，每張截圖都是真實輸出；全部示範（RKLB、AMD、META、NVDA、PLTR）於 2026-10-11 以最新 SEC 財報重新實跑，逐步截圖解說並附完整輸出
+> - **LLM 檢查納入 CI** — 以 12 份真實模型輸出驗證輸出合約、檢查每個提示詞的結構與大小預算，並在修改提示詞的 PR 上透過 Claude 實際執行被修改的技能（`scripts/test-llm-io.js`、`scripts/prompt-diff.js`、`scripts/claude-complete.js`）
+> - **資料包更準確** — `fetch-fundamentals` 計入只標在 `LongTermDebt` 的負債（如可轉債）、重建 SG&A、改用持續經營部門現金流，並新增含短期投資的淨現金
+> - **來源互相矛盾時的統一規則** — 第一手來源優先、其次取最新，兩個值都列出，絕不取平均；`catalyst-calendar` 與 `stock-screener` 改為以標準投資訊號框收尾
+>
 > **v1.12.0 新功能：**
 > - **無金鑰的 SEC EDGAR 取檔路徑** — `10k-digest`、`financial-report-analyst`、`fact-check` 內建具工具能力的助理可自行照做的取檔步驟（代號 → CIK → 申報索引 → 文件本體 → XBRL 數據）；助理無法上網時，兩支可選、零相依的腳本 `scripts/fetch-edgar.js`（申報文件存成純文字）與 `scripts/fetch-fundamentals.js`（由 XBRL 產生已對帳的財報資料包）替你抓第一手來源供貼上。不屬於外掛本體、離線測試涵蓋
 > - `install.sh` — 一行 `curl` 指令把全部框架安裝到任何 AI 代理（Claude Code、Cursor、Copilot、Gemini CLI、Codex、OpenCode 或任何 LLM）；文件網站全面改版；學習專區新增第二部（第 9–13 課與「答案是不」案例）
@@ -411,7 +417,7 @@ Copilot 會自動載入 `.github/copilot-instructions.md`
 
 ## 📊 專案狀態
 
-**目前版本：** 1.12.0
+**目前版本：** 1.13.0
 **技能框架：** 30 個（另有 3 個別名、1 個輸出工具）
 **通用提示詞：** 34 個
 **支援平台：** 6 個

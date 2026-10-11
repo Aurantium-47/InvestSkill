@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.13.0] - 2026-10-11
+
+Prompts are now tested like code, and every demo is a real, reproducible run. **LLM checks in CI** grade real model outputs against the output contract, keep prompt structure and size in check, and run the changed skills live through Claude on every prompt PR. Every demo was **re-run on 2026-10-11** against fresh SEC filings and rebuilt step by step with screenshots of the actual output, joined by a new **Live Walkthrough** (English + 繁體中文). The keyless `fetch-fundamentals` data pack now counts debt tagged only in `LongTermDebt`, rebuilds SG&A, uses continuing-operations cash flow and reports net cash including investments; all analysis skills share one rule for conflicting sources; and `catalyst-calendar` / `stock-screener` now close with the standard Investment Signal block. Still **30 analysis frameworks** across 34 skills; no API key, no runtime, no telemetry.
 
 ### Added
 - **LLM checks in CI** (`.github/workflows/llm-eval.yml`), on every PR that touches a skill, prompt, cross-AI system prompt or the eval machinery:
@@ -13,46 +15,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Prompt diff** (`scripts/prompt-diff.js`): changed prompts, token deltas, description changes and contract status in the job summary.
   - **Live eval:** the changed skills run through Claude (`scripts/claude-complete.js`, an `EVAL_CMD` adapter on the official SDK: streaming, `claude-opus-5-5` at explicit `medium` effort, server-side refusal fallback) on the fictional ZEPH pack and fail the job on any hard contract violation. The `ANTHROPIC_API_KEY` secret reaches the eval step only; the job is skipped, not failed, when it is unavailable.
   - npm scripts: `test:llm-io`, `prompt:diff`, `prompt:budgets`, `eval:claude`.
-
-### Fixed
-- **`catalyst-calendar` and `stock-screener` didn't close with the standard Investment Signal block.** Their custom boxes had no Signal/Score lines, so every output failed the parser (seen in the META demo). Both now give their summary as plain lines, then the standard block with a mapping note.
-- **The output parser misread valid outputs:** Traditional Chinese disclaimers (非投資建議), Retrieval values (使用者提供 / 網路) and Thesis Invalidation headings (論點失效條件) are recognised. An enum with a qualifier ("BUY (on pullback to ~$195)") parses as BUY with a warning, not a failure. `fact-check` is checked against its own rules (confidence capped by the Verification Score tier, a failed verification must read NEUTRAL / HOLD) instead of the Score Guide mapping, which flagged all five real fact-check runs.
-- `eval-skills.js --all` no longer runs `fact-check`, `learning-coach` or `etf-analysis` on the company fixture (they take a report or a fund, not a company data pack).
-
-### Fixed
-- **Four more `fetch-fundamentals` data-pack mislabels** the demo skills had to correct by hand:
-  - **SG&A that was really G&A.** The SG&A chain fell back to `GeneralAndAdministrativeExpense`, so META ($12,152M) and MSFT ($7,956M) packs showed G&A only. SG&A is now rebuilt from separate selling and G&A lines when tagged that way (META $24,143M, MSFT $34,666M), and a G&A-only filer gets a "G&A (SG&A not tagged)" row instead.
-  - **FCF that included discontinued operations.** Operating cash flow now prefers the continuing-operations tag (AMD: FCF $5,519M, not $6,735M), with the total stated in the Notes.
-  - **Net debt that ignored securities.** Packs add `short_term_investments_m` and `net_debt_incl_investments_m` and a matching table row (AMD net cash $7,330M, MSFT $36,549M). When nothing narrower is tagged, short-term investments fall back to all available-for-sale debt securities, flagged in the Notes (NVDA).
-  - **A share count labelled "cover page" of the wrong filing.** The count often comes from a 10-Q filed after the 10-K; the label now names the form, filing date and as-of date.
-  The offline `CNV` / `LTD` test doubles cover each case.
-
-### Fixed
-- **`fetch-fundamentals` missed debt tagged only in `LongTermDebt`.** It took `LongTermDebtNoncurrent` (+ current) whenever that tag existed, so Rocket Lab's FY2025 pack showed $2M of debt and missed $152M of convertible notes, overstating net cash by $150M (two RKLB demo skills caught it by hand). The pack now reads both the current + non-current split and the `LongTermDebt` total; when the total is more than 5% larger it uses the total and says why in the Notes. Commercial paper and short-term borrowings that are tagged but not in total debt are now named in the Notes (AAPL: $7,979M of commercial paper), not added, because some filers tag the same amount twice (AMD). AAPL, MSFT, NVDA, AMD, META and TSLA packs are unchanged. New offline test double `CNV` reproduces the RKLB tags; the synthetic AAPL facts gain the real `LongTermDebt` and `CommercialPaper` values.
-
-### Changed
-- **One rule for conflicting sources.** The `Data & Sources` section of the 28 analysis skills (and the `new-skill.js` template) adds: when sources disagree on the same figure, prefer the primary source, then the most recent dated one; show both values with their sources and dates; say which was used; never average. `test-skills.js` keeps it next to the "Mixed sources" rule. The Data & Accuracy page (EN + zh) documents it with the two RKLB cases, both now resolved on the RKLB demo page: the official 2026-10-09 close was $68.21 (Yahoo, CNBC and Morningstar agree; the $67.38 quote was not the close), and Rocket Lab's 8-K confirms the $3.6B Iridium bridge loan was terminated on 2026-09-15.
-
-### Changed
-- **Demos re-run for real, with screenshots.** Every demo page (META, NVDA, AMD, PLTR, RKLB) was re-run on 2026-10-11 against fresh SEC filings (`fetch:edgar` / `fetch:fundamentals`) and the 2026-10-09 close, and rebuilt in the Live Walkthrough format: command → screenshot of the real output → what to notice → result, with the full unedited outputs at the bottom. The 10-K demos read files only; the full demos (PLTR in English, RKLB in Traditional Chinese) may browse for market data and end with a `fact-check`. The 4,000-line single-report PLTR/RKLB pages are replaced by ten-skill walkthroughs using current (non-alias) skills.
-- **Demo Overview is now a hub in both languages** (`full-demo.html` ⇄ new `full-demo-zh-tw.html`): demo picker, how the demos were made, and what they have in common. The stale technical-analysis previews are gone. PLTR ⇄ RKLB are now language counterparts; the zh nav, tabs, footer and landing page point at the zh overview.
-
-### Added
 - **Live Walkthrough** (`walkthrough.html` / `walkthrough-zh-tw.html`, under Guides): a step-by-step post that runs four real skills on Microsoft — `stock-eval` → `bear-case` → `fact-check` → `learning-coach` — on an SEC EDGAR data pack built with `fetch:fundamentals`. Each step shows the command, screenshots of the real output, what to notice, and the result; the full unedited outputs are included. English and Traditional Chinese (the Chinese post shows the `--lang zh-TW` coach run).
 - The site build now copies `site/assets/` to `_site/assets/`, and content pages can reference images as `../assets/…` so they render both on GitHub and on the site.
 
-### Fixed
-- **`full-report` ran alias stubs as analysis modules.** Quick depth took its DCF from the `dcf-valuation` redirect card, and comprehensive depth re-ran `stock-eval` / `stock-valuation` logic through `fundamental-analysis` / `dcf-valuation`, while its Thesis Invalidation relied on a `bear-case` module no depth ran. Module #3 is now `stock-valuation`; comprehensive #11–#12 are now `bear-case` and `catalyst-calendar` (still 15 modules).
-- Cross-references to the alias skills (`/fundamental-analysis`, `/dcf-valuation`, `/research-bundle`) in `earnings-call-analysis`, `insider-trading`, `institutional-ownership`, `result-validator`, and `report-generator` now point at `stock-eval`, `stock-valuation`, and `full-report`.
-- The FAQ's Claude API snippet used a retired model and omitted the required `max_tokens`; it now runs as written.
-
 ### Changed
+- **One rule for conflicting sources.** The `Data & Sources` section of the 28 analysis skills (and the `new-skill.js` template) adds: when sources disagree on the same figure, prefer the primary source, then the most recent dated one; show both values with their sources and dates; say which was used; never average. `test-skills.js` keeps it next to the "Mixed sources" rule. The Data & Accuracy page (EN + zh) documents it with the two RKLB cases, both now resolved on the RKLB demo page: the official 2026-10-09 close was $68.21 (Yahoo, CNBC and Morningstar agree; the $67.38 quote was not the close), and Rocket Lab's 8-K confirms the $3.6B Iridium bridge loan was terminated on 2026-09-15.
+- **Demos re-run for real, with screenshots.** Every demo page (META, NVDA, AMD, PLTR, RKLB) was re-run on 2026-10-11 against fresh SEC filings (`fetch:edgar` / `fetch:fundamentals`) and the 2026-10-09 close, and rebuilt in the Live Walkthrough format: command → screenshot of the real output → what to notice → result, with the full unedited outputs at the bottom. The 10-K demos read files only; the full demos (PLTR in English, RKLB in Traditional Chinese) may browse for market data and end with a `fact-check`. The 4,000-line single-report PLTR/RKLB pages are replaced by ten-skill walkthroughs using current (non-alias) skills.
+- **Demo Overview is now a hub in both languages** (`full-demo.html` ⇄ new `full-demo-zh-tw.html`): demo picker, how the demos were made, and what they have in common. The stale technical-analysis previews are gone. PLTR ⇄ RKLB are now language counterparts; the zh nav, tabs, footer and landing page point at the zh overview.
 - **Prompt audit cleanup** (dated patterns written for older models):
   - `insider-trading` and `institutional-ownership` usage examples no longer contain invented facts about real companies (e.g. an NVDA CEO purchase, a Soros stake in META); they describe what the output covers instead. Their output templates use `[Qn YYYY] [%]` placeholders instead of pre-filled 2024 figures.
   - Thesis Invalidation in 17 skills drops the generic "closes below the MA200", "Fed pivots hawkish", and "earnings beat >20%" bullets that were copied into every skill (including macro and charting skills where they don't apply); each skill keeps its own trigger and asks for one or two more drawn from its own drivers. `technical-analysis` is unchanged.
   - `economics-analysis` and `sector-analysis` Data Verification gates now ask for indicator releases and sector-ETF levels instead of a single ticker's price, 52-week range, and market cap.
   - `financial-report-analyst` and `competitor-analysis` descriptions say when to use `10k-digest` and `industry-map` instead.
   - `README-claude-code.md`, `PLATFORM-COMPATIBILITY.md`, and `FAQ.md` no longer pin model names (Opus 4.6, Claude 3); they point at whichever model the session runs.
+
+### Fixed
+- **`catalyst-calendar` and `stock-screener` didn't close with the standard Investment Signal block.** Their custom boxes had no Signal/Score lines, so every output failed the parser (seen in the META demo). Both now give their summary as plain lines, then the standard block with a mapping note.
+- **The output parser misread valid outputs:** Traditional Chinese disclaimers (非投資建議), Retrieval values (使用者提供 / 網路) and Thesis Invalidation headings (論點失效條件) are recognised. An enum with a qualifier ("BUY (on pullback to ~$195)") parses as BUY with a warning, not a failure. `fact-check` is checked against its own rules (confidence capped by the Verification Score tier, a failed verification must read NEUTRAL / HOLD) instead of the Score Guide mapping, which flagged all five real fact-check runs.
+- `eval-skills.js --all` no longer runs `fact-check`, `learning-coach` or `etf-analysis` on the company fixture (they take a report or a fund, not a company data pack).
+- **Four more `fetch-fundamentals` data-pack mislabels** the demo skills had to correct by hand:
+  - **SG&A that was really G&A.** The SG&A chain fell back to `GeneralAndAdministrativeExpense`, so META ($12,152M) and MSFT ($7,956M) packs showed G&A only. SG&A is now rebuilt from separate selling and G&A lines when tagged that way (META $24,143M, MSFT $34,666M), and a G&A-only filer gets a "G&A (SG&A not tagged)" row instead.
+  - **FCF that included discontinued operations.** Operating cash flow now prefers the continuing-operations tag (AMD: FCF $5,519M, not $6,735M), with the total stated in the Notes.
+  - **Net debt that ignored securities.** Packs add `short_term_investments_m` and `net_debt_incl_investments_m` and a matching table row (AMD net cash $7,330M, MSFT $36,549M). When nothing narrower is tagged, short-term investments fall back to all available-for-sale debt securities, flagged in the Notes (NVDA).
+  - **A share count labelled "cover page" of the wrong filing.** The count often comes from a 10-Q filed after the 10-K; the label now names the form, filing date and as-of date.
+  The offline `CNV` / `LTD` test doubles cover each case.
+- **`fetch-fundamentals` missed debt tagged only in `LongTermDebt`.** It took `LongTermDebtNoncurrent` (+ current) whenever that tag existed, so Rocket Lab's FY2025 pack showed $2M of debt and missed $152M of convertible notes, overstating net cash by $150M (two RKLB demo skills caught it by hand). The pack now reads both the current + non-current split and the `LongTermDebt` total; when the total is more than 5% larger it uses the total and says why in the Notes. Commercial paper and short-term borrowings that are tagged but not in total debt are now named in the Notes (AAPL: $7,979M of commercial paper), not added, because some filers tag the same amount twice (AMD). AAPL, MSFT, NVDA, AMD, META and TSLA packs are unchanged. New offline test double `CNV` reproduces the RKLB tags; the synthetic AAPL facts gain the real `LongTermDebt` and `CommercialPaper` values.
+- **`full-report` ran alias stubs as analysis modules.** Quick depth took its DCF from the `dcf-valuation` redirect card, and comprehensive depth re-ran `stock-eval` / `stock-valuation` logic through `fundamental-analysis` / `dcf-valuation`, while its Thesis Invalidation relied on a `bear-case` module no depth ran. Module #3 is now `stock-valuation`; comprehensive #11–#12 are now `bear-case` and `catalyst-calendar` (still 15 modules).
+- Cross-references to the alias skills (`/fundamental-analysis`, `/dcf-valuation`, `/research-bundle`) in `earnings-call-analysis`, `insider-trading`, `institutional-ownership`, `result-validator`, and `report-generator` now point at `stock-eval`, `stock-valuation`, and `full-report`.
+- The FAQ's Claude API snippet used a retired model and omitted the required `max_tokens`; it now runs as written.
 
 ## [1.12.0] - 2026-09-25
 
