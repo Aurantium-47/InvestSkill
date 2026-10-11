@@ -1,0 +1,17 @@
+{
+  "_about": "Real model outputs (captured from the 2026-10-11 demo runs, unedited) scored by scripts/lib/signal-block.js validateOutput(). scripts/test-llm-io.js asserts each verdict, so a change to the output parser or the contract that would break real outputs fails in CI. Add a case whenever a real run exposes a parser gap.",
+  "cases": [
+    { "file": "msft-stock-eval.md", "skill": "stock-eval", "expect": "pass", "signal": "NEUTRAL", "score": 5.5, "retrieval": "pasted by user", "note": "baseline English analysis from a pasted SEC data pack" },
+    { "file": "msft-learning-coach.md", "skill": "learning-coach", "expect": "pass", "signal": "NEUTRAL", "score": 5.5, "note": "meta skill that copies the analysed report's signal unchanged" },
+    { "file": "msft-learning-coach-zh.md", "skill": "learning-coach", "expect": "pass", "signal": "NEUTRAL", "score": 5.5, "note": "Traditional Chinese output" },
+    { "file": "nvda-financial-report-analyst.md", "skill": "financial-report-analyst", "expect": "pass", "signal": "BULLISH", "score": 6.8, "retrieval": "pasted by user", "note": "10-K deep read; Data & Sources header without a code fence" },
+    { "file": "nvda-fact-check.md", "skill": "fact-check", "expect": "pass", "signal": "BULLISH", "score": 8.5, "note": "Score is the Verification Score; Signal mirrors the report" },
+    { "file": "rklb-fact-check-zh.md", "skill": "fact-check", "expect": "pass", "signal": "NEUTRAL", "score": 7.1, "note": "Verification Score 7.1 with a mirrored NEUTRAL: valid for fact-check, would fail the generic score→signal rule" },
+    { "file": "meta-result-validator.md", "skill": "result-validator", "expect": "pass", "signal": "NEUTRAL", "score": 5.6, "note": "two boxes (validated + standard); the parser must read the last one" },
+    { "file": "pltr-stock-eval-web.md", "skill": "stock-eval", "expect": "pass", "signal": "NEUTRAL", "score": 4.5, "retrieval": "pasted by user", "note": "mixed sources (pasted + web), each dated" },
+    { "file": "pltr-technical-analysis.md", "skill": "technical-analysis", "expect": "pass", "signal": "BULLISH", "score": 7.0, "warning": "Action carries a qualifier", "note": "Action: BUY (on pullback to ~$195) — parsed as BUY with a warning" },
+    { "file": "amd-financial-report-analyst-zh.md", "skill": "financial-report-analyst", "expect": "pass", "signal": "NEUTRAL", "score": 5.5, "note": "Chinese disclaimer (非投資建議)" },
+    { "file": "rklb-competitor-analysis-zh.md", "skill": "competitor-analysis", "expect": "pass", "signal": "NEUTRAL", "score": 5.6, "retrieval": "pasted by user", "note": "Chinese Retrieval value (使用者提供) and Thesis Invalidation heading (論點失效條件)" },
+    { "file": "meta-catalyst-calendar-legacy-box.md", "skill": "catalyst-calendar", "expect": "fail", "issue": "Score missing", "note": "the pre-fix catalyst-calendar box had no Signal/Score lines; kept as a known-bad real output" }
+  ]
+}

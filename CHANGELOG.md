@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **LLM checks in CI** (`.github/workflows/llm-eval.yml`), on every PR that touches a skill, prompt, cross-AI system prompt or the eval machinery:
+  - **Offline output-contract tests** (`scripts/test-llm-io.js`, now part of `npm test`, 213 checks): 12 unedited real model outputs from the demo runs (`tests/llm-golden/`) must get their expected verdict from the shared output parser; 12 mutations of a real output must fail with the right reason; every prompt must close with the standard signal block, keep a short skill description, and stay within 25% of `tests/prompt-budgets.json`; the ZEPH eval harness and the arithmetic scorer are checked.
+  - **Prompt diff** (`scripts/prompt-diff.js`): changed prompts, token deltas, description changes and contract status in the job summary.
+  - **Live eval:** the changed skills run through Claude (`scripts/claude-complete.js`, an `EVAL_CMD` adapter on the official SDK: streaming, `claude-opus-5-5` at explicit `medium` effort, server-side refusal fallback) on the fictional ZEPH pack and fail the job on any hard contract violation. Skipped, not failed, when the `ANTHROPIC_API_KEY` secret is unavailable.
+  - npm scripts: `test:llm-io`, `prompt:diff`, `prompt:budgets`, `eval:claude`.
+
+### Fixed
+- **`catalyst-calendar` and `stock-screener` didn't close with the standard Investment Signal block.** Their custom boxes had no Signal/Score lines, so every output failed the parser (seen in the META demo). Both now give their summary as plain lines, then the standard block with a mapping note.
+- **The output parser misread valid outputs:** Traditional Chinese disclaimers (非投資建議), Retrieval values (使用者提供 / 網路) and Thesis Invalidation headings (論點失效條件) are recognised. An enum with a qualifier ("BUY (on pullback to ~$195)") parses as BUY with a warning, not a failure. `fact-check` is checked against its own rules (confidence capped by the Verification Score tier, a failed verification must read NEUTRAL / HOLD) instead of the Score Guide mapping, which flagged all five real fact-check runs.
+- `eval-skills.js --all` no longer runs `fact-check`, `learning-coach` or `etf-analysis` on the company fixture (they take a report or a fund, not a company data pack).
+
 ### Fixed
 - **Four more `fetch-fundamentals` data-pack mislabels** the demo skills had to correct by hand:
   - **SG&A that was really G&A.** The SG&A chain fell back to `GeneralAndAdministrativeExpense`, so META ($12,152M) and MSFT ($7,956M) packs showed G&A only. SG&A is now rebuilt from separate selling and G&A lines when tagged that way (META $24,143M, MSFT $34,666M), and a G&A-only filer gets a "G&A (SG&A not tagged)" row instead.

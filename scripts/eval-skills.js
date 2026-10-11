@@ -60,7 +60,9 @@ const DEFAULT_SKILLS = ['stock-eval', 'bear-case', 'stock-valuation', 'dividend-
 const NOT_SINGLE_TICKER = ['portfolio-review', 'stock-screener', 'sector-analysis', 'economics-analysis',
   'industry-map', '10k-digest', 'financial-report-analyst', 'earnings-call-analysis', 'chart-master',
   'full-report', 'thesis-tracker', 'catalyst-calendar', 'options-analysis', 'short-interest',
-  'insider-trading', 'institutional-ownership', 'technical-analysis'];
+  'insider-trading', 'institutional-ownership', 'technical-analysis',
+  // These take another report (fact-check, learning-coach) or a fund (etf-analysis), not a company data pack.
+  'fact-check', 'learning-coach', 'etf-analysis'];
 
 const EVAL_CMD = process.env.EVAL_CMD;
 const fixtureName = flag('fixture', 'ZEPH');
@@ -70,8 +72,13 @@ const fromDir = flag('from-dir');
 const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 const outDir = path.join(reg.ROOT, 'qa', 'eval-output', date);
 
+/** Every skill the single-ticker fixture can feed (what --all runs). */
+function evalableSkills() {
+  return reg.listSkillDirs().filter(n => reg.isFramework(n) && !reg.META_SKILLS.includes(n) && !NOT_SINGLE_TICKER.includes(n));
+}
+
 const skills = has('all')
-  ? reg.listSkillDirs().filter(n => reg.isFramework(n) && !reg.META_SKILLS.includes(n) && !NOT_SINGLE_TICKER.includes(n))
+  ? evalableSkills()
   : flag('skills', DEFAULT_SKILLS.join(',')).split(',').map(s => s.trim()).filter(Boolean);
 
 // ── fixture ──────────────────────────────────────────────────────────────────
@@ -215,7 +222,7 @@ function main() {
       fs.writeFileSync(path.join(outDir, `${skill}.md`), output);
       process.stdout.write(error ? `✗ ${error}\n` : `${(ms / 1000).toFixed(0)}s\n`);
     }
-    const hard = sb.validateOutput(output, { expectRetrieval: 'pasted by user' });
+    const hard = sb.validateOutput(output, { expectRetrieval: 'pasted by user', skill });
     const soft = softChecks(output, fx);
     results.push({ skill, error, ms, hard, soft, chars: output.length });
   }
@@ -256,4 +263,4 @@ if (require.main === module) {
   try { main(); } catch (e) { process.stderr.write(`\n  ✗ ${e.message}\n\n`); process.exit(1); }
 }
 
-module.exports = { loadFixture, assemblePrompt, softChecks, numbersNear };
+module.exports = { loadFixture, assemblePrompt, softChecks, numbersNear, evalableSkills, DEFAULT_SKILLS, NOT_SINGLE_TICKER };

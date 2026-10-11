@@ -307,17 +307,36 @@ Adjust weeks and labels to match the actual look-ahead window and identified cat
 
 ---
 
+**Catalyst summary** (plain lines above the signal block):
+
+```
+Next Catalyst:     [EVENT] on [DATE]
+30-Day Bias:       BULLISH / NEUTRAL / BEARISH
+Catalyst Density:  HIGH / MEDIUM / LOW
+Highest Impact:    [EVENT] — [±X%] expected
+Risk Window:       [DATE RANGE]
+```
+
+All analysis concludes with this standardized block:
+
 ```
 ╔══════════════════════════════════════════════╗
-║         INVESTMENT SIGNAL — CATALYST CALENDAR             ║
+║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣
-║ Next Catalyst:   [EVENT] on [DATE]           ║
-║ 30-Day Bias:     BULLISH / NEUTRAL / BEARISH ║
-║ Catalyst Density: HIGH / MEDIUM / LOW        ║
+║ Signal:      BULLISH / NEUTRAL / BEARISH     ║
+║ Confidence:  HIGH / MEDIUM / LOW             ║
+║ Horizon:     SHORT / MEDIUM / LONG-TERM      ║
+║ Score:       X.X / 10                        ║
 ╠══════════════════════════════════════════════╣
-║ Highest Impact:  [EVENT] — [±X%] expected    ║
-║ Risk Window:     [DATE RANGE]                ║
+║ Action:      BUY / HOLD / SELL               ║
+║ Conviction:  STRONG / MODERATE / WEAK        ║
 ╚══════════════════════════════════════════════╝
 ```
+
+Score Guide: 8.0–10.0 Strongly Bullish | 6.0–7.9 Moderately Bullish | 4.0–5.9 Neutral | 2.0–3.9 Moderately Bearish | 0.0–1.9 Strongly Bearish
+Confidence: HIGH (strong data, clear signals) | MEDIUM (mixed signals) | LOW (limited data, conflicting signals)
+Horizon: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG-TERM (1+ years)
+
+**Mapping:** Signal is the 30-Day Bias; Horizon is SHORT-TERM (the 90-day window); Score follows the Score Guide for that bias, weighted by how clear the catalysts are; Action and Conviction say what to do *ahead of* the highest-impact event. When magnitudes can't be sourced (no options chain or consensus), say so and keep Confidence at LOW or MEDIUM.
 
 **Disclaimer:** Educational analysis only. Not financial advice.
