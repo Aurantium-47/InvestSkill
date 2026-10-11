@@ -29,6 +29,7 @@ Data & Sources
 
 - `Retrieval: model memory` must be paired with `Confidence: LOW` — memory is a placeholder until confirmed against a primary source.
 - Mixed sources: list each with its own as-of date rather than blending them.
+- Sources disagree on the same figure (a closing price, a deal term): prefer the primary source (SEC filing, company release, exchange data) over an aggregator, then the most recent dated one. Show both values with their sources and dates, say which you used and why, and never average them.
 - Data the user pasted is reported as `pasted by user`; do not upgrade its confidence beyond what the user's own source supports.
 
 ---

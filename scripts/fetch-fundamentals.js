@@ -88,8 +88,18 @@ const INSTANT = {
   goodwill: ['Goodwill'],
   total_assets: ['Assets'],
   accounts_payable: ['AccountsPayableCurrent'],
-  short_term_debt: ['LongTermDebtCurrent', 'DebtCurrent', 'ShortTermBorrowings', 'CommercialPaper'],
-  long_term_debt: ['LongTermDebtNoncurrent', 'LongTermDebt'],
+  short_term_debt: ['LongTermDebtCurrent', 'DebtCurrent', 'ShortTermBorrowings', 'CommercialPaper', 'ConvertibleNotesPayableCurrent', 'ConvertibleDebtCurrent'],
+  long_term_debt: ['LongTermDebtNoncurrent', 'ConvertibleDebtNoncurrent'],
+  // Total debt including current maturities. Some filers tag part of their debt
+  // only here — RKLB's convertible notes sit in LongTermDebt ($152M) while
+  // LongTermDebtNoncurrent carries just a $2M term loan — so it is read
+  // alongside the current/non-current split, not as a fallback after it.
+  long_term_debt_total: ['LongTermDebt', 'ConvertibleNotesPayable'],
+  // Read only to flag borrowings that are tagged but not in total debt (AAPL's
+  // commercial paper). Not added: filers also tag the same amount as
+  // LongTermDebtCurrent *and* ShortTermBorrowings (AMD), which would double count.
+  short_borrowings: ['ShortTermBorrowings'],
+  commercial_paper: ['CommercialPaper'],
   total_liabilities: ['Liabilities'],
   total_equity: ['StockholdersEquity', 'StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest'],
 };
@@ -163,6 +173,41 @@ function fiscalYearEnds(gaap) {
   return [...ends.entries()].map(([end, m]) => ({ end, ...m })).sort((a, b) => (a.end < b.end ? 1 : -1));
 }
 
+/**
+ * Total debt from the tagged facts, and a note saying how it was built.
+ * Two routes: the current + non-current split, and the `LongTermDebt` total
+ * (which already includes current maturities, so the current portion is never
+ * added to it). When both exist and the total is more than 5% larger, the split
+ * missed debt tagged only in the total (convertible notes, typically) and the
+ * total wins; otherwise the split is kept. `long_term_debt` is restated so the
+ * table's current + long-term lines still sum to the total.
+ * @returns {{total_debt: number|null, long_term_debt: number|null, total_debt_note: string, debt_notes: string[]}}
+ */
+function totalDebt(r, concept) {
+  const cur = r.short_term_debt, nonCur = r.long_term_debt, tagged = r.long_term_debt_total;
+  const split = nonCur !== null ? nonCur + (cur || 0) : null;
+  const notes = [];
+  let total = null, longTerm = nonCur, how;
+  if (split !== null && tagged !== null && tagged > split * 1.05) {
+    total = tagged; longTerm = tagged - (cur || 0);
+    how = `tagged \`${concept.long_term_debt_total}\` (already includes current maturities), used because it exceeds current + non-current as tagged`;
+    notes.push(`Total debt uses \`${concept.long_term_debt_total}\` (${fmtM(tagged)}M) rather than \`${concept.long_term_debt}\` + current (${fmtM(split)}M): the gap is debt tagged only in the total, often convertible notes. Check the debt note in the filing.`);
+  } else if (split !== null) {
+    total = split; how = 'current + non-current debt as tagged';
+  } else if (tagged !== null) {
+    total = tagged; longTerm = tagged - (cur || 0);
+    how = `tagged \`${concept.long_term_debt_total}\` (already includes current maturities), used as is`;
+  } else if (cur !== null) {
+    total = cur; how = 'current debt only (no long-term debt tagged)';
+  } else {
+    how = 'no debt tagged';
+  }
+  for (const [k, label] of [['commercial_paper', 'Commercial paper'], ['short_borrowings', 'Short-term borrowings']]) {
+    if (r[k] !== null && r[k] !== undefined && r[k] !== cur) notes.push(`${label} of ${fmtM(r[k])}M is tagged but not included in total debt; add it if the analysis needs gross borrowings.`);
+  }
+  return { total_debt: total, long_term_debt: longTerm, total_debt_note: how, debt_notes: notes };
+}
+
 /** Dollars -> whole millions (null passes through). */
 const M = v => (v === null || v === undefined ? null : Math.round(v / 1e6));
 /** Dollars -> "1,234" millions for a table cell, or "n/a". */
@@ -209,14 +254,7 @@ async function main() {
     for (const [m, chain] of Object.entries(INSTANT)) { const p = pick(gaap, m, chain, end, { duration: false }); r[m] = p ? p.val : null; concept[m] = p ? p.concept : null; }
     if (r.gross_profit === null && r.revenue !== null && r.cost_of_revenue !== null) r.gross_profit = r.revenue - r.cost_of_revenue;
     r.fcf = r.ocf !== null && r.capex !== null ? r.ocf - r.capex : null;
-    // us-gaap:LongTermDebt already includes current maturities; only the
-    // *Noncurrent* tag needs the current portion added, or the current slice
-    // would be counted twice in total and net debt.
-    const ltdIncludesCurrent = concept.long_term_debt === 'LongTermDebt';
-    r.total_debt = r.long_term_debt !== null || r.short_term_debt !== null
-      ? (r.long_term_debt || 0) + (ltdIncludesCurrent ? 0 : (r.short_term_debt || 0))
-      : null;
-    r.total_debt_note = ltdIncludesCurrent ? 'tagged `LongTermDebt` (already includes current maturities), used as is' : 'current + non-current debt as tagged';
+    Object.assign(r, totalDebt(r, concept));
     r.net_debt = r.total_debt !== null && r.cash !== null ? r.total_debt - r.cash : null;
     return r;
   };
@@ -231,7 +269,9 @@ async function main() {
     sharesOut = { asOf: latest, value: so.filter(x => x.end === latest).reduce((s, x) => s + x.val, 0) };
   }
 
-  const missing = Object.entries(c).filter(([, v]) => v === null).map(([k]) => k);
+  // Helper facts read only to build or annotate total debt aren't line items.
+  const HELPERS = new Set(['long_term_debt_total', 'short_borrowings', 'commercial_paper']);
+  const missing = Object.entries(c).filter(([k, v]) => v === null && !HELPERS.has(k)).map(([k]) => k);
   const filingUrl = edgar.filingIndexUrl(company.cik, cur.accn);
   const factsUrl = `${edgar.DATA_URL}/api/xbrl/companyfacts/CIK${company.cik}.json`;
   const today = new Date().toISOString().slice(0, 10);
@@ -340,6 +380,7 @@ async function main() {
   b.push('');
   b.push('- Figures are US-GAAP as tagged by the company; "n/a" means the company did not tag that concept for the period (it may still appear in the filing under a different line).');
   b.push(`- Gross profit is the tagged value where available, otherwise revenue − cost of revenue. Total debt = ${c.total_debt_note}; leases are excluded unless the company tags them as debt.`);
+  for (const n of c.debt_notes) b.push(`- ${n}`);
   b.push('- Derived lines (FCF, net debt, margins) are arithmetic on reported figures, shown so the analysis can be reconciled.');
   if (missing.length) b.push(`- Not tagged for ${fyLabel}: ${missing.join(', ')}.`);
   b.push('');

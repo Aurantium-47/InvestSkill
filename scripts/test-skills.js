@@ -236,6 +236,16 @@ registeredSkills.forEach(skill => {
   } else {
     fail(`${skill}/SKILL.md — low word count (${words} words, min ${MIN_SKILL_WORDS})`);
   }
+
+  // The Data & Sources rules travel together: a skill that tells the model how to
+  // list mixed sources must also say what to do when two sources disagree.
+  if (content.includes('- Mixed sources: list each with its own as-of date')) {
+    if (content.includes('- Sources disagree on the same figure')) {
+      pass(`${skill}/SKILL.md — Data & Sources header carries the "sources disagree" rule`);
+    } else {
+      fail(`${skill}/SKILL.md — has the "Mixed sources" rule but not "Sources disagree" (prefer primary, then most recent; show both; never average)`);
+    }
+  }
 });
 
 // ─── Test 6: Prompts Sync Check ──────────────────────────────────────────────

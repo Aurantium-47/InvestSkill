@@ -23,7 +23,12 @@
  *                          10-K document is a 404
  *   LTD     (CIK 777)     — tags LongTermDebt (includes current maturities) +
  *                          LongTermDebtCurrent, no Noncurrent tag: the
- *                          double-counting trap for total debt
+ *                          double-counting trap for total debt; also tags
+ *                          ShortTermBorrowings equal to the current portion
+ *                          (AMD does this), which must not be flagged or added
+ *   CNV     (CIK 888)     — RKLB's FY2025 pattern: convertible notes tagged only
+ *                          in LongTermDebt ($152M) while LongTermDebtNoncurrent
+ *                          carries a $2M term loan; total debt must use the total
  * The numbers for AAPL are the FY2025 figures as reported, so a reader can
  * sanity-check the pack the generator produces against the real 10-K.
  */
@@ -136,6 +141,8 @@ const AAPL_FACTS = {
       AccountsPayableCurrent: usd(twoInst(69860, 68960)),
       LongTermDebtCurrent: usd(twoInst(12350, 10912)),
       LongTermDebtNoncurrent: usd(twoInst(78328, 85750)),
+      LongTermDebt: usd(twoInst(90678, 96662)),
+      CommercialPaper: usd(twoInst(7979, 9967)),
       Liabilities: usd(twoInst(285508, 308030)),
       StockholdersEquity: usd(twoInst(73733, 56950)),
     },
@@ -169,7 +176,26 @@ const LTD_FACTS = {
       NetIncomeLoss: usd([dur('2025-01-01', '2025-12-31', M(400), ...LTD_K)]),
       LongTermDebt: usd([inst('2025-12-31', M(1000), ...LTD_K)]),
       LongTermDebtCurrent: usd([inst('2025-12-31', M(200), ...LTD_K)]),
+      ShortTermBorrowings: usd([inst('2025-12-31', M(200), ...LTD_K)]),
       CashAndCashEquivalentsAtCarryingValue: usd([inst('2025-12-31', M(100), ...LTD_K)]),
+    },
+  },
+};
+// CNV mirrors Rocket Lab's FY2025 10-K tags: LongTermDebtNoncurrent is only a
+// small term loan; the convertible senior notes appear only in LongTermDebt.
+const CNV = { cik: '0000000888', name: 'CONVERTIBLE TEST CORP', recent: [{ form: '10-K', filed: '2026-02-26', period: '2025-12-31', accn: '0000000888-26-000013', doc: 'cnv-20251231.htm' }] };
+const CNV_K = ['10-K', '2026-02-26', '0000000888-26-000013', 2025];
+const CNV_FACTS = {
+  cik: 888, entityName: 'Convertible Test Corp',
+  facts: {
+    dei: {},
+    'us-gaap': {
+      Revenues: usd([dur('2025-01-01', '2025-12-31', M(602), ...CNV_K)]),
+      NetIncomeLoss: usd([dur('2025-01-01', '2025-12-31', M(-198), ...CNV_K)]),
+      LongTermDebtNoncurrent: usd([inst('2025-12-31', M(2), ...CNV_K)]),
+      LongTermDebtCurrent: usd([inst('2025-12-31', 0, ...CNV_K)]),
+      LongTermDebt: usd([inst('2025-12-31', M(152), ...CNV_K)]),
+      CashAndCashEquivalentsAtCarryingValue: usd([inst('2025-12-31', M(827), ...CNV_K)]),
     },
   },
 };
@@ -181,6 +207,7 @@ const TICKERS = {
   3: { cik_str: 999, ticker: 'NOFACTS', title: 'NO FACTS CORP' },
   4: { cik_str: 500, ticker: 'FLAKY', title: 'FLAKY HOLDINGS' },
   5: { cik_str: 777, ticker: 'LTD', title: 'LEVERAGED TEST CORP' },
+  6: { cik_str: 888, ticker: 'CNV', title: 'CONVERTIBLE TEST CORP' },
 };
 
 /** A `data.sec.gov/submissions/CIK...json` payload for a synthetic company. */
@@ -231,6 +258,8 @@ function route(url) {
   }
 
   if (url === `${DATA}/submissions/CIK0000000777.json`) return response(200, submissions(LTD));
+  if (url === `${DATA}/submissions/CIK0000000888.json`) return response(200, submissions(CNV));
+  if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000888.json`) return response(200, CNV_FACTS);
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000320193.json`) return response(200, AAPL_FACTS);
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000777.json`) return response(200, LTD_FACTS);
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0001046179.json`) return response(200, TSM_FACTS);
