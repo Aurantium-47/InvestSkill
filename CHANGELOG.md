@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **`doc/DISTRIBUTION-LISTINGS.md`** — where InvestSkill is listed (third-party Claude plugin directories, auto-indexed from GitHub), where it is not (Anthropic's official directory, ChatGPT GPT Store), and the steps and readiness checklist for submitting to Anthropic's official directory.
+
+### Changed
+- **`plugins/us-stock-analysis/README.md`** rewritten — it listed 6 of 34 skills with pre-namespace commands. Now covers every skill, current `/us-stock-analysis:<skill>` usage, and a "what this plugin runs and sends" disclosure. Anthropic's directory shows this file as the listing description.
+
 ## [1.13.0] - 2026-10-11
 
 Prompts are now tested like code, and every demo is a real, reproducible run. **LLM checks in CI** grade real model outputs against the output contract, keep prompt structure and size in check, and run the changed skills live through Claude on every prompt PR. Every demo was **re-run on 2026-10-11** against fresh SEC filings and rebuilt step by step with screenshots of the actual output, joined by a new **Live Walkthrough** (English + 繁體中文). The keyless `fetch-fundamentals` data pack now counts debt tagged only in `LongTermDebt`, rebuilds SG&A, uses continuing-operations cash flow and reports net cash including investments; all analysis skills share one rule for conflicting sources; and `catalyst-calendar` / `stock-screener` now close with the standard Investment Signal block. Still **30 analysis frameworks** across 34 skills; no API key, no runtime, no telemetry.

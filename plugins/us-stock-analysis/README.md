@@ -1,119 +1,49 @@
-# US Stock Analysis Plugin
+# us-stock-analysis
 
-Professional investment analysis and stock evaluation skills for US markets.
+Structured investment-analysis frameworks for US stocks, ETFs and portfolios — **30 analysis frameworks** (+ 3 aliases, 1 output tool) covering fundamental, technical, valuation, financial-report, capital-allocation, ownership, options, risk, tax and position-management analysis. Every framework ends with the same Investment Signal block (signal, 0–10 score, confidence, horizon), so results are comparable across skills.
 
-## Skills Included
+Part of [InvestSkill](https://github.com/yennanliu/InvestSkill). Full documentation: <https://yennj12.js.org/InvestSkill/>.
 
-### 1. `/stock-eval` - US Stock Evaluation
-Comprehensive fundamental and valuation analysis of individual US stocks including:
-- Company overview and competitive position
-- Financial health metrics
-- Valuation analysis (P/E, PEG, P/B, etc.)
-- Key financial ratios
-- Peer comparison and investment thesis
+## Install
 
-### 2. `/economics-analysis` - US Economics Analysis
-Analyze US economic indicators and their market implications:
-- Growth indicators (GDP, employment, PMI)
-- Inflation metrics (CPI, PCE, PPI)
-- Monetary policy and Fed stance
-- Market sentiment indicators
-- Sector rotation recommendations
-
-### 3. `/fundamental-analysis` - Fundamental Analysis
-Deep-dive fundamental analysis using financial statements:
-- Income statement, balance sheet, cash flow analysis
-- Profitability and efficiency metrics
-- Growth and competitive analysis
-- Capital allocation assessment
-- Fair value estimation
-
-### 4. `/technical-analysis` - Technical Analysis
-Technical analysis using charts and indicators:
-- Chart patterns and trend identification
-- Technical indicators (RSI, MACD, Moving Averages)
-- Support/resistance levels
-- Volume analysis
-- Entry/exit points and price targets
-
-### 5. `/portfolio-review` - Portfolio Review
-Comprehensive portfolio analysis and optimization:
-- Performance metrics and risk-adjusted returns
-- Asset allocation and diversification
-- Risk assessment and concentration analysis
-- Rebalancing recommendations
-- Position-level insights
-
-### 6. `/sector-analysis` - Sector Analysis
-US market sector analysis and rotation strategies:
-- Sector performance and trends
-- Economic cycle positioning
-- Fundamental sector metrics
-- Macro drivers and catalysts
-- Sector rotation recommendations
-
-## Installation
-
-### From GitHub
-```bash
+```
 /plugin marketplace add yennanliu/InvestSkill
 /plugin install us-stock-analysis@invest-skill
 ```
 
-### Local Development
-```bash
-/plugin marketplace add /path/to/InvestSkill
-/plugin install us-stock-analysis@invest-skill
+For local development, point the marketplace at a clone: `/plugin marketplace add /path/to/InvestSkill`.
+
+## Usage examples
+
+```
+/us-stock-analysis:stock-eval AAPL
+/us-stock-analysis:technical-analysis TSLA
+/us-stock-analysis:economics-analysis
+/us-stock-analysis:portfolio-review [paste holdings]
+/us-stock-analysis:full-report MSFT --depth standard
 ```
 
-## Usage Examples
+## Skills
 
-### Evaluate a Stock
-```
-/stock-eval AAPL
-```
+| Area | Skills |
+|------|--------|
+| Core evaluation | `stock-eval`, `stock-valuation`, `technical-analysis`, `competitor-analysis`, `bear-case` |
+| Filings & earnings | `financial-report-analyst`, `10k-digest`, `earnings-call-analysis`, `earnings-preview`, `fact-check` |
+| Ownership & flows | `insider-trading`, `institutional-ownership`, `short-interest`, `options-analysis` |
+| Market & macro | `economics-analysis`, `sector-analysis`, `industry-map`, `catalyst-calendar`, `etf-analysis` |
+| Portfolio & position | `portfolio-review`, `risk-stress-test`, `position-ladder`, `dividend-analysis`, `tax-lens`, `stock-screener`, `thesis-tracker` |
+| Quality & learning | `result-validator`, `learning-coach`, `chart-master`, `full-report` |
+| Output tool | `report-generator` |
+| Aliases | `fundamental-analysis` → `stock-eval`, `dcf-valuation` → `stock-valuation`, `research-bundle` → `full-report` |
 
-### Check Economic Conditions
-```
-/economics-analysis
-```
+## What this plugin runs and sends
 
-### Deep Fundamental Analysis
-```
-/fundamental-analysis MSFT
-```
-
-### Technical Chart Analysis
-```
-/technical-analysis TSLA
-```
-
-### Review Your Portfolio
-```
-/portfolio-review [paste portfolio holdings]
-```
-
-### Sector Rotation Analysis
-```
-/sector-analysis
-```
-
-## Requirements
-
-These skills work best when combined with:
-- Real-time market data access
-- Financial statement databases
-- Economic indicator sources
-- Technical charting tools
-
-## License
-
-MIT License - See LICENSE file for details
-
-## Contributing
-
-Contributions welcome! Please open issues or pull requests on GitHub.
+Nothing. The plugin contains only `SKILL.md` prompt files — no hooks, MCP servers, scripts, or dependencies, and no API key. It does not collect, store, or transmit any data. When the host assistant has web search or fetch tools, the skills ask it to cite primary sources (SEC EDGAR, company IR, FRED); otherwise they work from data you paste in and mark unsourced figures as unverified.
 
 ## Disclaimer
 
-This plugin provides educational analysis and is not financial advice. Always consult with qualified financial advisors before making investment decisions.
+Educational analysis only — not financial, investment, or tax advice.
+
+## License
+
+MIT. Contributions welcome — open an issue or pull request on [GitHub](https://github.com/yennanliu/InvestSkill).
