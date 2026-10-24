@@ -201,7 +201,7 @@ button { font-family: inherit; }
 @keyframes popIn { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
 .lang-opt { display: block; padding: .5rem .75rem; border-radius: 8px; color: var(--text-muted); font-size: .9rem; text-decoration: none; white-space: nowrap; }
 .lang-opt:hover { background: var(--surface); color: var(--text); }
-.lang-opt.active { color: var(--accent); background: var(--accent-light); font-weight: 600; }
+.lang-opt.active, .lang-opt[aria-current] { color: var(--accent); background: var(--accent-light); font-weight: 600; }
 
 /* Search modal */
 .search-modal {

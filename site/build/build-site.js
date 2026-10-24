@@ -166,46 +166,9 @@ const NAV = {
   ],
 };
 
-// Pairs of English ⇄ Traditional Chinese counterparts (by output filename).
-const LANG_PAIRS = [
-  ['index.html', 'zh-tw.html'],
-  ['learning.html', 'learning-zh-tw.html'],
-  ['learning-foundations.html', 'learning-foundations-zh-tw.html'],
-  ['learning-statements.html', 'learning-statements-zh-tw.html'],
-  ['learning-quality.html', 'learning-quality-zh-tw.html'],
-  ['learning-valuation.html', 'learning-valuation-zh-tw.html'],
-  ['learning-market.html', 'learning-market-zh-tw.html'],
-  ['learning-portfolio.html', 'learning-portfolio-zh-tw.html'],
-  ['learning-playbook.html', 'learning-playbook-zh-tw.html'],
-  ['learning-case-amd.html', 'learning-case-amd-zh-tw.html'],
-  ['learning-setup.html', 'learning-setup-zh-tw.html'],
-  ['learning-etfs.html', 'learning-etfs-zh-tw.html'],
-  ['learning-taxes.html', 'learning-taxes-zh-tw.html'],
-  ['learning-earnings.html', 'learning-earnings-zh-tw.html'],
-  ['learning-psychology.html', 'learning-psychology-zh-tw.html'],
-  ['learning-case-pass.html', 'learning-case-pass-zh-tw.html'],
-  ['learning-macro.html', 'learning-macro-zh-tw.html'],
-  ['learning-options.html', 'learning-options-zh-tw.html'],
-  ['cheatsheet.html', 'cheatsheet-zh-tw.html'],
-  ['non-us-guide.html', 'non-us-guide-zh-tw.html'],
-  ['faq.html', 'faq-zh-tw.html'],
-  ['concepts.html', 'concepts-zh-tw.html'],
-  ['glossary.html', 'glossary-zh-tw.html'],
-  ['choose-a-skill.html', 'choose-a-skill-zh-tw.html'],
-  ['use-cases.html', 'use-cases-zh-tw.html'],
-  ['data-and-accuracy.html', 'data-and-accuracy-zh-tw.html'],
-  ['cookbook.html', 'cookbook-zh-tw.html'],
-  ['skills.html', 'skills-zh-tw.html'],
-  ['walkthrough.html', 'walkthrough-zh-tw.html'],
-  // The demo overview (English) pairs with the RKLB full demo (Traditional Chinese).
-  ['full-demo.html', 'full-demo-zh-tw.html'],
-  // The two full-coverage demos pair across languages: PLTR (English) ⇄ RKLB (Traditional Chinese).
-  ['full-demo-pltr.html', 'full-demo-rklb.html'],
-  // The two 10-K deep dives pair across languages: NVDA (English) ⇄ AMD (Traditional Chinese).
-  ['full-demo-nvda.html', 'full-demo-amd.html'],
-];
-const EN_TO_ZH = Object.fromEntries(LANG_PAIRS);
-const ZH_TO_EN = Object.fromEntries(LANG_PAIRS.map(([en, zh]) => [zh, en]));
+// English ⇄ Traditional Chinese counterparts and the language switcher's
+// routing rule live in lang-pairs.js, so the tests can check them without a build.
+const { EN_TO_ZH, ZH_TO_EN, langOf, switchTargets } = require('./lang-pairs');
 
 const RAW_BASE    = 'https://raw.githubusercontent.com/yennanliu/InvestSkill/main';
 const GITHUB_BLOB = 'https://github.com/yennanliu/InvestSkill/blob/main';
@@ -980,15 +943,6 @@ function navIcon(sectionTitle) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 }
 
-// Language of a page, derived from its output filename.
-// These demos are fully Traditional Chinese content, so they belong to the
-// zh site even though their filenames don't carry the -zh-tw suffix.
-const ZH_CONTENT_DEMOS = new Set(['full-demo-rklb.html', 'full-demo-amd.html']);
-function langOf(outFile) {
-  if (ZH_CONTENT_DEMOS.has(outFile)) return 'zh';
-  return (outFile === 'zh-tw.html' || outFile.endsWith('-zh-tw.html')) ? 'zh' : 'en';
-}
-
 function buildNav(lang, currentPage) {
   return NAV[lang].map(section => {
     const icon = navIcon(section.title);
@@ -1081,10 +1035,11 @@ ${tabs}
 
 // Header language switcher: links to this page's counterpart in each language.
 function buildLangSwitch(lang, outFile) {
-  const enHref = lang === 'en' ? outFile : (ZH_TO_EN[outFile] || 'index.html');
-  const zhHref = lang === 'zh' ? outFile : (EN_TO_ZH[outFile] || 'zh-tw.html');
-  const opt = (href, label, code) =>
-    `<a href="${href}" class="lang-opt${lang === code ? ' active' : ''}">${label}</a>`;
+  const { en: enHref, zh: zhHref } = switchTargets(outFile);
+  // The reader's current language is marked for assistive tech, not only styled.
+  const opt = (href, label, code) => lang === code
+    ? `<a href="${href}" class="lang-opt active" hreflang="${code === 'zh' ? 'zh-Hant' : 'en'}" aria-current="true">${label}</a>`
+    : `<a href="${href}" class="lang-opt" hreflang="${code === 'zh' ? 'zh-Hant' : 'en'}">${label}</a>`;
   return `<details class="lang-menu">
       <summary class="icon-btn" aria-label="Language" title="Language">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>

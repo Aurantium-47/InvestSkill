@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Site language switcher (文A) no longer drops you on the home page.** A page with no counterpart in the other language — every `skill-<name>.html` reference page and the English-only demos — used to link 文A to the other language's home page. It now goes to the parent index (the zh Skill Reference, the zh demo overview); only pages with neither a twin nor a parent (changelog, contributing) still land on home. The current language is marked `aria-current`. The routing rule moved to `site/build/lang-pairs.js` and is covered by `scripts/test-tooling.js` (section 5).
+
 ## [1.14.0] - 2026-10-24
 
 Four new frameworks and a machine-readable output. **`compare`** argues a pick across 2–5 stocks, **`credit-check`** scores solvency and refinancing risk, **`forensic-accounting`** scores earnings-quality and manipulation risk, and **`trade-postmortem`** closes the loop on a finished trade. Every skill now ends with a **JSON footer** that matches its signal box, runs in **Traditional Chinese with `--lang zh-TW`**, and `stock-eval` / `financial-report-analyst` gain **sector KPI packs** (banks, insurers, REITs, biotech, SaaS). `full-report` can now run every framework that applies to one stock. On the site: Lessons 14–15, a cheat sheet, a Non-US Investor Guide, a 124-term glossary and a zh skill index. CI and releases are each down to one workflow. **34 analysis frameworks** across 38 skills; no API key, no runtime, no telemetry.

@@ -8,7 +8,7 @@
  * For each site/content/X.md:
  *   1. X-zh-TW.md must exist (FAQ-zh-TW.md pairs with the root FAQ.md), unless X is a demo that pairs with a different
  *      ticker in the other language (DEMO_PAIRS, mirrored from LANG_PAIRS in
- *      site/build/build-site.js)                                       → fail
+ *      site/build/lang-pairs.js)                                       → fail
  *   2. the two files must have the same number of ## and ### headings,
  *      within HEADING_SLACK — a missing section is the usual drift      → fail
  *   3. code fences must be balanced in both (a stray fence swallows the
