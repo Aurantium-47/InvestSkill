@@ -175,6 +175,26 @@ None of these is a verdict by itself — each is a *question to investigate* in 
 
 ---
 
+## Check yourself
+
+1. Which statement answers each question: (a) "Did real cash actually come in?" (b) "Was the business profitable this year?" (c) "What does it own and owe today?"
+2. A company has revenue of $2,000, COGS of $1,100, SG&A and R&D of $500, interest and taxes of $150, and 100 shares outstanding. Work out its gross margin, operating margin, net margin, and EPS.
+3. Operating cash flow is $500M, capex is $200M, and net income is $450M. What is free cash flow, and what should the comparison with net income prompt you to do?
+4. A company ships $100 of goods in December; the customer pays in January. Where does that $100 appear in December's statements, and why?
+5. Revenue grew 10% this year, but receivables grew 35%. Why does that worry an investor — and is it a verdict on its own?
+
+<details><summary>Answers</summary>
+
+1. (a) The **cash flow statement**. (b) The **income statement** (a video of the period). (c) The **balance sheet** (a photo on one day).
+2. Gross profit = 2,000 − 1,100 = 900 → gross margin **45%**. EBIT = 900 − 500 = 400 → operating margin **20%**. Net income = 400 − 150 = 250 → net margin **12.5%**. EPS = 250 ÷ 100 = **$2.50**.
+3. FCF = CFO − capex = 500 − 200 = **$300M**, well below the $450M of net income. Profit and cash have diverged, so trust the cash and ask *why* — heavy reinvestment, or receivables and inventory soaking up cash?
+4. On the **income statement** as December revenue (accrual accounting records revenue when it is earned), and on the **balance sheet** as a receivable. It does not appear as cash received in December's cash flow statement — the cash arrives in January.
+5. Sales may be booked before cash is collected, or customers may be struggling to pay. It is not a verdict by itself: it is a question to investigate in the footnotes and the cash flow statement.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - Three statements, three questions: income = *profitable?*, balance sheet = *position now?*, cash flow = *did cash really move?*

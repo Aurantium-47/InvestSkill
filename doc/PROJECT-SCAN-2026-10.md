@@ -214,3 +214,21 @@ Batches 1–3 are a patch release (`1.13.1`); batch 5 or the first new skill is 
 ## 7. Deliberately not proposed
 
 The roadmap's §9 still holds: no live-data or broker APIs inside the skills, no crypto/forex, no ML price prediction, no change to the signal block's six fields. This scan also does **not** propose analytics on the site — "nothing phones home" is part of the product; if usage data is ever wanted it should be cookieless and stated on the Data & Accuracy page.
+
+---
+
+## 8. Progress
+
+Status of the §5 batches. Update this table in the PR that ships each item.
+
+| Batch | Status | Shipped in | Notes |
+|-------|--------|------------|-------|
+| 1 · Correctness | ✅ Done | `fix/project-scan-batches` | A1 (19 skills + a contract check that the box fence holds only the box), A6–A8, A9, A10, A11; also B5, B6, B8 |
+| 2 · Release & CI | ✅ Done | `fix/project-scan-batches` | A2 (`scripts/lib/release.js`), A3–A5 (`release.yml` is the only release path; `auto-deploy.yml` removed), A12, A13, B9–B11, B13, B14, B16; `ci.yml` replaces four workflows; B12 checks (anchors, fence lint, Choose-a-Skill coverage, `new-skill.js` smoke test) |
+| 3 · Docs refresh | ✅ Done | `fix/project-scan-batches` | B17–B21; `COUNT_DOCS` extended (platform guides, ADDING-NEW-SKILLS, SECURITY, zh FAQ, plugin README) and a stale-"current version" test; C2 descriptions; plugin icon; issue templates. **Maintainer action left:** comment on and close #5 (no longer reproduces), #2 and #6–#10; decide #24; submit for #11 |
+| 4 · Site | ✅ Done | `fix/project-scan-batches` | B22–B25, B27 (FAQ in both languages, bilingual 404) |
+| 5 · Contract features | ◐ Partly | `fix/project-scan-batches` | JSON footer on every skill + parser + tests; B1–B4. `--lang zh-TW` everywhere and `full-report` comprehensive + `--skip` are roadmap §4.1 / §4.3 items → shipped with the roadmap P0–P2 PR (`feat/roadmap-p0-p2`) |
+| 6 · New skills | ✅ Done | `fix/project-scan-batches` | `trade-postmortem`, `forensic-accounting`, `compare`, `credit-check`, and sector KPI packs as `--sector` on `stock-eval` / `financial-report-analyst` — 34 frameworks |
+| 7 · Learning | ◐ Partly | `fix/project-scan-batches` | Lessons 14–15 (EN + zh), Check-yourself for Lessons 1–8, the cheat sheet, zh Cookbook parity, `check-zh-parity.js`. The glossary, the non-US investor guide and the zh Skill Reference index are roadmap §5.3 / §5.4 / §5.6 items → roadmap P0–P2 PR |
+
+Not done in either PR: B7 (move `report-generator`'s HTML template out of the prompt) and B15 (eslint / `@ts-check`, `.editorconfig` / `.nvmrc`, `engines` ≥ 20).

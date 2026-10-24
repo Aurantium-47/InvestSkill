@@ -267,7 +267,7 @@ The LEI composite combines 10 leading indicators across financial markets, labor
 **Sahm Rule Indicator** = Current 3-month average unemployment rate minus the minimum of the 3-month average unemployment rate over the prior 12 months.
 
 - **Threshold: ≥ 0.5 percentage points** = Real-time recession signal with high historical accuracy
-- Triggered in every US recession since 1970
+- Triggered in every US recession since 1970 — and once without one so far (August 2024), so a trigger raises the odds rather than confirming a recession
 - Works in real-time without revision lag that affects other indicators
 
 **Current Sahm Indicator reading**: ____
@@ -290,7 +290,9 @@ Scoring model combining: Yield curve signal + LEI trend + Sahm Rule + Credit spr
 | 2001 (Dot-com) | 2000                 | Yes         | Yes          | −49%                   |
 | 2008 (GFC)     | 2006–2007            | Yes         | Yes          | −57%                   |
 | 2020 (COVID)   | 2019                 | Yes         | Yes          | −34%                   |
-| 2022–2023      | 2022–2023            | Yes         | No (so far)  | −25% (bear market)     |
+| 2022–2024 (no recession declared) | 2022–2024 (longest on record) | Yes | Yes (Aug 2024) | −25% (2022 bear market) |
+
+The 2022–2024 row is the counter-example: the curve inverted for about two years, the LEI fell, and the Sahm rule triggered in August 2024, yet no recession had been declared as of this writing. Treat the indicators as shifts in probability, not verdicts, and say so in the output.
 
 ---
 
@@ -302,11 +304,6 @@ Deliver concise economic assessment with:
 - Sector and asset class implications
 - Investment positioning recommendations
 
-## Standard Signal Output
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -325,6 +322,17 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Standard Signal Output
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "economics-analysis", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

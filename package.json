@@ -4,7 +4,7 @@
   "description": "Professional investment analysis frameworks for US stock markets — works with Claude Code, Cursor, Gemini CLI, GitHub Copilot, and any AI assistant",
   "main": "scripts/test-skills.js",
   "scripts": {
-    "test": "node scripts/test-skills.js && node scripts/check-skill-contract.js --quiet && node scripts/sync-prompts.js --check && node scripts/test-llm-io.js && node scripts/test-edgar.js && node scripts/test-install.js",
+    "test": "node scripts/test-skills.js && node scripts/check-skill-contract.js --quiet && node scripts/sync-prompts.js --check && node scripts/check-zh-parity.js && node scripts/test-llm-io.js && node scripts/test-edgar.js && node scripts/test-tooling.js && node scripts/test-install.js",
     "test:contract": "node scripts/check-skill-contract.js",
     "sync:prompts": "node scripts/sync-prompts.js",
     "sync:prompts:check": "node scripts/sync-prompts.js --check",
@@ -30,13 +30,10 @@
     "pre-release": "node scripts/pre-release-check.js && node scripts/validate-prompts.js && npm test",
     "release": "node scripts/release-interactive.js",
     "release:dry-run": "node scripts/release-dry-run.js",
-    "publish:cursor": "node scripts/publish-cursor-rules.js",
-    "publish:gemini": "node scripts/publish-gemini.js",
-    "publish:release-notes": "node scripts/generate-platform-release-notes.js",
-    "record:deploy": "node scripts/record-deploy.js",
     "integration-tests": "node scripts/integration-tests.js",
     "integration-tests:verbose": "node scripts/integration-tests.js --verbose",
-    "notify:release": "node scripts/notify-release.js"
+    "test:tooling": "node scripts/test-tooling.js",
+    "check:zh": "node scripts/check-zh-parity.js"
   },
   "keywords": [
     "investment",
@@ -61,6 +58,10 @@
   "homepage": "https://github.com/yennanliu/InvestSkill",
   "bugs": {
     "url": "https://github.com/yennanliu/InvestSkill/issues"
+  },
+  "devDependencies": {
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^8.6.7"
   },
   "engines": {
     "node": ">=18.0.0"

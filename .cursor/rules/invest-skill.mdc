@@ -6,7 +6,7 @@ alwaysApply: true
 
 # InvestSkill — Cursor Rules & Setup Guide
 
-This is the InvestSkill repository — a collection of 30 professional investment analysis frameworks for US stocks. These rules automatically apply when you work in this project.
+This is the InvestSkill repository — a collection of 34 professional investment analysis frameworks for US stocks. These rules automatically apply when you work in this project.
 
 ## Installation & Setup
 
@@ -27,7 +27,7 @@ Cursor automatically loads this file when you open the InvestSkill repository. *
 
 3. **Open AI Chat** (usually `Cmd+K`)
    - Cursor automatically loads the investment analysis rules
-   - All 30 frameworks are immediately available
+   - All 34 frameworks are immediately available
 
 ### Verify Setup
 
@@ -40,9 +40,9 @@ If the framework loads, setup is complete!
 
 ---
 
-## Available Analysis Frameworks (30 frameworks + 3 aliases + 1 output tool)
+## Available Analysis Frameworks (34 frameworks + 3 aliases + 1 output tool)
 
-### Core Stock Analysis (4 frameworks)
+### Core Stock Analysis (5 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
@@ -50,14 +50,17 @@ If the framework loads, setup is complete!
 | Stock Valuation | `@prompts/stock-valuation.md` | DCF + comparable companies + EV multiples |
 | Technical Analysis | `@prompts/technical-analysis.md` | Chart patterns, volume, indicators |
 | Economics Analysis | `@prompts/economics-analysis.md` | Macro indicators, recession probability |
+| Head-to-Head Compare | `@prompts/compare.md` | Compare 2–5 stocks head to head on one table — business quality, growth, valuation, balance sheet, momentum, risks and catalysts — then argue the pick: which one, why, what would flip it, and whether owning more than one adds anything |
 
-### Financial Report Analysis (3 frameworks)
+### Financial Report Analysis (5 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
 | Financial Report Analyst | `@prompts/financial-report-analyst.md` | 10-K, 10-Q, annual reports |
 | 10-K Report Digest | `@prompts/10k-digest.md` | Structured digest doc — abstract, section summaries, metrics, refs (EN/繁中) |
 | Earnings Call Analysis | `@prompts/earnings-call-analysis.md` | Management tone, guidance, themes |
+| Forensic Accounting | `@prompts/forensic-accounting.md` | Earnings-quality forensics — Beneish M-Score, Altman Z, Sloan accruals ratio, cash-vs-earnings divergence, SBC-adjusted FCF, revenue-recognition and capitalisation checks, auditor and related-party flags, scored as a Manipulation Risk Score 0–10 |
+| Credit Check | `@prompts/credit-check.md` | Balance-sheet solvency and refinancing risk — debt maturity wall, interest coverage trend, leverage vs. covenants, liquidity runway, ratings and spreads, the cost of refinancing at today's rates, and an equity-holder verdict, scored as a Credit Health Score 0–10 |
 
 ### Market Monitoring (4 frameworks)
 
@@ -68,7 +71,7 @@ If the framework loads, setup is complete!
 | Dividend Analysis | `@prompts/dividend-analysis.md` | Dividend safety, yield trap detection |
 | Short Interest | `@prompts/short-interest.md` | Short squeeze scoring, thesis evaluation |
 
-### Advanced Analysis (14 frameworks)
+### Advanced Analysis (15 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
@@ -86,6 +89,7 @@ If the framework loads, setup is complete!
 | Earnings Preview | `@prompts/earnings-preview.md` | The before-earnings skill — consensus vs. whisper, 8-quarter beat rate and post-print move distribution, options-implied vs. realized move, what the current price already assumes, the KPIs to watch, and a three-scenario grid (beat-and-raise / beat-and-lower / miss) with expected reaction and a position rule for each |
 | Tax Lens | `@prompts/tax-lens.md` | US tax mechanics for a position or portfolio — short- vs. long-term treatment, wash-sale window check, qualified-dividend holding-period test, lot selection (specific-ID vs. FIFO), tax-loss-harvesting pairs, account placement, estimated annual tax drag — plus a --non-us module (W-8BEN, dividend withholding and treaty rates, capital-gains treatment, US estate-tax exposure, UCITS alternatives). Educational only, never tax advice |
 | Risk Stress Test | `@prompts/risk-stress-test.md` | Portfolio and position risk report — beta-weighted exposure, historical scenario replay (2008, March 2020, 2022 rate shock, 2025 tariff shock), parametric VaR / CVaR at 95 / 99 %, max-drawdown estimate, correlation-spike scenario, rate / USD / oil sensitivity, liquidity (days to exit at 20 % of ADV), and a Risk Budget Score 0–10 |
+| Trade Post-Mortem | `@prompts/trade-postmortem.md` | Review a closed trade or a year of trades — process vs. outcome matrix, plan adherence, the biases that showed up, what the pre-trade skills said, and the one lesson for the journal; reads closed thesis-tracker files |
 
 ### Full Report (1 frameworks)
 
@@ -411,7 +415,7 @@ InvestSkill/
 │       └── invest-skill.mdc      # This file (auto-loaded)
 ├── .github/
 │   └── copilot-instructions.md   # GitHub Copilot integration
-├── prompts/                       # 30 frameworks (+ 3 aliases, 1 output tool)
+├── prompts/                       # 34 frameworks (+ 3 aliases, 1 output tool)
 │   ├── stock-eval.md
 │   ├── stock-valuation.md
 │   ├── fundamental-analysis.md
@@ -441,6 +445,10 @@ InvestSkill/
 │   ├── risk-stress-test.md
 │   ├── learning-coach.md
 │   ├── fact-check.md
+│   ├── trade-postmortem.md
+│   ├── forensic-accounting.md
+│   ├── credit-check.md
+│   ├── compare.md
 │   └── report-generator.md     # HTML/PDF report design system
 ├── plugins/
 │   └── us-stock-analysis/
@@ -574,7 +582,7 @@ Analyze AAPL with:
 - **README.md** — Full setup for Claude Code, Gemini, Copilot, Cursor
 - **GEMINI.md** — Detailed Gemini CLI guide
 - **.github/copilot-instructions.md** — GitHub Copilot integration guide
-- **prompts/** — All 30 framework files (+ 3 aliases, 1 output tool)
+- **prompts/** — All 34 framework files (+ 3 aliases, 1 output tool)
 - **GitHub Issues** — Report problems or request features
 
 ---

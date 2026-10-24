@@ -18,7 +18,7 @@ Found an issue? Help us fix it.
 
 Include:
 - Platform (Claude Code, Cursor, Gemini CLI, etc.)
-- Your version: `npm test` shows version
+- Your version: `/plugin list` in Claude Code, or `jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json`
 - Steps to reproduce
 - Expected vs. actual behavior
 - Error messages (full output)
@@ -53,12 +53,7 @@ Improvements to:
 
 Want to create a new analysis framework?
 
-**See [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md)** for:
-- Complete 12-step walkthrough
-- File structure & templates
-- Platform sync checklist
-- Testing procedures
-- Review process
+Start with `node scripts/new-skill.js <name> --category … --title … --desc …` — it scaffolds the skill with the full output contract and wires it into the site, READMEs, cross-AI configs and CHANGELOG. **See [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md)** for what is left to do by hand, testing, and the PR checklist.
 
 ### 5. 🧪 Fix Bugs
 
@@ -67,10 +62,12 @@ Found and fixed a bug? We'd love your PR!
 ### 6. ✨ Enhance Existing Skills
 
 Improvements to existing frameworks:
-- Better algorithms
+- Better methodology or thresholds
 - More comprehensive analysis
-- Faster computation
+- Clearer output
 - Better documentation
+
+Edit `plugins/us-stock-analysis/skills/<name>/SKILL.md`, then run `node scripts/sync-prompts.js <name>` — the universal `prompts/<name>.md` is generated from it and must never be edited by hand (`npm test` fails on drift). If the prompt grows on purpose, run `npm run prompt:budgets` and commit `tests/prompt-budgets.json`.
 
 ---
 
@@ -89,8 +86,8 @@ Improvements to existing frameworks:
 git clone https://github.com/yennanliu/InvestSkill.git
 cd InvestSkill
 
-# Install dependencies (if any)
-npm install
+# Install dev dependencies (the plugin itself has none)
+npm ci
 
 # Run test suite
 npm test
@@ -109,11 +106,12 @@ npm run verify
 npm run pre-release
 
 # Or individually
-npm test                          # Unit tests (skills + install script)
-npm run test:install              # install.sh only (lint-style + sandboxed runs)
+npm test                          # Every offline suite: structure + counts, skill contract, prompt sync, LLM I/O, EDGAR helpers, install script
+npm run test:install              # install.sh only (static checks + sandboxed runs)
 npm run validate                  # Prompt quality
+npm run prompt:diff               # What your branch changed in the prompts
+npm run build:site                # Site builds; npm run check:links checks its links
 npm run verify                    # Setup verification
-npm run integration-tests         # Platform artifacts
 ```
 
 All tests must pass before submitting a PR.
@@ -149,8 +147,8 @@ All tests must pass before submitting a PR.
 
 4. **Test your changes**
    ```bash
-   npm test                    # Unit tests
-   npm run integration-tests   # Platform tests
+   npm test                    # All offline suites
+   npm run build:site          # Site still builds
    npm run pre-release         # Full validation
    ```
 
@@ -167,8 +165,8 @@ All tests must pass before submitting a PR.
 
 ### PR Checklist
 
-- [ ] Tests pass: `npm test` shows 270+ passed
-- [ ] Linting passes: No warnings
+- [ ] Tests pass: `npm test` reports 0 failed
+- [ ] Prompts regenerated with `sync-prompts.js` if a `SKILL.md` changed
 - [ ] Documentation updated
 - [ ] Commit messages are clear
 - [ ] Changes follow project conventions
@@ -222,14 +220,12 @@ All tests must pass before submitting a PR.
 
 Quick summary:
 
-1. Create skill directory: `plugins/us-stock-analysis/skills/skill-name/`
-2. Write `SKILL.md` (Claude Code skill definition)
-3. Copy to `prompts/skill-name.md` (universal prompt, no frontmatter)
-4. Register in `plugin.json`
-5. Update `.cursor/rules/`, `GEMINI.md`, `.github/copilot-instructions.md`
-6. Update README files & CHANGELOG
-7. Run full test suite
-8. Submit PR with all changes
+1. `node scripts/new-skill.js skill-name --category <core|reports|monitoring|advanced|meta> --title "…" --desc "…"` — scaffolds `SKILL.md` and wires the skill into every file (skills are auto-discovered; no `plugin.json` change)
+2. Write the analysis in `plugins/us-stock-analysis/skills/skill-name/SKILL.md`
+3. `node scripts/sync-prompts.js skill-name` — generates `prompts/skill-name.md`
+4. Update the framework / skill counts `npm test` reports, and `npm run prompt:budgets -- --add-missing`
+5. `npm test` and `npm run build:site`
+6. Submit the PR — no version bump; the release does that
 
 ---
 
@@ -239,7 +235,7 @@ Quick summary:
 
 ✅ **Good PRs have:**
 - Clear purpose & description
-- Tests passing (270+ unit tests, 22 integration tests)
+- Tests passing (`npm test`, and CI on the PR)
 - Updated documentation
 - Focused, logical commits
 - Follows project conventions
@@ -278,6 +274,8 @@ Reviewers will provide feedback, or approve and merge.
 | **[ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md)** | Complete contributor guide |
 | **[FAQ.md](FAQ.md)** | Common questions & answers |
 | **[CHANGELOG.md](CHANGELOG.md)** | Version history |
+| **[RELEASE-QUICK-REFERENCE.md](RELEASE-QUICK-REFERENCE.md)** | How releases are cut |
+| **[CI-CD-GUIDE.md](CI-CD-GUIDE.md)** | What each workflow checks |
 | **[doc/archive/DEPLOYMENT-STATUS.md](doc/archive/DEPLOYMENT-STATUS.md)** | Historical platform status (archived) |
 
 ---

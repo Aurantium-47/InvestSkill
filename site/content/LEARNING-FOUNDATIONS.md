@@ -211,6 +211,26 @@ Everything in the lessons ahead — statements, quality, valuation, market, port
 
 ---
 
+## Check yourself
+
+1. Company A trades at $20 with 600 million shares outstanding; Company B trades at $400 with 20 million shares. Which is the bigger company, and which size bucket does each fall into?
+2. You buy Apple shares on Nasdaq today. Does Apple receive your money? Which market is this?
+3. A stock you own falls 20% in a month, then fully recovers over the next year, and you held throughout. Did you suffer the kind of risk that matters most? What would have turned it into that kind?
+4. A stock rises 4% in a year and pays a 2.5% dividend. What was its total return, and at that rate, roughly how long would your money take to double?
+5. Your savings account pays 1% a year while inflation runs at 3%. The balance grows every year — so why might you still be getting poorer?
+
+<details><summary>Answers</summary>
+
+1. Company A: $20 × 600M = **$12 billion** (large cap, over $10B). Company B: $400 × 20M = **$8 billion** (mid cap, $2–10B). The lower share price belongs to the bigger company — size is market cap, not price.
+2. No. That is the **secondary market**: you are buying existing shares from another investor, and the company gets no new cash. A company raises money only in the primary market, for example at its IPO.
+3. No — that was **volatility**, not a **permanent loss of capital**. It becomes a real loss if you sell near the bottom, or if the business itself erodes or fails so the price never comes back.
+4. Total return = price appreciation + dividends = 4% + 2.5% ≈ **6.5%**. Rule of 72: 72 ÷ 6.5 ≈ **11 years** to double.
+5. Because purchasing power is what counts. Prices rising 3% while your money earns 1% means you can buy about 2% less each year — a negative real return. Beating inflation is the minimum bar for building real wealth.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - A stock is fractional ownership of a real business, giving you a claim on its profits and assets.

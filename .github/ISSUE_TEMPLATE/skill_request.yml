@@ -1,0 +1,21 @@
+name: Skill request or improvement
+description: Propose a new analysis framework, or a change to an existing one
+labels: [enhancement]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: The investor question it answers
+      description: What would you ask the skill, and why can't an existing skill (see the Choose a Skill page) answer it?
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: What the output should contain
+      description: Sections, metrics with formulas or thresholds, and how it would score. Every analysis skill ends with the standard Investment Signal block.
+  - type: input
+    id: related
+    attributes:
+      label: Related skills
+      placeholder: stock-eval, bear-case

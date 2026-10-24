@@ -7,12 +7,14 @@ The previous long-form backlog (last updated 2026-02-24) is archived at [doc/arc
 ## Top 5
 
 1. **`full-report --depth comprehensive` runs every framework** — add the frameworks missing since v1.8 (`bear-case` above all) plus the new Tier 1 skills where they fit, swap the alias modules for their targets, add `--skip <skill>`. → roadmap §4.3
-2. **`--lang zh-TW` on every skill + a machine-readable JSON footer** — the remaining two items of the skill contract (§4.1); the footer is what lets `eval-skills.js` and `result-validator` parse results without regex on box-drawing characters.
-3. **Learning lessons: Macro & the Fed Cycle, Options for Stock Investors** — the two §5.1 lessons still open (Lesson 5 has the material); plus self-check quizzes for Lessons 1–8 and the printable cheat sheet (§5.4). → roadmap §5.1, §5.4
-4. **Non-US Investor Guide page** — Lesson 11's non-US section is the core; the page adds brokers, FX, and account opening (§5.4). Glossary: the ~16 filing / technical terms still missing (§5.3).
-5. **Tier 2 skills as demand shows** — `forensic-accounting`, `proxy-governance`, `trade-postmortem` (closed `thesis-tracker` files are its input), `investment-policy`. → roadmap §3.2
+2. **`--lang zh-TW` on every skill** — the last open item of the skill contract (§4.1); the JSON footer has shipped.
+3. **Non-US Investor Guide page** — Lesson 11's non-US section is the core; the page adds brokers, FX, and account opening (§5.4). Glossary: the filing / technical / macro / options terms still missing (§5.3).
+4. **zh Skill Reference index** — `skills-zh-tw.html` with Chinese category headings, so the language switch never dead-ends to English (§5.6).
+5. **Tier 2 skills as demand shows** — `proxy-governance`, `investment-policy`, `ipo-analysis`, `pair-trade`; and `special-situations` / `watchlist` from the [2026-10 scan](doc/PROJECT-SCAN-2026-10.md) §4.1. → roadmap §3.2
 
 ## Recently shipped from the roadmap
+
+- From the [2026-10 project scan](doc/PROJECT-SCAN-2026-10.md) (§8 there): the Thesis Invalidation fence bug in 19 skills, `full-report` scoring fixes, a working `npm run release` and one release path, one CI workflow, the JSON footer, four new skills (`trade-postmortem`, `forensic-accounting`, `compare`, `credit-check`) and `--sector` KPI packs, Lessons 14–15 (Macro & the Fed, Options), Check-yourself for Lessons 1–8, the cheat sheet, the FAQ on the site, sitemap / Open Graph / hreflang / section-level search, and parity, fence and anchor checks
 
 - Stale counts fixed and historical docs archived (§7)
 - Skill contract enforced on every analysis skill — `Data & Sources` header, Data Verification gate, Thesis Invalidation — with `scripts/check-skill-contract.js` in `npm test` (§4.1, §6.3)

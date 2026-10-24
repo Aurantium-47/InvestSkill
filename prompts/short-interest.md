@@ -5,7 +5,7 @@
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — shares short and its settlement date (exchange reports twice a month), float, average daily volume (for days to cover), borrow fee / utilization if available, and the date of each figure.
 3. **State your data source** — fill in the `Data & Sources` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -152,8 +152,8 @@ Understand why short sellers are positioned against the company:
 - **Structural decline**: Industry secular headwinds, obsolescence risk, debt spiral
 
 **Short Seller Credibility Assessment**
-- Known activist short sellers (Hindenburg, Citron, Muddy Waters, Gotham City): publish detailed reports, track record publicly known
-- Hedge fund shorts (13F disclosures): disclosed quarterly, often fundamental/valuation-based
+- Known activist short sellers (Muddy Waters, Citron, Gotham City, Kerrisdale; Hindenburg Research closed in January 2025, but its past reports still move stocks when revisited): publish detailed reports, track record publicly known
+- Hedge fund shorts: **not** visible in 13F filings, which report long positions only. US short positions surface only in aggregate (exchange short-interest reports twice a month; the SEC's Rule 13f-2 / Form SHO aggregate reporting once in force) or through the fund's own letters; in Europe, net shorts above 0.5% of share capital are published by name. Usually fundamental/valuation-based
 - Anonymous internet posts: low credibility, but sometimes contain legitimate leads
 - Evaluate track record: success rate of prior short thesis for identified short seller
 
@@ -350,11 +350,6 @@ Squeeze Probability: Low / Moderate / High / Very High / Extreme
 - Borrow rate level that signals imminent covering pressure
 - Price level that would technically confirm squeeze initiation
 
-## Standard Signal Output
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -373,6 +368,17 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Standard Signal Output
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "short-interest", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

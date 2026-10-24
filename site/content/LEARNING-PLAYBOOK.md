@@ -262,6 +262,26 @@ The point: same disciplined loop, dialed to the risk. See **real, step-by-step r
 
 ---
 
+## Check yourself
+
+1. Name the eight stages of the professional's loop, in order.
+2. Apple scores as a high-quality business, yet the decision is "buy on weakness / hold," not "buy." Which two numbers in the lesson drive that?
+3. Using the Step 8 trading plan, the stock falls to $158 and then rebounds to $210. Which rungs filled, how large is the position, and what does the plan say to do at $210?
+4. The stock is up 40% since your first buy and every KPI on the dashboard is intact. Is that a reason to sell? What are the four reasons a professional does sell?
+5. Name two of the thesis-invalidation triggers written for the Apple thesis. Why are they written at purchase rather than later?
+
+<details><summary>Answers</summary>
+
+1. Idea → thesis → research plan → analyze → decide & size → trading plan → monitor → review / sell.
+2. The price (~$200) sits **above the base-case fair value (~$185)**, so the margin of safety is negative; and the **P/E of ~32×** is above the ~20–25× the business has historically commanded. Great company, full price: the discipline is to wait.
+3. The **starter (≤ $175, ~1.5%)** and **Add #1 (~$160, +1.5%)** filled; Add #2 (~$145) did not. The position is about **3%**. At $210 the price is above base fair value but below the $230 trim level, so: no adds, hold.
+4. No — "it's up 40%" is not a reason to sell a compounder. The four reasons: **the thesis broke** (a trigger fired), **a materially better opportunity**, **extreme overvaluation** (far beyond even the bull case), and **position / risk management** (it grew past the concentration cap).
+5. Any two of: gross margin structurally below ~40%; services growth stalls; buybacks halted and cash redeployed into value-destructive M&A; a regulatory ruling permanently impairs the App Store or search economics; the one-sentence thesis is no longer true. They are written while you are calm and objective — not in the middle of a 20% drawdown, when you will rationalize anything.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - Run the **same loop every time**: idea → thesis → plan → analyze → decide → trading plan → monitor → review. Repeatable beats brilliant.

@@ -262,7 +262,7 @@ In `--non-us` mode, replace "Harvest capture" with **Estate-tax exposure** (10 l
 
 ```
 User: tax-lens AVGO — I hold 20 sh bought 2026-05-30 @ $128 (taxable) and 10 sh bought
-      2025-08-14 @ $96. Price $122. I want to sell 15 shares and rebuy lower with the
+      2025-05-14 @ $96. Price $122. I want to sell 15 shares and rebuy lower with the
       position-ladder plan. 24% bracket, single, DRIP is on.
 
 The assistant opens with the not-tax-advice banner and a Data & Sources header (tax year 2026,
@@ -327,6 +327,12 @@ After delivering the analysis signal, specify what would reverse it:
 This skill measures **tax efficiency of the action or portfolio as specified, not the merit of the investment**, so state the mapping: `Signal: BULLISH` means proceed as planned from a tax standpoint; `NEUTRAL` means the same trade should be done differently (lot choice, timing, account); `BEARISH` means the action as specified is tax-inefficient (a wash, a short-term gain days from long-term, a large avoidable withholding or estate exposure). `Action: BUY / HOLD / SELL` refers to **the tax plan** — adopt it / adjust it / abandon it — never to the stock. Read the investment view from `stock-eval`, `dividend-analysis`, or `etf-analysis`.
 
 All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "tax-lens", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
 
 ```
 ╔══════════════════════════════════════════════╗

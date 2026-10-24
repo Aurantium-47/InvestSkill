@@ -81,13 +81,14 @@ InvestSkill:
 
 ## Supported Versions
 
+Only the **latest minor release** is supported. Fixes ship as a new patch release on top of it rather than as backports to older lines.
+
 | Version | Status | Support |
 |---------|--------|---------|
-| 1.4.0 | ✅ Current | Full support |
-| 1.3.0 | ⚠️ Legacy | Critical fixes only |
-| 1.2.0 & earlier | ❌ Unsupported | No support |
+| Latest minor (see [plugin.json](plugins/us-stock-analysis/.claude-plugin/plugin.json) / [CHANGELOG](CHANGELOG.md)) | ✅ Supported | Security and bug fixes |
+| Any earlier minor | ❌ Unsupported | Upgrade to the latest release |
 
-**Note**: Update to latest version for security patches and improvements.
+**Note**: Update to the latest version for security patches and improvements — `/plugin marketplace update invest-skill` in Claude Code, or re-run the `install.sh` command.
 
 ---
 
@@ -95,7 +96,7 @@ InvestSkill:
 
 Before using InvestSkill:
 
-- [ ] Running latest version (v1.4.0+)
+- [ ] Running the latest release
 - [ ] Using trusted Claude Code/Cursor/platform version
 - [ ] No credentials or API keys stored in repository
 - [ ] Not sharing analysis with untrusted parties
@@ -219,7 +220,7 @@ All InvestSkill platforms are equally safe:
 ### Security Updates
 
 - **v1.4.0** (2026-02-27): Initial security policy
-- Future updates tracked here
+- **Later**: supported-versions policy changed to "latest minor only"; security-relevant changes are listed in [CHANGELOG.md](CHANGELOG.md)
 
 ---
 

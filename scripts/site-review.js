@@ -11,7 +11,14 @@
  * deleted on every run, so qa/ never accumulates history (the CI job commits
  * the deletions alongside the new report).
  *
- * Usage:  node scripts/site-review.js        (npm run review)
+ * Quiet history: with --only-on-change the report is written only when the
+ * result differs from the newest report already in qa/ (overall status, each
+ * check's status, and the snapshot numbers — dates and timings excluded), so a
+ * green day with nothing new produces no commit. Every run also prints the
+ * report, and CI copies it to the job summary.
+ *
+ * Usage:  node scripts/site-review.js                    (npm run review)
+ *         node scripts/site-review.js --only-on-change   (CI)
  * CI:     .github/workflows/site-review.yml  (daily cron)
  *
  * Exit code: 0 if every check passed, 1 otherwise (the report is still
@@ -23,6 +30,8 @@ const { execSync } = require('child_process');
 
 const ROOT = path.join(__dirname, '..');
 const QA_DIR = path.join(ROOT, 'qa');
+const reg = require('./lib/skill-registry');
+const ONLY_ON_CHANGE = process.argv.includes('--only-on-change');
 
 // How many daily reports to keep in qa/ (today's run included).
 const RETENTION_DAYS = 5;
@@ -46,11 +55,9 @@ const readJSON = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const firstMatch = (s, re) => { const m = s.match(re); return m ? m[0].trim() : ''; };
 
 // ── Repo snapshot ─────────────────────────────────────────────────────────────
-const skillsDir = path.join(ROOT, 'plugins/us-stock-analysis/skills');
-const skillCount = fs.readdirSync(skillsDir).filter(d => fs.statSync(path.join(skillsDir, d)).isDirectory()).length;
-const promptCount = fs.readdirSync(path.join(ROOT, 'prompts')).filter(f => f.endsWith('.md')).length;
-const OUTPUT_TOOLS = ['report-generator'];
-const advertised = skillCount - OUTPUT_TOOLS.length;
+const skillCount = reg.listSkillDirs().length;
+const promptCount = reg.listPromptNames().length;
+const advertised = reg.frameworkCount();
 
 const pkg = readJSON('package.json');
 const plugin = readJSON('plugins/us-stock-analysis/.claude-plugin/plugin.json');
@@ -71,10 +78,12 @@ checks.push({
   detail: firstMatch(links.out, /(Link check passed[^\n]*|\d+ broken internal link[^\n]*)/i) || (links.ok ? 'ok' : 'broken links'),
 });
 
-const tests = run('node scripts/test-skills.js');
-const passed = (tests.out.match(/Passed:\s*(\d+)/) || [])[1] || '?';
-const failed = (tests.out.match(/Failed:\s*(\d+)/) || [])[1] || '?';
-checks.push({ name: 'Test suite', ok: tests.ok, detail: `${passed} passed, ${failed} failed` });
+// The full suite (`npm test`): every sub-suite prints its own Passed/Failed lines.
+const tests = run('npm test --silent');
+const sum = (re) => [...tests.out.matchAll(re)].reduce((n, m) => n + parseInt(m[1], 10), 0);
+const passed = sum(/Passed:\s*(\d+)/g) + sum(/(\d+) checks passed/g);
+const failed = sum(/Failed:\s*(\d+)/g) + sum(/(\d+) failed,/g);
+checks.push({ name: 'Test suite (npm test)', ok: tests.ok, detail: `${passed} passed, ${failed} failed` });
 
 const validate = run('node scripts/validate-prompts.js');
 checks.push({ name: 'Prompt validation', ok: validate.ok, detail: validate.ok ? 'valid' : 'issues found' });
@@ -100,20 +109,38 @@ md += `\n## Snapshot\n\n| Metric | Value |\n|---|---|\n`;
 md += `| Version | ${plugin.version} |\n`;
 md += `| Skill directories | ${skillCount} |\n`;
 md += `| Universal prompts | ${promptCount} |\n`;
-md += `| Advertised frameworks | ${advertised} (${skillCount} − ${OUTPUT_TOOLS.length} output tool) |\n`;
+md += `| Advertised frameworks | ${advertised} (${skillCount} − ${reg.OUTPUT_TOOLS.length} output tool − ${reg.ALIAS_SKILLS.length} aliases) |\n`;
 md += `| Built HTML pages | ${pageCount} |\n`;
 
 if (!allOk) {
   md += `\n## ⚠️ Failing check output\n\n`;
   checks.filter(c => !c.ok).forEach(c => {
-    const src = c.name === 'Test suite' ? tests.out : c.name === 'Internal links' ? links.out : c.name === 'Site build' ? build.out : validate.out;
+    const src = c.name.startsWith('Test suite') ? tests.out : c.name === 'Internal links' ? links.out : c.name === 'Site build' ? build.out : validate.out;
     md += `### ${c.name}\n\n\`\`\`\n${(src || '').trim().slice(-1200)}\n\`\`\`\n\n`;
   });
 }
 
-md += `\n---\n*Report ${stamp} · generated ${now.toISOString()}*\n`;
+// What "changed" means for --only-on-change: the verdicts and the snapshot,
+// not the date or anything that varies run to run.
+const signature = JSON.stringify({
+  ok: allOk,
+  checks: checks.map(c => [c.name, c.ok]),
+  snapshot: [plugin.version, skillCount, promptCount, advertised, pageCount],
+});
+md += `\n---\n*Report ${stamp} · generated ${now.toISOString()}*\n<!-- status: ${signature} -->\n`;
 
 fs.mkdirSync(QA_DIR, { recursive: true });
+const reports0 = fs.readdirSync(QA_DIR).filter(f => /^site_review_\d{8}\.md$/.test(f)).sort();
+const latest = reports0.length ? fs.readFileSync(path.join(QA_DIR, reports0[reports0.length - 1]), 'utf8') : '';
+const latestSig = (latest.match(/<!-- status: (.*) -->/) || [])[1];
+const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+if (summaryFile) fs.appendFileSync(summaryFile, md);
+
+if (ONLY_ON_CHANGE && latestSig === signature) {
+  console.log(`= status unchanged since ${reports0[reports0.length - 1]} — no new report written (overall ${allOk ? 'PASS' : 'FAIL'})`);
+  checks.forEach(c => console.log(`  ${c.ok ? '✅' : '❌'} ${c.name}: ${c.detail}`));
+  process.exit(allOk ? 0 : 1);
+}
 const outFile = path.join(QA_DIR, `site_review_${stamp}.md`);
 fs.writeFileSync(outFile, md);
 

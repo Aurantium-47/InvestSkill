@@ -1,9 +1,11 @@
 name: Daily Site Review
 
-# Runs the automated site-review health check once per day and commits a
-# dated report to qa/site_review_YYYYMMDD.md. The script also prunes reports
-# older than the 5-day retention window, and those deletions are committed in
-# the same commit. Also runnable on demand.
+# Runs the automated site-review health check once per day. The report always
+# goes to the job summary; it is committed to qa/site_review_YYYYMMDD.md only
+# when the result changed since the newest report there (--only-on-change), so
+# green days with nothing new add no commit. The script also prunes reports
+# beyond the 5-day retention window, committed in the same commit. Also
+# runnable on demand.
 on:
   schedule:
     - cron: '17 6 * * *'   # 06:17 UTC daily
@@ -25,14 +27,15 @@ jobs:
       uses: actions/setup-node@v5
       with:
         node-version: '22'
+        cache: npm
 
-    - name: Install build dependencies
-      run: npm install --no-save markdown-it@^14.0.0 markdown-it-anchor@^8.6.7
+    - name: Install dependencies
+      run: npm ci
 
     - name: Run site review
       id: review
       continue-on-error: true
-      run: node scripts/site-review.js
+      run: node scripts/site-review.js --only-on-change
 
     - name: Commit report to qa/ (and prune old ones)
       if: always()
@@ -45,12 +48,12 @@ jobs:
         if git diff --cached --quiet; then
           echo "No report changes to commit."
         else
-          git commit -m "chore(qa): daily site review report $(date -u +%Y%m%d) (keep last 5 days)"
+          git commit -m "chore(qa): site review status changed $(date -u +%Y%m%d) (keep last 5 days)"
           git push
         fi
 
     - name: Reflect check status
       if: steps.review.outcome == 'failure'
       run: |
-        echo "::warning::Daily site review found failing checks — see the committed qa/ report."
+        echo "::warning::Daily site review found failing checks — see the job summary."
         exit 1

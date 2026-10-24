@@ -1,0 +1,54 @@
+name: CI
+
+# One workflow for every push and PR: the full offline suite (`npm test` —
+# structure, skill contract, prompt sync, LLM I/O contract, EDGAR helpers,
+# release/scaffold tooling, install script) and the site build + link check.
+# Specialised jobs stay in their own workflows: install-script.yml (shellcheck,
+# OS/node matrix, live curl | bash installs) and llm-eval.yml (prompt diff and
+# the live Claude eval).
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: npm test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Manifests are valid JSON
+        run: |
+          jq empty plugins/us-stock-analysis/.claude-plugin/plugin.json
+          jq empty .claude-plugin/marketplace.json
+      - name: Full offline suite
+        run: npm test
+
+  site:
+    name: Site build + links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build the site
+        run: npm run build:site
+      - name: Internal links and anchors
+        run: node scripts/check-links.js

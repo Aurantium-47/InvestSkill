@@ -242,6 +242,26 @@ Same four reasons as the Playbook — for AMD, #1 (thesis broken) is the one to 
 
 ---
 
+## Check yourself
+
+1. AMD's GAAP net income is about $1.6B, yet its free cash flow is about $3–4B. What explains the gap, and which number better describes the business's cash reality?
+2. The fair-value range is roughly $90–210 with a base case of ~$140. Why is the right response a smaller position and a scale-in plan rather than a more precise model?
+3. Using the Step 8 trading plan, the stock falls to $105 and then recovers to $150. Which rungs filled, how large is the position, and what does the plan say to do at $150?
+4. Apple's playbook uses a 5% core position with an 8% cap; AMD's uses ≤ 3% with a ≤ 4% cap. Give three reasons from the lesson for the difference.
+5. Name two AMD-specific thesis-invalidation triggers. Separately: after a rally AMD has grown to 5% of your portfolio and every KPI is intact — what does the plan say?
+
+<details><summary>Answers</summary>
+
+1. Largely **non-cash amortization from the Xilinx acquisition** (~$3B a year), which depresses GAAP earnings without consuming cash. **FCF** is the cash reality; GAAP is the optics.
+2. A ±60% range is the honest picture of a bet on an uncertain AI ramp — the outcome depends on execution you cannot yet confirm. False precision would not shrink that uncertainty; a small position with staged entries means a wrong thesis costs a scratch, not a scar.
+3. The **starter (≤ $130, ~1%)** and **Add #1 (~$110, +1%)** filled; Add #2 (~$90) did not. The position is about **2%**. At $150 the price is above base fair value (~$140) but below the $200 trim level: no adds, hold.
+4. Any three of: confidence is only **medium** (cyclical, execution-dependent); the AI-GPU **moat is contested** by NVIDIA's CUDA; the **fair-value range is very wide** (±60%); the stock is volatile, with **±30–40% swings** to be expected; ROIC is modest and cyclical. That makes it a satellite, not a core.
+5. Triggers (any two): Data Center growth decelerates sharply or guidance is cut; the MI300 / AI ramp misses guidance for two-plus quarters; gross margin stalls or falls; NVIDIA extends its software lead and customers standardize on CUDA; the one-sentence thesis is no longer true. At 5% it is past the 4% cap, so **trim back to target** — sell reason #4, risk management — even with the thesis intact.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - The **same 10-step loop** works on a volatile AI-semi name as on a steady compounder — you just adjust size, bands, and triggers to the risk.

@@ -1,6 +1,6 @@
 # InvestSkill — GitHub Copilot Setup & Usage Guide
 
-This repository contains 30 professional investment analysis frameworks for US stock markets. When working in this workspace, Copilot automatically loads these analysis methodologies to provide institutional-quality investment analysis.
+This repository contains 34 professional investment analysis frameworks for US stock markets. When working in this workspace, Copilot automatically loads these analysis methodologies to provide institutional-quality investment analysis.
 
 ## Installation & Setup
 
@@ -21,7 +21,7 @@ GitHub Copilot automatically loads this file when you work in the InvestSkill re
 
 3. **Open Copilot Chat** (usually `Ctrl+K` or `Cmd+K`)
    - Copilot automatically loads `copilot-instructions.md`
-   - You now have access to all 30 analysis frameworks
+   - You now have access to all 34 analysis frameworks
 
 ### Verify Setup
 
@@ -34,9 +34,9 @@ If Copilot references the frameworks, setup is complete!
 
 ---
 
-## Available Analysis Frameworks (30 frameworks + 3 aliases + 1 output tool)
+## Available Analysis Frameworks (34 frameworks + 3 aliases + 1 output tool)
 
-### Core Stock Analysis (4 frameworks)
+### Core Stock Analysis (5 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
@@ -44,14 +44,17 @@ If Copilot references the frameworks, setup is complete!
 | Stock Valuation | `prompts/stock-valuation.md` | Multi-method valuation (DCF + comps + EV) |
 | Technical Analysis | `prompts/technical-analysis.md` | Chart patterns and indicators |
 | Economics Analysis | `prompts/economics-analysis.md` | Macro outlook and recession risk |
+| Head-to-Head Compare | `prompts/compare.md` | Compare 2–5 stocks head to head on one table — business quality, growth, valuation, balance sheet, momentum, risks and catalysts — then argue the pick: which one, why, what would flip it, and whether owning more than one adds anything |
 
-### Financial Report Analysis (3 frameworks)
+### Financial Report Analysis (5 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
 | Financial Report Analyst | `prompts/financial-report-analyst.md` | 10-K/10-Q analysis |
 | 10-K Report Digest | `prompts/10k-digest.md` | Structured digest doc — abstract, summaries, metrics, refs (EN/繁中) |
 | Earnings Call Analysis | `prompts/earnings-call-analysis.md` | Management tone and guidance |
+| Forensic Accounting | `prompts/forensic-accounting.md` | Earnings-quality forensics — Beneish M-Score, Altman Z, Sloan accruals ratio, cash-vs-earnings divergence, SBC-adjusted FCF, revenue-recognition and capitalisation checks, auditor and related-party flags, scored as a Manipulation Risk Score 0–10 |
+| Credit Check | `prompts/credit-check.md` | Balance-sheet solvency and refinancing risk — debt maturity wall, interest coverage trend, leverage vs. covenants, liquidity runway, ratings and spreads, the cost of refinancing at today's rates, and an equity-holder verdict, scored as a Credit Health Score 0–10 |
 
 ### Market Monitoring (4 frameworks)
 
@@ -62,7 +65,7 @@ If Copilot references the frameworks, setup is complete!
 | Dividend Analysis | `prompts/dividend-analysis.md` | Dividend safety and sustainability |
 | Short Interest | `prompts/short-interest.md` | Squeeze potential and bearish thesis |
 
-### Advanced Analysis (14 frameworks)
+### Advanced Analysis (15 frameworks)
 
 | Framework | File | Best For |
 |-----------|------|----------|
@@ -80,6 +83,7 @@ If Copilot references the frameworks, setup is complete!
 | Earnings Preview | `prompts/earnings-preview.md` | The before-earnings skill — consensus vs. whisper, 8-quarter beat rate and post-print move distribution, options-implied vs. realized move, what the current price already assumes, the KPIs to watch, and a three-scenario grid (beat-and-raise / beat-and-lower / miss) with expected reaction and a position rule for each |
 | Tax Lens | `prompts/tax-lens.md` | US tax mechanics for a position or portfolio — short- vs. long-term treatment, wash-sale window check, qualified-dividend holding-period test, lot selection (specific-ID vs. FIFO), tax-loss-harvesting pairs, account placement, estimated annual tax drag — plus a --non-us module (W-8BEN, dividend withholding and treaty rates, capital-gains treatment, US estate-tax exposure, UCITS alternatives). Educational only, never tax advice |
 | Risk Stress Test | `prompts/risk-stress-test.md` | Portfolio and position risk report — beta-weighted exposure, historical scenario replay (2008, March 2020, 2022 rate shock, 2025 tariff shock), parametric VaR / CVaR at 95 / 99 %, max-drawdown estimate, correlation-spike scenario, rate / USD / oil sensitivity, liquidity (days to exit at 20 % of ADV), and a Risk Budget Score 0–10 |
+| Trade Post-Mortem | `prompts/trade-postmortem.md` | Review a closed trade or a year of trades — process vs. outcome matrix, plan adherence, the biases that showed up, what the pre-trade skills said, and the one lesson for the journal; reads closed thesis-tracker files |
 
 ### Full Report (1 frameworks)
 
@@ -368,7 +372,7 @@ What's the valuation in the:
 
 ```
 InvestSkill/
-├── prompts/                    # 30 analysis frameworks (+ 3 aliases, 1 output tool)
+├── prompts/                    # 34 analysis frameworks (+ 3 aliases, 1 output tool)
 │   ├── stock-eval.md
 │   ├── stock-valuation.md
 │   ├── fundamental-analysis.md
@@ -398,6 +402,10 @@ InvestSkill/
 │   ├── risk-stress-test.md
 │   ├── learning-coach.md
 │   ├── fact-check.md
+│   ├── trade-postmortem.md
+│   ├── forensic-accounting.md
+│   ├── credit-check.md
+│   ├── compare.md
 │   └── report-generator.md     # HTML/PDF report design system
 ├── plugins/                    # Claude Code plugin (optional)
 ├── .github/copilot-instructions.md  # This file (auto-loaded)
@@ -445,7 +453,7 @@ Use the stock-eval framework for MSFT, but format as:
 
 ## Project Overview
 
-- **30 Institutional-Quality Frameworks** — all tested and validated (plus 3 aliases and 1 output tool)
+- **34 Institutional-Quality Frameworks** — all tested and validated (plus 3 aliases and 1 output tool)
 - **Works with Copilot Chat** — integrated into VS Code and JetBrains IDEs
 - **Universal Prompts** — also work with Gemini CLI, Cursor, and any AI tool
 - **Educational Focus** — for learning institutional analysis methods
@@ -456,7 +464,7 @@ Use the stock-eval framework for MSFT, but format as:
 ## Additional Resources
 
 - **README.md** — Complete setup guide for all platforms (Claude Code, Gemini, Cursor)
-- **prompts/** — All 30 analysis framework files (+ 3 aliases, 1 output tool)
+- **prompts/** — All 34 analysis framework files (+ 3 aliases, 1 output tool)
 - **plugins/** — Claude Code plugin integration (optional)
 - **GitHub Issues** — Report problems or request features
 

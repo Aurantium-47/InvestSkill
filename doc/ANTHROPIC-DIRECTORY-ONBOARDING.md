@@ -39,7 +39,7 @@ claude plugin validate ./plugins/us-stock-analysis
 npm test
 ```
 
-At v1.13.0 this prints `✔ Validation passed` with one warning (no icon).
+At v1.13.0 this printed `✔ Validation passed` with one warning (no icon); with the icon added after v1.13.0 it passes with no warnings.
 
 ### 3.2 Readiness checklist
 
@@ -50,15 +50,15 @@ At v1.13.0 this prints `✔ Validation passed` with one warning (no icon).
 | `README.md` of ≥ 40 words (outside code blocks) in the plugin folder — shown as the listing description | Blocks | ✅ |
 | No `.DS_Store` / `Thumbs.db` / `__MACOSX` in the plugin folder | Blocks | ✅ |
 | No symlinks, submodules, or Git LFS files | Blocks | ✅ |
-| ≤ 512 files; each non-image file < 256 KiB; text and images only | Held for reviewer | ✅ 36 files, all Markdown/JSON |
+| ≤ 512 files; each non-image file < 256 KiB; text and images only | Held for reviewer | ✅ 41 files: Markdown, JSON and one PNG icon |
 | No hooks, MCP servers, `npx`/`uvx` launchers, or credentials | Blocks / held | ✅ Prompt files only |
 | Valid YAML front matter with a text `description` in every `SKILL.md` | Blocks | ✅ Enforced by `npm test` |
-| Icon — square PNG/JPEG, 512–2048 px, < 2 MB, at `.claude-plugin/icon.png` | Warning | ⚠️ None |
+| Icon — square PNG/JPEG, 512–2048 px, < 2 MB, at `.claude-plugin/icon.png` | Warning | ✅ 512 × 512 PNG (the site's mark) |
 | Distinctive name | Held for reviewer | ⚠️ See §3.3 |
 
 ### 3.3 Two decisions to make first
 
-1. **Icon.** Optional, but the portal takes the icon **only on the first save** — adding one later does not change the listing. If we want one, commit `plugins/us-stock-analysis/.claude-plugin/icon.png` before step 4.2.
+1. **Icon.** Optional, but the portal takes the icon **only on the first save** — adding one later does not change the listing. `plugins/us-stock-analysis/.claude-plugin/icon.png` is now committed (512 × 512, the site's coral chart mark); replace it before step 4.2 if a different icon is wanted.
 2. **Name.** `us-stock-analysis` is made of generic words, and other authors publish plugins with the same name in third-party directories, so review may raise *"Name may be confused with an existing listing"*. That is a hold, not a rejection. To reduce the risk, add a `displayName` to `plugin.json`, e.g. `"displayName": "InvestSkill — US Stock Analysis"`. Do **not** change `name`: it is the install slug, and changing it breaks `us-stock-analysis@invest-skill` for existing users.
 
 ## 4. Submission steps

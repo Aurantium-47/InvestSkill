@@ -74,8 +74,8 @@ function checkPlatformSpecific(content, filename) {
     issues.push('@-references in prompt body (should only be in instructions)');
   }
 
-  // Check for `> ` prompts (Gemini CLI specific)
-  if (content.match(/^\s*>\s+[a-zA-Z]/m) && !filename.includes('research')) {
+  // Gemini CLI prompt lines ("> @prompts/x.md …"). A markdown blockquote is not one.
+  if (content.match(/^\s*>\s+@/m)) {
     issues.push('Interactive prompts `> ` (Gemini CLI specific)');
   }
 
@@ -87,24 +87,20 @@ function checkPlatformSpecific(content, filename) {
 }
 
 /**
- * Check for required sections
+ * Check the document shape every generated prompt shares: one H1 title at the
+ * top, at least three ## sections, and an output section or the signal block.
+ * (The output contract itself — Data & Sources, Data Verification, Thesis
+ * Invalidation, signal block, JSON footer, disclaimer — is check-skill-contract.js.)
  */
 function checkSections(content, filename) {
-  const requiredPatterns = [
-    { name: 'Instructions/Overview', pattern: /^#\s+(Overview|Instructions|Framework|Analysis)/m },
-    { name: 'Key Components', pattern: /^##\s+(Key|Steps|Framework|Components|Analysis|Method)/m },
-    { name: 'Output Format', pattern: /(output|format|result|deliverable)/i }
-  ];
-
   const missing = [];
-  requiredPatterns.forEach(({ name, pattern }) => {
-    if (!pattern.test(content)) {
-      missing.push(name);
-    }
-  });
-
+  const h1 = content.match(/^# .+$/gm) || [];
+  if (!/^# /.test(content.trimStart())) missing.push('H1 title on the first line');
+  if (h1.length > 1 && !/```/.test(content)) missing.push('a single H1');
+  if ((content.match(/^## /gm) || []).length < 3) missing.push('at least three ## sections');
+  if (!/^#{2,3} .*(Output|Signal|Report|Deliverable)/mi.test(content) && !content.includes('INVESTMENT SIGNAL')) missing.push('an output section');
   if (missing.length > 0) {
-    console.log(`   ⚠️  ${filename}: Missing sections: ${missing.join(', ')}`);
+    console.log(`   ⚠️  ${filename}: Missing ${missing.join(', ')}`);
     warnings++;
   }
 }
@@ -144,7 +140,9 @@ function checkFormatting(content, filename) {
 function checkTokenCount(content, filename) {
   const tokens = estimateTokens(content);
 
-  if (tokens > 5000) {
+  // Per-file size budgets live in tests/prompt-budgets.json (test-llm-io.js);
+  // this only flags a prompt big enough to crowd a small model's context.
+  if (tokens > 16000) {
     console.log(`   ⚠️  ${filename}: Large prompt (${tokens} estimated tokens)`);
     console.log(`      Consider breaking into sub-prompts if >6000 tokens`);
     warnings++;

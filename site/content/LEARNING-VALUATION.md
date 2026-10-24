@@ -157,6 +157,28 @@ No single tool works everywhere. Match the method to the company.
 
 In practice, professionals rarely rely on one method. They triangulate — a DCF plus a comps check plus a sanity check on FCF yield — and worry when the methods strongly disagree.
 
+---
+
+## Check yourself
+
+1. Why is a dollar you receive in ten years worth less than a dollar today, and which input in a DCF captures that?
+2. In the lesson's worked DCF, what share of the total intrinsic value came from the terminal value — and why should that make you humble about the answer?
+3. A company is losing money. Why is its P/E useless, and what does the lesson suggest instead?
+4. You estimate a stock is worth $80; it trades at $60. What is your margin of safety, and is it enough if the business is early-stage and hard to forecast?
+5. Two companies each have a $10B market cap. One has $5B of debt and no cash; the other has $2B of cash and no debt. What is each one's enterprise value, and why compare them on EV/EBITDA rather than P/E?
+
+<details><summary>Answers</summary>
+
+1. Because today's dollar can be invested and grown in the meantime. The **discount rate** (for a whole company, the WACC) shrinks each future cash flow back to today: `Present value = Future cash ÷ (1 + WACC)^years`. A higher WACC means future cash is worth less today.
+2. **74%** ($1,243 of $1,682) — inside the typical 60–80% range. Most of a DCF's answer comes from cash far in the future, which is exactly the part you know least about.
+3. With no earnings there is nothing to divide by, so P/E is meaningless. Use **P/S** against peers (carefully — sales without profit can be worthless), and size the opportunity with TAM, comparables, and a scenario DCF.
+4. (80 − 60) ÷ 80 = **25%**. For a low-confidence, hard-to-forecast business the lesson suggests **40%+**, which would mean paying about **$48** or less. Not enough.
+5. EV = market cap + debt − cash: **$15B** for the indebted company, **$8B** for the cash-rich one. EV is the cost of buying the whole business, including paying off its debt, so EV multiples compare a debt-laden and a debt-free company fairly; P/E cannot.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - **Price is quoted; value is estimated.** Your edge is buying when your value estimate sits well above the price.

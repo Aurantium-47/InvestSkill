@@ -9,7 +9,7 @@ description: Evaluate US stocks with comprehensive fundamental and valuation ana
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — the latest reported quarter and fiscal year (revenue, EPS, margins, FCF), current multiples (P/E, EV/EBITDA, P/FCF) computed from the confirmed price, net debt, and consensus estimates with their date.
 3. **State your data source** — fill in the `Data & Sources` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -211,11 +211,11 @@ When a visual or report output is needed, populate these tables for chart genera
 **Revenue & Earnings Growth**
 ```
 Year    Revenue ($M)    Revenue Growth %    Net Income ($M)    EPS ($)
-2020    [value]         [%]                 [value]            [value]
-2021    [value]         [%]                 [value]            [value]
-2022    [value]         [%]                 [value]            [value]
-2023    [value]         [%]                 [value]            [value]
-2024    [value]         [%]                 [value]            [value]
+FY-4    [value]         [%]                 [value]            [value]
+FY-3    [value]         [%]                 [value]            [value]
+FY-2    [value]         [%]                 [value]            [value]
+FY-1    [value]         [%]                 [value]            [value]
+FY0     [value]         [%]                 [value]            [value]    ← latest reported fiscal year (label with the actual years)
 ```
 
 **Profit Margin Trends**
@@ -380,6 +380,8 @@ ROIC vs. WACC spread trend (expanding = improving value creation, compressing = 
 ---
 
 ## DCF Framework
+
+> **A quick DCF, not the valuation of record.** This section gives a fast intrinsic-value range to place the stock in context. For the full model — WACC decomposition, three scenarios, sensitivity tables and comparables — run `stock-valuation`, and when the two disagree, use its number. Both use the same Gordon-growth terminal value; this quick version cross-checks with an EV/EBITDA exit multiple, `stock-valuation` with EV/FCF, so expect small differences.
 
 ### Step-by-Step DCF Methodology
 
@@ -589,6 +591,44 @@ Track the direction of earnings estimate changes over time:
 
 ---
 
+## Sector KPI Packs (`--sector`)
+
+Generic operating-company metrics mislead in five sectors. When the user passes `--sector <bank|insurer|reit|biotech|saas>` — or the company is clearly in one of them (SIC code, business description) — **swap the generic metrics for the sector pack, say which pack was applied, and drop the metrics in its "Ignore" line** (or show them only with a note that they are not meaningful here). Pull the KPIs from the 10-K / 10-Q and, where they are not GAAP line items (CET1, occupancy, NRR), from the company's supplemental disclosures, regulatory filings or earnings release — never from memory.
+
+```
+/stock-eval ZEPH --sector saas
+/financial-report-analyst ZEPH 10-K --sector reit
+```
+
+**bank**
+- *Swap in:* CET1 ratio vs. its regulatory minimum + buffers · net interest margin (NIM) · efficiency ratio (non-interest expense / revenue) · NPL ratio and net charge-off (NCO) ratio · allowance / loans · loan-to-deposit ratio · deposit beta (Δ deposit cost / Δ policy rate) and uninsured-deposit share · AOCI and held-to-maturity unrealised losses vs. tangible equity · ROTCE · P/TBV
+- *Ignore:* P/E as the primary multiple, EV/EBITDA, Altman Z, Beneish, current ratio, DSO/DIO, debt/equity and FCF (deposits and loans are the business, not its financing)
+- *Read:* efficiency < 60% is good; NCO ratio against the bank's own cycle history; HTM losses above ~25% of tangible equity are a warning; justify P/TBV with ROTCE (fair P/TBV ≈ ROTCE / cost of equity)
+
+**insurer**
+- *Swap in:* combined ratio = loss ratio + expense ratio (P&C) · prior-year reserve development (favourable / adverse, % of opening reserves) · net investment yield and portfolio credit mix · book value per share growth (with and ex-AOCI) · ROE · P/B · solvency: RBC ratio (US) or Solvency II ratio
+- *Ignore:* EV/EBITDA, Altman Z, Beneish, FCF, working-capital days, and premium growth as a quality signal (fast growth can mean under-pricing)
+- *Read:* combined ratio < 100% = underwriting profit; repeated adverse development is a major flag; BVPS growth plus dividends is the compounding measure; justify P/B with sustainable ROE
+
+**reit**
+- *Swap in:* FFO and AFFO per share (NAREIT FFO; AFFO deducts recurring capex, straight-line rent and leasing costs) · P/FFO and P/AFFO · occupancy · same-store NOI growth · weighted average lease expiry (WALE) and the lease-expiry ladder · net debt / EBITDA and fixed-charge coverage · AFFO payout ratio · NAV and implied cap rate
+- *Ignore:* EPS and P/E (real-estate depreciation distorts GAAP earnings), Altman X2 (REITs must distribute income), FCF before AFFO adjustments
+- *Read:* AFFO payout < ~85% leaves room to grow the dividend, > 100% is unfunded; sector net debt / EBITDA typically runs 5–7×; falling occupancy or negative same-store NOI is the operating warning
+
+**biotech**
+- *Swap in:* cash runway in quarters = (cash + investments) / quarterly operating burn · pipeline table (asset, indication, phase, next readout, partner, economics) · probability of success to approval by phase · catalysts (readouts, PDUFA dates, advisory committees) · partnerships (upfronts, milestones, royalties, who holds which rights) · dilution history (shares outstanding over 3–5 years, ATM use, offerings and their discounts)
+- *Ignore:* P/E, EV/EBITDA, margins, ROIC, Piotroski F-Score (pre-revenue companies fail it by construction), and DCFs built on management's peak-sales claims
+- *Read:* runway < 6 quarters means a raise is near. Rough base rates to approval from industry clinical-success studies (BIO / Informa, all indications): Phase 1 ≈ 8–10%, Phase 2 ≈ 15%, Phase 3 ≈ 50–60%, filed (NDA/BLA) ≈ 90%; oncology runs lower. Risk-adjust every pipeline value by them and hand the dates to `catalyst-calendar`
+
+**saas**
+- *Swap in:* ARR and ARR growth · net revenue retention (NRR) and gross revenue retention (GRR) · Rule of 40 (revenue growth % + FCF margin %) · CAC payback (months) = S&M / (net-new ARR × gross margin) × 12 · subscription gross margin · SBC-adjusted FCF margin · RPO and current RPO (cRPO) growth vs. revenue growth
+- *Ignore:* GAAP P/E for early-stage names, EV/EBITDA that adds back SBC, headline FCF margin without deducting SBC, current ratio (deferred revenue inflates current liabilities)
+- *Read:* NRR > 110% strong, < 100% means the base is shrinking; GRR > 90%; Rule of 40 ≥ 40 on the SBC-adjusted margin; CAC payback < 24 months; cRPO growing slower than revenue is a leading deceleration signal
+
+**How the pack changes the rest of the analysis.** Valuation switches to the sector multiple (P/TBV, P/B, P/AFFO, risk-adjusted pipeline value, EV/ARR or EV/revenue vs. growth); quality uses the sector KPIs in place of the generic margin and ratio checks; risk adds the sector's failure mode (deposit flight and rate marks for banks, reserve inadequacy for insurers, refinancing and occupancy for REITs, trial failure and dilution for biotech, retention decay for SaaS). Everything else — data verification, thesis invalidation and the signal block — is unchanged. State in the output which generic metrics were dropped and why.
+
+---
+
 ## Output Format
 
 Provide clear, actionable insights structured as follows:
@@ -602,11 +642,6 @@ Provide clear, actionable insights structured as follows:
 7. **Price Targets**: Bull / Base / Bear case with probability weighting
 8. **Recommended Entry Zone**: Based on margin of safety and technical support levels
 
-## Standard Signal Output
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -625,6 +660,17 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Standard Signal Output
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "stock-eval", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

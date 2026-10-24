@@ -29,7 +29,7 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const reg = require('./lib/skill-registry');
 
 const ROOT = reg.ROOT;
@@ -45,6 +45,8 @@ const CATEGORIES = {
   advanced:   { site: 'Advanced Research',   readme: 'Advanced Research',   zh: '進階分析',     crossai: 'Advanced Analysis' },
   meta:       { site: 'Meta & Output',       readme: 'Meta & Output',       zh: '元技能與輸出', crossai: 'Meta-Analysis & Visualization' },
 };
+
+const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\&-]/g, '\\$&');
 
 function die(msg) { process.stderr.write(`\n  ✗ ${msg}\n\n`); process.exit(1); }
 
@@ -83,7 +85,7 @@ description: ${desc}
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — TODO: the specific figures this skill needs (which filing or data series, which period), each with its date.
 3. **State your data source** — fill in the \`Data & Sources\` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -197,6 +199,12 @@ After delivering the analysis signal, specify what would reverse it:
 
 All analysis concludes with this standardized block:
 
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+\`\`\`json
+{"investskill": "1", "skill": "${name}", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+\`\`\`
+
 \`\`\`
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -222,7 +230,7 @@ fs.writeFileSync(path.join(skillDir, 'SKILL.md'), template);
 done.push(`plugins/us-stock-analysis/skills/${name}/SKILL.md (template — replace every TODO)`);
 
 // ── 2. prompt ─────────────────────────────────────────────────────────────────
-execSync(`node ${path.join(__dirname, 'sync-prompts.js')} ${name}`, { stdio: 'ignore' });
+execFileSync(process.execPath, [path.join(__dirname, 'sync-prompts.js'), name], { stdio: 'ignore' });
 done.push(`prompts/${name}.md (generated)`);
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -255,7 +263,7 @@ function edit(file, fn) {
 
 // ── 3. site categories ────────────────────────────────────────────────────────
 edit('site/build/build-site.js', t => {
-  const re = new RegExp(`(\\{ title: '${cat.site.replace(/[&]/g, '\\$&')}',\\s*skills: \\[)([^\\]]*)(\\])`);
+  const re = new RegExp(`(\\{ title: '${escapeRegExp(cat.site)}',\\s*skills: \\[)([^\\]]*)(\\])`);
   return t.replace(re, (_, a, b, c) => `${a}${b.trimEnd()}${b.trim() ? ',' : ''}'${name}'${c}`);
 });
 
@@ -267,15 +275,16 @@ edit('site/content/CHOOSE-A-SKILL-zh-TW.md', t =>
 
 // ── 5. READMEs ────────────────────────────────────────────────────────────────
 edit('README.md', t =>
-  appendTableRow(t, new RegExp(`^### ${cat.readme.replace(/[&]/g, '\\$&')}\\s*$`), `| \`${name}\` | ${desc} |`, 'README.md'));
+  appendTableRow(t, new RegExp(`^### ${escapeRegExp(cat.readme)}\\s*$`), `| \`${name}\` | ${desc} |`, 'README.md'));
 edit('README-zh-TW.md', t => {
-  const re = new RegExp(`^(\\| \\*\\*${cat.zh}\\*\\* \\()(\\d+)(\\) \\| )([^|]*?)(\\s*\\|)`, 'm');
+  // "(5)" or, for the meta row, "(5 + 1 輸出工具)" — only the leading count is bumped.
+  const re = new RegExp(`^(\\| \\*\\*${escapeRegExp(cat.zh)}\\*\\* \\()(\\d+)([^)]*\\) \\| )([^|]*?)(\\s*\\|)`, 'm');
   if (!re.test(t)) { todo.push(`README-zh-TW.md: category row "${cat.zh}" not found`); return t; }
   return t.replace(re, (_, a, n, b, cell, tail) => `${a}${parseInt(n, 10) + 1}${b}${cell.trimEnd()} · **${name}**${tail}`);
 });
 
 // ── 6. cross-AI configs ───────────────────────────────────────────────────────
-const crossHeading = new RegExp(`^### ${cat.crossai.replace(/[&-]/g, '\\$&')} \\(\\d+ (?:skills|frameworks)\\)`, 'm');
+const crossHeading = new RegExp(`^### ${escapeRegExp(cat.crossai)} \\(\\d+ (?:skills|frameworks)\\)`, 'm');
 edit('GEMINI.md', t => insertTreeLine(bumpHeadingCount(
   appendTableRow(t, crossHeading, `| ${title} | \`@prompts/${name}.md\` | \`${example}\` |`, 'GEMINI.md'), crossHeading), 'GEMINI.md'));
 edit('.cursor/rules/invest-skill.mdc', t => insertTreeLine(bumpHeadingCount(
@@ -305,6 +314,6 @@ process.stdout.write(`   5. npm test && npm run build:site             # counts,
 
 if (!has('no-test')) {
   try {
-    execSync(`node ${path.join(__dirname, 'check-skill-contract.js')} --quiet`, { stdio: 'inherit' });
+    execFileSync(process.execPath, [path.join(__dirname, 'check-skill-contract.js'), '--quiet'], { stdio: 'inherit' });
   } catch (e) { process.exit(1); }
 }

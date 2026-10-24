@@ -6,6 +6,30 @@ description: Run InvestSkill analysis modules on a stock at configurable depth a
 
 Orchestrate InvestSkill analysis modules on one ticker at your chosen depth, synthesize findings into a unified investment thesis with composite scoring, and produce a standalone professional HTML report with interactive Chart.js visualizations.
 
+## Data Verification
+
+**Open the report with a `Data & Sources` header** (see [Data & Accuracy](https://yennanliu.github.io/InvestSkill/data-and-accuracy.html)) so provenance is explicit:
+
+```
+Data & Sources
+  As of:      <date the figures represent>
+  Source:     <primary docs — SEC EDGAR 10-K/10-Q, company IR, FRED, …>
+  Retrieval:  <pasted by user | web/tool retrieval | model memory>
+  Confidence: <HIGH | MEDIUM | LOW>
+```
+
+Before rendering the final report, verify:
+- The `Data & Sources` header is present and the Retrieval/Confidence are honest (flag "model memory" as LOW)
+- All executed modules returned scores (not blank)
+- Scores are within 0–10 range
+- Weighted composite arithmetic is correct (weights sum to 100%)
+- Missing modules for quick/standard depth are flagged as "not assessed" and the re-weighted component weights are shown
+- No data older than 90 days used without explicit warning
+
+**Then run `fact-check` on the composite** (every figure the modules produced, verified against the filing and market data, with citations), **and hand `result-validator` two separate things**: the *corrected composite* as the analysis to validate (so its "Original Score" is the investment score, not the Verification Score), and the fact-check *ledger and Verification Score* as evidence for its Data Quality dimension. Include both scores in the report footer, labelled — a composite thesis should never ship without this verification-and-validation pass.
+
+---
+
 ## Depth Flags
 
 Select how many modules to run with `--depth`:
@@ -62,9 +86,10 @@ Establish qualitative and quantitative foundation before attempting valuation.
 
 - **stock-eval** — Company overview, competitive position, relative valuation vs. peers
 - **competitor-analysis** *(standard+)* — Moat depth, Porter's Five Forces, pricing power
+- **dividend-analysis** *(comprehensive)* — Capital allocation: dividend and buyback sustainability, FCF deployment, M&A record, debt management
 
 Output: **Business Quality Score (0–10)**
-Score reflects durability of competitive advantages, financial health, and consistency of returns.
+Score reflects durability of competitive advantages, financial health, capital allocation, and consistency of returns.
 
 ### Phase 2 — Valuation
 
@@ -123,22 +148,24 @@ Risk Profile              15%      [Phase 5 modules]
 ─────────────────────────────────────────────────────
 COMPOSITE SCORE          100%      X.X / 10
 
-Composite Interpretation:
-8.0–10.0  → Strong Buy   (all signals aligned)
-6.5–7.9   → Buy          (most signals positive)
-5.0–6.4   → Hold/Watch   (mixed signals)
-3.5–4.9   → Underweight  (mostly negative signals)
-0.0–3.4   → Sell/Avoid   (strong negative signals)
+Composite Interpretation (the standard Score Guide — the box at the end uses the same bands):
+8.0–10.0  → Strongly Bullish    (all signals aligned)
+6.0–7.9   → Moderately Bullish  (most signals positive)
+4.0–5.9   → Neutral             (mixed signals)
+2.0–3.9   → Moderately Bearish  (mostly negative signals)
+0.0–1.9   → Strongly Bearish    (strong negative signals)
 ```
 
+The composite *is* the box Score, so the box Signal follows from it: ≥ 6.0 BULLISH, 4.0–5.9 NEUTRAL, < 4.0 BEARISH. Action and Conviction are a judgement on top (a 6.2 can be BULLISH / HOLD / WEAK when the valuation is stretched), but never contradict the Signal.
+
 Sub-score derivation:
-- Business Quality: average of moat score (competitor-analysis) + financial strength (stock-eval)
+- Business Quality: average of the modules that ran — financial strength (stock-eval), moat score (competitor-analysis, standard+), capital-allocation score (dividend-analysis, comprehensive)
 - Valuation: 10 = deep discount to intrinsic value; 5 = at fair value; 0 = extreme overvaluation
 - Market Signals: weighted average of insider, institutional, and earnings call scores
 - Technical Setup: Strong=8–10, Moderate=4–7, Weak=0–3
 - Risk Profile: inverse of risk — Low risk = 8–10, High risk = 0–3; at comprehensive depth this includes the `bear-case` downside severity and the `catalyst-calendar` event risk
 
-When running quick or standard depth, scores for missing modules default to neutral (5.0) and are flagged as "not assessed" in the scorecard.
+**Missing modules are never scored as 5.0.** A sub-score is the average of the modules in its phase that actually ran. If a whole component has no module at the chosen depth (Risk Profile at `--depth quick`), drop it and re-weight the remaining components proportionally (quick: Business Quality 29.4% · Valuation 29.4% · Market Signals 23.5% · Technical Setup 17.6%). The scorecard lists every skipped module as "not assessed" and states the weights actually used, so a quick-depth composite is never presented as if it had weighed the risks.
 
 ---
 
@@ -202,7 +229,7 @@ The output file is a standalone HTML document (no external dependencies except C
 **Arguments:**
 - `<TICKER>` — required, any US-listed stock
 - `--depth` — `quick` | `standard` | `comprehensive` (default: `comprehensive`)
-- `--lang` — output language, default `en`, supports `zh-TW`, `zh-CN`, `ja`
+- `--lang` — output language, default `en`, supports `zh-TW`
 - `--output` — custom save path, default `output/`
 
 ---
@@ -213,7 +240,7 @@ The output file is a standalone HTML document (no external dependencies except C
 output/<TICKER>_report_<YYYY-MM-DD>.html
 ```
 
-Example: `output/AAPL_report_2025-06-19.html`
+Example: `output/AAPL_report_2026-10-24.html`
 
 ---
 
@@ -228,28 +255,6 @@ Example: `output/AAPL_report_2025-06-19.html`
 7. Write file to output path and confirm location
 
 ---
-
-## Data Verification
-
-**Open the report with a `Data & Sources` header** (see [Data & Accuracy](https://yennanliu.github.io/InvestSkill/data-and-accuracy.html)) so provenance is explicit:
-
-```
-Data & Sources
-  As of:      <date the figures represent>
-  Source:     <primary docs — SEC EDGAR 10-K/10-Q, company IR, FRED, …>
-  Retrieval:  <pasted by user | web/tool retrieval | model memory>
-  Confidence: <HIGH | MEDIUM | LOW>
-```
-
-Before rendering the final report, verify:
-- The `Data & Sources` header is present and the Retrieval/Confidence are honest (flag "model memory" as LOW)
-- All executed modules returned scores (not blank)
-- Scores are within 0–10 range
-- Weighted composite arithmetic is correct (weights sum to 100%)
-- Missing modules for quick/standard depth are flagged as "not assessed"
-- No data older than 90 days used without explicit warning
-
-**Then run `fact-check` on the composite** (every figure the modules produced, verified against the filing and market data, with citations), **and hand `result-validator` two separate things**: the *corrected composite* as the analysis to validate (so its "Original Score" is the investment score, not the Verification Score), and the fact-check *ledger and Verification Score* as evidence for its Data Quality dimension. Include both scores in the report footer, labelled — a composite thesis should never ship without this verification-and-validation pass.
 
 ---
 
@@ -278,6 +283,12 @@ The composite thesis is only as good as its weakest well-weighted module. After 
 ## Output Format
 
 End with the standard signal block after the final synthesis section:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "full-report", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
 
 ```
 ╔══════════════════════════════════════════════╗

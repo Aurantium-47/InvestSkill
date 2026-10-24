@@ -18,7 +18,7 @@ Evaluate the underlying data used in the analysis:
 
 | Check | Points | Notes |
 |-------|--------|-------|
-| Data sources cited or identifiable | 0–5 | Named sources score higher. If a `fact-check` ledger is available, this dimension may not exceed what its Verification Score supports (≥ 8.0 → up to 20; 6.0–7.9 → up to 15; < 6.0 → up to 10) |
+| Data sources cited or identifiable | 0–5 | Named sources score higher. If a `fact-check` ledger is available, the whole Data Quality dimension (this table, out of 20) may not exceed what its Verification Score supports (≥ 8.0 → up to 20; 6.0–7.9 → up to 15; < 6.0 → up to 10) |
 | Data recency (how fresh?) | 0–5 | <30 days = 5, 30–90 days = 3, >90 days = 1 |
 | Data completeness (missing fields?) | 0–5 | Count unfilled table cells, blanks, "N/A" |
 | Data consistency (no contradictions) | 0–5 | Flag any internal conflicts |
@@ -46,7 +46,7 @@ Evaluate the underlying data used in the analysis:
 |-------|--------|-------|
 | Technical and fundamental signals aligned | 0–7 | Same direction = 7, mixed = 3, opposing = 0 |
 | Sentiment signals (insider, institutional) aligned | 0–7 | Same direction = 7, mixed = 3, opposing = 0 |
-| Macro/sector context supports the thesis | 0–6 | Tailwinds = 6, neutral = 3, headwinds = 0 |
+| Macro/sector context addressed and consistent with the thesis | 0–6 | Context assessed and it supports the thesis direction (tailwinds for a bull case, headwinds for a bear case) = 6; mixed or only partly addressed = 3; contradicts the thesis without acknowledgment, or ignored = 0. Never reward a bullish thesis for macro tailwinds a bearish one would be penalised for |
 
 **Signal Consistency Score: __ / 20**
 
@@ -99,7 +99,15 @@ TOTAL CONFIDENCE:        __ / 100
 
 ## Flags & Red Flags
 
-List specific issues found during validation:
+List specific issues found during validation. Always check the output contract first — these are mechanical and come before any judgement:
+
+| Contract check | If it fails |
+|----------------|-------------|
+| `Data & Sources` header present with As of · Source · Retrieval · Confidence | 🚩 Red flag; Data Quality capped at 10 / 20 |
+| `Retrieval: model memory` paired with anything but `Confidence: LOW` | 🚩 Red flag |
+| Signal box complete (six fields) and its Score maps to its Signal by the Score Guide (skill-specific rules such as `fact-check`'s Verification Score excepted) | 🚩 Red flag |
+| JSON footer (```` ```json {"investskill": …} ```` right after the box) present | ⚠ Warning if missing — outputs from before the footer existed are still valid |
+| JSON footer values (signal, score, confidence, action, conviction) equal the box | 🚩 Red flag if they disagree — one of the two was edited after the other |
 
 ### ⚠ Warnings (moderate concern)
 - [List each warning]
@@ -146,7 +154,24 @@ If the validated analysis contained an Investment Signal block, reproduce it bel
 
 ## Output Format
 
-Always end with the standard signal block reflecting the **validation result itself** (not the original analysis):
+Always end with the standard signal block reflecting the **validation result itself** (not the original analysis). Fill it from the validation, not by judgement:
+
+| Box field | How it is set |
+|-----------|---------------|
+| Score | `5.0 + (Original Score − 5.0) × Confidence Score / 100` — a low-confidence analysis is pulled toward neutral. No original signal → 5.0 |
+| Signal | From that Score by the Score Guide (≥ 6.0 BULLISH · 4.0–5.9 NEUTRAL · < 4.0 BEARISH) |
+| Confidence | Confidence Tier collapsed to three: VERY HIGH / HIGH → HIGH · MEDIUM → MEDIUM · LOW / VERY LOW → LOW |
+| Horizon | The original analysis' horizon |
+| Action | The original Action if the Signal is unchanged; HOLD if the Signal moved to NEUTRAL; never a stronger action than the original |
+| Conviction | STRONG only with HIGH confidence and no red flags; WEAK with any red flag |
+
+Example: original BULLISH 7.4, Confidence Score 62 (MEDIUM) → Score 5.0 + 2.4 × 0.62 = 6.5 → BULLISH / MEDIUM / original action / MODERATE.
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "result-validator", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
 
 ```
 ╔══════════════════════════════════════════════╗

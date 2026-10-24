@@ -12,6 +12,9 @@ npm run validate            # Validate prompt file contents and format
 npm run pre-release         # Full pre-release check: pre-release-check + validate + test
 npm run verify              # Verify local setup is correct
 npm run release:dry-run     # Preview release without making changes
+npm run release             # Cut a release from main: bump 3 manifests, stamp CHANGELOG, commit, tag, push
+npm run test:tooling        # Release library, release workflow, new-skill.js smoke test (part of npm test)
+npm run check:zh            # EN ⇄ zh-TW site-content parity (part of npm test)
 npm run integration-tests   # Run integration tests
 npm run test:llm-io         # Offline output-contract, prompt and eval-harness checks (part of npm test)
 npm run prompt:diff         # What this branch changed in the prompts (tokens, description, contract)
@@ -50,7 +53,7 @@ These two files must stay in sync. The `prompts/` version is what Cursor, Gemini
 
 ### Signal Block Requirement
 
-Every SKILL.md and every `prompts/*.md` must close with the standardized Investment Signal section: the box-drawn block (UTF-8 box-drawing characters), followed only by the Score Guide / Confidence / Horizon lines, an optional one-paragraph mapping note, and the `**Disclaimer:**` line. Nothing else may follow the block. `check-skill-contract.js` and Test 5/7 validate the block's presence; the closing order is a convention every skill follows.
+Every SKILL.md and every `prompts/*.md` must close with the standardized Investment Signal section: the box-drawn block (UTF-8 box-drawing characters), followed only by the Score Guide / Confidence / Horizon lines, an optional one-paragraph mapping note, and the `**Disclaimer:**` line. Nothing else may follow the block. The box's code fence holds the box alone — no heading inside it. Just above the box fence, every skill also defines the **JSON footer** the model emits right after the box (```` ```json {"investskill": "1", "skill": …, "signal": …, "score": …} ```` — same values as the box, parsed by `parseJsonFooter` in `scripts/lib/signal-block.js`; optional on outputs, but it must agree with the box when present). `check-skill-contract.js` validates the block, the footer template and the clean fence; `test-llm-io.js` validates the closing order.
 
 ## Adding a New Skill (12-step process)
 
@@ -81,7 +84,7 @@ Always update **both** the English and Traditional Chinese (`-zh-TW`) variants o
 
 ## QA Report Retention Rule
 
-The daily site review (`npm run review` / `.github/workflows/site-review.yml`) writes `qa/site_review_YYYYMMDD.md`. **Only the last 5 days are kept** — `scripts/site-review.js` prunes older reports on every run (`RETENTION_DAYS`), and the workflow stages `qa/` with `git add -A` so those deletions land in the same commit. `qa/PROJECT-REVIEW.md` is the hand-written qualitative review and is never pruned.
+The daily site review (`npm run review` / `.github/workflows/site-review.yml`) runs the full `npm test`, the site build and the link check. In CI it runs with `--only-on-change`: the report always goes to the job summary, but `qa/site_review_YYYYMMDD.md` is written (and committed) only when the result differs from the newest report in `qa/` — green days with nothing new add no commit. **Only the last 5 reports are kept** — `scripts/site-review.js` prunes older ones (`RETENTION_DAYS`), and the workflow stages `qa/` with `git add -A` so those deletions land in the same commit. `qa/PROJECT-REVIEW.md` is the hand-written qualitative review and is never pruned.
 
 ## Install Script Rule
 
@@ -105,7 +108,7 @@ InvestSkill has **no runtime**: the skills fetch nothing. Two optional, zero-dep
 - **Never commit filings or generated real-ticker packs.** `data/filings/` and `data/fixtures/*` (except the fictional `ZEPH.md`) are ignored via `.gitignore`; real numbers go stale and PDFs bloat a markdown plugin.
 - Save text, not PDFs — the skills consume text. No Playwright / headless-browser dependency.
 - Honour SEC fair access: an identifying `User-Agent` (`EDGAR_USER_AGENT` env) and paced requests (`edgar.js` enforces the interval).
-- **Tests:** `scripts/test-edgar.js` (`npm run test:edgar`, part of `npm test` and the `test.yml` / `pr-check.yml` / `validate.yml` workflows) covers the library in-process and runs both CLIs as subprocesses against the fetch double `scripts/lib/edgar-mock-fetch.js` — no network. Add a route to the double when you add an endpoint; keep the synthetic AAPL facts equal to the real FY2025 figures so the pack stays sanity-checkable. When you change what the helpers fetch, also run them once against a real ticker.
+- **Tests:** `scripts/test-edgar.js` (`npm run test:edgar`, part of `npm test`, so it runs in `ci.yml`) covers the library in-process and runs both CLIs as subprocesses against the fetch double `scripts/lib/edgar-mock-fetch.js` — no network. Add a route to the double when you add an endpoint; keep the synthetic AAPL facts equal to the real FY2025 figures so the pack stays sanity-checkable. When you change what the helpers fetch, also run them once against a real ticker.
 
 ## LLM Eval Rule
 
@@ -143,13 +146,13 @@ Choosing the version number and *when* to cut the release both matter — don't 
 
 **When to stamp the date and tag:**
 - The `## [X.Y.Z] - YYYY-MM-DD` heading in `CHANGELOG.md` must carry the **actual release date**, not the day you started the work. If the ship date is uncertain, keep the changes under `## [Unreleased]` and let the release step stamp the date when the release is actually cut.
-- The git tag `vX.Y.Z` is created by `npm run release` (`release-interactive.js`), which commits the version bump, tags, and triggers CI. **Create the tag at release time — do not tag ahead of merge.** Preview first with `npm run release:dry-run`.
-- Feature work lands on a branch → PR → merge to `main`; the tag/release is cut from `main` once merged. The manifest version can be bumped in the feature branch (tests require CHANGELOG ↔ manifest version parity), but the *tag* waits until the release is genuinely happening.
+- The git tag `vX.Y.Z` is created by `npm run release` (`release-interactive.js`, logic in `scripts/lib/release.js`): on a clean `main` equal to `origin/main` it runs `npm run pre-release`, writes the version into all three manifests, turns `## [Unreleased]` into `## [X.Y.Z] - <today>`, commits `chore(release): vX.Y.Z`, tags, and pushes after a confirmation. Pushing the tag triggers `release.yml` — **the only workflow that tags or publishes** (it re-runs `npm test` and checks the tag against every manifest first). **Create the tag at release time — do not tag ahead of merge.** Preview first with `npm run release:dry-run`.
+- Feature work lands on a branch → PR → merge to `main`; the tag/release is cut from `main` once merged. Feature branches add their entries under `## [Unreleased]` and leave the version alone; `npm run release` bumps it and stamps the date when the release is cut (the tests check that CHANGELOG.md has a section for the manifest version).
 - Batch small changes: prefer one clean `1.9.0` release over tagging every intermediate commit. Cut the release when the set of changes is coherent and green (`npm run pre-release` passes).
 
 ## Framework Count Rule
 
-The **advertised framework count** = number of skills in `plugins/us-stock-analysis/skills/` **minus output-only tools** (`report-generator`) **minus alias/redirect stubs** (`fundamental-analysis`, `dcf-valuation`, `research-bundle`). It is currently **30 analysis frameworks** (34 skill directories − 1 output tool − 3 aliases). The classification lives in one place — `scripts/lib/skill-registry.js` (`OUTPUT_TOOLS`, `ALIAS_SKILLS`, `META_SKILLS`) — and is imported by `test-skills.js`, `test-install.js`, `check-skill-contract.js`, and `site/build/build-site.js`. The alias list is mirrored in `install.sh`'s `case` block (the install tests check parity).
+The **advertised framework count** = number of skills in `plugins/us-stock-analysis/skills/` **minus output-only tools** (`report-generator`) **minus alias/redirect stubs** (`fundamental-analysis`, `dcf-valuation`, `research-bundle`). It is currently **34 analysis frameworks** (38 skill directories − 1 output tool − 3 aliases). The classification lives in one place — `scripts/lib/skill-registry.js` (`OUTPUT_TOOLS`, `ALIAS_SKILLS`, `META_SKILLS`) — and is imported by `test-skills.js`, `test-install.js`, `check-skill-contract.js`, and `site/build/build-site.js`. The alias list is mirrored in `install.sh`'s `case` block (the install tests check parity).
 
 - Keep this number consistent across `README.md`, `README-zh-TW.md`, `site/content/CHOOSE-A-SKILL(-zh-TW).md`, `site/content/COOKBOOK(-zh-TW).md`, and `plugin.json`'s description.
 - `site/build/build-site.js` derives it automatically (`FRAMEWORK_COUNT`) — never hardcode a count there.
@@ -160,7 +163,7 @@ The **advertised framework count** = number of skills in `plugins/us-stock-analy
 ## Current State
 
 - **Version**: 1.13.0 (plugin.json = marketplace.json = package.json)
-- **Skills**: 34 directories in `plugins/us-stock-analysis/skills/` (auto-discovered)
-- **Advertised frameworks**: 30 analysis frameworks (34 − `report-generator` − 3 aliases)
-- **Prompts**: 34 universal files in `prompts/` — **generated** from SKILL.md by `scripts/sync-prompts.js` (never hand-edit them; `--check` runs in `npm test`)
+- **Skills**: 38 directories in `plugins/us-stock-analysis/skills/` (auto-discovered)
+- **Advertised frameworks**: 34 analysis frameworks (38 − `report-generator` − 3 aliases)
+- **Prompts**: 38 universal files in `prompts/` — **generated** from SKILL.md by `scripts/sync-prompts.js` (never hand-edit them; `--check` runs in `npm test`)
 - **Node**: ≥18.0.0 required

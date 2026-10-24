@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const reg = require('./lib/skill-registry');
 
 const ROOT = path.resolve(__dirname, '..');
 const VERBOSE = process.argv.includes('--verbose');
@@ -145,7 +146,9 @@ function testPlatformArtifacts() {
     
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
     if (!plugin.version) throw new Error('No version in plugin.json');
-    if (!Array.isArray(plugin.skills)) throw new Error('No skills array in plugin.json');
+    // Skills are auto-discovered from skills/; plugin.json must not pin a skills list.
+    if (Array.isArray(plugin.skills)) throw new Error('plugin.json has a skills array — skills are auto-discovered from skills/');
+    if (!reg.listSkillDirs().length) throw new Error('no skill directories found');
   });
 
   test('Marketplace manifest exists', () => {
@@ -241,7 +244,7 @@ function testNoDuplicateSkills() {
     const pluginPath = path.join(ROOT, 'plugins/us-stock-analysis/.claude-plugin/plugin.json');
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
     
-    const skills = plugin.skills;
+    const skills = reg.listSkillDirs().map(s => s.toLowerCase());
     const uniqueSkills = new Set(skills);
     
     if (skills.length !== uniqueSkills.size) {
@@ -253,7 +256,7 @@ function testNoDuplicateSkills() {
     const pluginPath = path.join(ROOT, 'plugins/us-stock-analysis/.claude-plugin/plugin.json');
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
     
-    plugin.skills.forEach(skill => {
+    reg.listSkillDirs().forEach(skill => {
       const skillPath = path.join(ROOT, `plugins/us-stock-analysis/skills/${skill}/SKILL.md`);
       if (!fs.existsSync(skillPath)) {
         throw new Error(`Missing SKILL.md for ${skill}`);
@@ -267,16 +270,14 @@ function testNoDuplicateSkills() {
     const pluginPath = path.join(ROOT, 'plugins/us-stock-analysis/.claude-plugin/plugin.json');
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
     
-    const skillNames = plugin.skills;
+    const skillNames = reg.listSkillDirs();
     const promptNames = prompts.map(p => p.replace('.md', ''));
-    
-    // report-generator is excluded from prompts (it's a tool, not an analysis framework)
-    const promptsExcluded = ['report-generator'];
-    
+    // prompts/ is generated from every skill (scripts/sync-prompts.js), output tools included.
     promptNames.forEach(prompt => {
-      if (!promptsExcluded.includes(prompt) && !skillNames.includes(prompt)) {
-        throw new Error(`Prompt ${prompt}.md has no corresponding skill`);
-      }
+      if (!skillNames.includes(prompt)) throw new Error(`Prompt ${prompt}.md has no corresponding skill`);
+    });
+    skillNames.forEach(skill => {
+      if (!promptNames.includes(skill)) throw new Error(`Skill ${skill} has no prompts/${skill}.md — run node scripts/sync-prompts.js`);
     });
   });
 }

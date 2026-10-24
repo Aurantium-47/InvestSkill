@@ -171,6 +171,26 @@ Use it as an *input*, not an oracle. A single skill sees one slice of the pictur
 
 ---
 
+## Check yourself
+
+1. Which kind of risk can diversification remove, and which can it not? Give one example of each.
+2. You own ten semiconductor stocks. Why might you be barely more diversified than if you owned one?
+3. You cap any single stock at 6% of a $200,000 portfolio. What is the most you hold in one name, and what does a 50% fall in that name cost the whole portfolio?
+4. Fund A returned 14% with 20% volatility; Fund B returned 10% with 8% volatility. The risk-free rate is 4%. Which delivered the better risk-adjusted return?
+5. Your portfolio beat the market in a strong up year, but it has a beta of 1.5. Does that prove skill?
+
+<details><summary>Answers</summary>
+
+1. **Idiosyncratic** (company-specific) risk can be diversified away — a failed product, an accounting scandal, a factory fire. **Market** (systematic) risk cannot — a recession or an interest-rate shock hits almost everything at once.
+2. Diversification's power comes from **low correlation**, not the number of holdings. Ten stocks in one industry tend to move together, so the combined path is barely calmer than one.
+3. 6% × $200,000 = **$12,000** per name. A 50% fall loses $6,000 — a **3%** hit to the portfolio: a dent, not a disaster.
+4. Sharpe = (return − risk-free) ÷ volatility. A: (14 − 4) ÷ 20 = **0.5**. B: (10 − 4) ÷ 8 = **0.75**. **Fund B** — less return, but more return per unit of risk.
+5. No. A beta-1.5 portfolio is expected to rise about 1.5 times as much as the market in an up year; beating it that way is just taking more risk. Skill shows up as **alpha** — return beyond what the beta would predict.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - Diversification removes company-specific risk but never market risk — a diversified portfolio can still fall in a downturn.

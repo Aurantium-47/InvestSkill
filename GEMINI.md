@@ -1,6 +1,6 @@
 # InvestSkill — Gemini CLI Setup & Usage Guide
 
-This project contains professional investment analysis prompt frameworks for US stock markets. When you run Gemini CLI in this directory, all 30 analysis frameworks are automatically available.
+This project contains professional investment analysis prompt frameworks for US stock markets. When you run Gemini CLI in this directory, all 34 analysis frameworks are automatically available.
 
 ## Installation & Setup
 
@@ -14,7 +14,7 @@ cd /path/to/InvestSkill
 gemini
 ```
 
-**That's it!** Gemini CLI automatically loads `GEMINI.md` and gives you access to all 30 analysis frameworks in the `prompts/` directory.
+**That's it!** Gemini CLI automatically loads `GEMINI.md` and gives you access to all 34 analysis frameworks in the `prompts/` directory.
 
 ### Verify Setup
 
@@ -28,9 +28,9 @@ When you first run `gemini`, you should see context about InvestSkill loaded. Th
 
 ---
 
-## Available Analysis Prompts (30 frameworks + 3 aliases + 1 output tool)
+## Available Analysis Prompts (34 frameworks + 3 aliases + 1 output tool)
 
-### Core Stock Analysis (4 skills)
+### Core Stock Analysis (5 skills)
 
 | Analysis Type               | Prompt File                            | Usage Example                              |
 |-----------------------------|----------------------------------------|--------------------------------------------|
@@ -38,14 +38,17 @@ When you first run `gemini`, you should see context about InvestSkill loaded. Th
 | Stock Valuation (DCF+)      | `@prompts/stock-valuation.md`          | `Analyze MSFT using all valuation methods` |
 | Technical Analysis          | `@prompts/technical-analysis.md`       | `Analyze TSLA chart patterns`              |
 | Economics Analysis          | `@prompts/economics-analysis.md`       | `What's the current economic outlook?`     |
+| Head-to-Head Compare | `@prompts/compare.md` | `Compare AMD vs NVDA vs AVGO` |
 
-### Financial Report Analysis (3 skills)
+### Financial Report Analysis (5 skills)
 
 | Analysis Type               | Prompt File                            | Usage Example                              |
 |-----------------------------|----------------------------------------|--------------------------------------------|
 | Financial Report Analyst    | `@prompts/financial-report-analyst.md` | `[paste 10-K] Analyze this filing`        |
 | 10-K Report Digest          | `@prompts/10k-digest.md`               | `NVDA FY2024 --lang zh-TW` (EN or 繁中)   |
 | Earnings Call Analysis      | `@prompts/earnings-call-analysis.md`   | `[paste transcript] Analyze sentiment`     |
+| Forensic Accounting | `@prompts/forensic-accounting.md` | `Run a forensic accounting check on SMCI` |
+| Credit Check | `@prompts/credit-check.md` | `Credit check on Carvana` |
 
 ### Market Monitoring (4 skills)
 
@@ -56,7 +59,7 @@ When you first run `gemini`, you should see context about InvestSkill loaded. Th
 | Dividend Analysis           | `@prompts/dividend-analysis.md`        | `Is JNJ dividend safe?`                    |
 | Short Interest              | `@prompts/short-interest.md`           | `What's the squeeze potential in GME?`     |
 
-### Advanced Analysis (14 skills)
+### Advanced Analysis (15 skills)
 
 | Analysis Type               | Prompt File                            | Usage Example                              |
 |-----------------------------|----------------------------------------|--------------------------------------------|
@@ -74,6 +77,7 @@ When you first run `gemini`, you should see context about InvestSkill loaded. Th
 | Earnings Preview | `@prompts/earnings-preview.md` | `NVDA reports on Aug 27 — what is priced in?` |
 | Tax Lens | `@prompts/tax-lens.md` | `I sold AVGO at a loss and want to rebuy — wash sale?` |
 | Risk Stress Test | `@prompts/risk-stress-test.md` | `Stress-test this portfolio against 2008 and 2022` |
+| Trade Post-Mortem | `@prompts/trade-postmortem.md` | `Post-mortem my closed NVDA trade` |
 
 ### Full Report (1 skills)
 
@@ -331,7 +335,7 @@ All analyses end with this format:
 
 ```
 InvestSkill/
-├── prompts/                    # 30 analysis frameworks (+ 3 aliases, 1 output tool)
+├── prompts/                    # 34 analysis frameworks (+ 3 aliases, 1 output tool)
 │   ├── stock-eval.md
 │   ├── stock-valuation.md
 │   ├── fundamental-analysis.md
@@ -361,6 +365,10 @@ InvestSkill/
 │   ├── risk-stress-test.md
 │   ├── learning-coach.md
 │   ├── fact-check.md
+│   ├── trade-postmortem.md
+│   ├── forensic-accounting.md
+│   ├── credit-check.md
+│   ├── compare.md
 │   └── report-generator.md     # HTML/PDF report design system
 ├── plugins/                    # Claude Code plugin (optional)
 │   └── us-stock-analysis/
@@ -408,7 +416,7 @@ gemini
 ## Additional Resources
 
 - **README.md** — Complete project overview and all platforms
-- **prompts/** directory — All 30 analysis frameworks
+- **prompts/** directory — All 34 analysis frameworks
 - **plugins/** — Claude Code plugin configuration (if using Claude Code)
 - **GitHub Issues** — Report bugs or suggest improvements
 

@@ -24,7 +24,7 @@ Released 2026-10-11. Prompts are now tested like code, and every demo is a real,
 ### Claude Code
 ```bash
 /plugin marketplace add yennanliu/InvestSkill
-/plugin install us-stock-analysis
+/plugin install us-stock-analysis@invest-skill
 /us-stock-analysis:stock-eval AAPL
 ```
 
@@ -50,7 +50,7 @@ gemini
 
 | Platform | Status | Installation | Documentation |
 |----------|--------|---------------|----------------|
-| Claude Code | ✅ Available | `/plugin install us-stock-analysis` or `install.sh -a claude` | [README-claude-code.md](README-claude-code.md) |
+| Claude Code | ✅ Available | `/plugin install us-stock-analysis@invest-skill` or `install.sh -a claude` | [README-claude-code.md](README-claude-code.md) |
 | Cursor IDE | ✅ Available | Auto-loads from `.cursor/rules/invest-skill.mdc` or `install.sh -a cursor` | [README-cursor.md](README-cursor.md) |
 | Gemini CLI | ✅ Available | Auto-loads from `GEMINI.md` or `install.sh -a gemini` | [README-gemini.md](README-gemini.md) |
 | GitHub Copilot | ✅ Available | Auto-loads from `.github/copilot-instructions.md` or `install.sh -a copilot` | [README.md](README.md) |

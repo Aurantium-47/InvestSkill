@@ -242,6 +242,6 @@ The disposition-effect portfolio keeps the broken company and gives away the com
 
 ---
 
-> **Next / Related:** Previous lesson — [Earnings Season, Explained](learning-earnings.html). Next: [**Case Study: When the Answer Is No**](learning-case-pass.html) shows the loop ending in a pass, twice. Or head back to the [Learning hub](learning.html), then [Choose a Skill](choose-a-skill.html) to put it to work. See also [Concepts](concepts.html) and the [Glossary](glossary.html).
+> **Next / Related:** Previous lesson — [Earnings Season, Explained](learning-earnings.html). Next: [**Lesson 14 · Macro & the Fed Cycle →**](learning-macro.html). The capstone [**Case Study: When the Answer Is No**](learning-case-pass.html) shows the loop ending in a pass, twice. Or head back to the [Learning hub](learning.html), then [Choose a Skill](choose-a-skill.html) to put it to work. See also [Concepts](concepts.html) and the [Glossary](glossary.html).
 
 *Educational content only. Not financial advice.*

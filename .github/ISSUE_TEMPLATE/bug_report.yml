@@ -1,0 +1,42 @@
+name: Bug report
+description: A skill, the installer, the site or a script does something wrong
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. To ask for an analysis of a stock, install InvestSkill and run it in your assistant — an issue can't run one.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options: [A skill's output or instructions, Installing (Claude Code plugin or install.sh), The documentation site, A repo script or test, Other]
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Assistant and version
+      description: e.g. Claude Code 2.x on macOS · Cursor · Gemini CLI · Copilot · Codex
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Skill (if any)
+      placeholder: stock-eval
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+      description: For a skill, paste the command and the part of the output that is wrong (the signal block and the Data & Sources header help most).
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. /plugin install us-stock-analysis@invest-skill
+        2. /us-stock-analysis:stock-eval AAPL
+        3. …

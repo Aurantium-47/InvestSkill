@@ -18,7 +18,7 @@ console.log('🔍 Running pre-release validation checks...\n');
 
 /**
  * ─────────────────────────────────────────────────────────────────
- * 1. CHECK: All 18 skills registered in plugin.json
+ * 1. CHECK: skills are auto-discovered (plugin.json pins no bare-name skills list)
  * ─────────────────────────────────────────────────────────────────
  */
 function checkSkillsRegistry() {
@@ -65,15 +65,9 @@ function checkPromptsSync() {
     return fs.statSync(path.join(skillsDir, f)).isDirectory();
   });
 
-  // Skills that don't need universal prompts (output tools, not analysis frameworks)
-  const promptsExcluded = ['report-generator'];
-
-  // Check each skill has a corresponding prompt
+  // Check each skill has a corresponding prompt (prompts/ is generated from
+  // every skill by scripts/sync-prompts.js, output tools included)
   skillDirs.forEach(skill => {
-    if (promptsExcluded.includes(skill)) {
-      return; // Skip excluded skills
-    }
-
     const promptFile = `${skill}.md`;
     if (!promptFiles.includes(promptFile)) {
       console.log(`   ✗ MISSING: prompts/${promptFile} for skill ${skill}`);

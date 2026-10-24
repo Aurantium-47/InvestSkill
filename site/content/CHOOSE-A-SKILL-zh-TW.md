@@ -1,6 +1,6 @@
 # 選擇技能
 
-> 30 個框架不算少。本頁將你的*目標*對應到合適的技能——並釐清大家最常問的重疊之處。第一次來？先從 `stock-eval` 開始；它一次就觸及品質、價值與風險。
+> 34 個框架不算少。本頁將你的*目標*對應到合適的技能——並釐清大家最常問的重疊之處。第一次來？先從 `stock-eval` 開始；它一次就觸及品質、價值與風險。
 
 ---
 
@@ -13,7 +13,11 @@
 | 判斷它*便宜還是貴* | `stock-valuation` | `bear-case` |
 | 取得嚴謹的*內在價值* | `stock-valuation`（其 DCF 方法＋敏感度表） | `result-validator` |
 | 讀 10-K／10-Q 找出警訊 | `financial-report-analyst` | `earnings-call-analysis` |
+| 取得 10-K 的*逐節結構化摘要*（英文或繁中） | `10k-digest` | `financial-report-analyst` |
+| 檢查公司*公布的盈餘是否可信* | `forensic-accounting` | `financial-report-analyst` |
+| 知道公司*還不還得起債、能不能再融資* | `credit-check` | `dividend-analysis` |
 | 評估一場法說會 | `earnings-call-analysis` | `options-analysis` |
+| 看未來 90 天可能影響股價的*重要事件日程* | `catalyst-calendar` | `thesis-tracker` |
 | 檢查*股利是否安全* | `dividend-analysis` | `portfolio-review` |
 | *抓進出場時機* | `technical-analysis` | `chart-master` |
 | 評估*競爭護城河* | `competitor-analysis` | `industry-map` |
@@ -27,6 +31,8 @@
 | 挑選*選擇權*策略 | `options-analysis` | `technical-analysis` |
 | 判讀*總經*環境 | `economics-analysis` | `sector-analysis` |
 | 找*類股輪動*機會 | `sector-analysis` | `stock-eval` |
+| 在 2–5 檔股票之間*並排比較、做出選擇* | `compare` | `bear-case` |
+| 從*較長的股票清單*中排名、找出最佳候選 | `stock-screener` | `compare` |
 | 檢視我的*整體投組* | `portfolio-review` | `dividend-analysis` |
 | 建立*單一完整投資論述* | `full-report` | `result-validator` |
 | 匯出*精美的 HTML 報告* | `full-report` | `report-generator` |
@@ -38,6 +44,7 @@
 | 看清一筆交易或投組的*稅務後果*（美國人，或非美國投資人） | `tax-lens` | — |
 | 知道我的*投組在惡劣環境下可能虧多少* | `risk-stress-test` | — |
 | *看懂*我剛拿到的分析（並學會背後的概念） | `learning-coach` | — |
+| *從已平倉的交易中學習*（流程 vs. 結果） | `trade-postmortem` | `thesis-tracker` |
 
 ---
 
@@ -105,7 +112,7 @@
 事關重大時先跑 `fact-check`——建構良好但輸入錯誤的分析仍然是錯的。驗證器的「資料品質」分數受查核結果限制。
 
 ### 別名——`fundamental-analysis`、`dcf-valuation`、`research-bundle`
-這三個仍可使用，但屬於**轉址**，不是獨立框架，也不計入 30 個框架：
+這三個仍可使用，但屬於**轉址**，不是獨立框架，也不計入 34 個框架：
 
 | 別名 | 現在位於 | 為何合併 |
 |------|----------|----------|

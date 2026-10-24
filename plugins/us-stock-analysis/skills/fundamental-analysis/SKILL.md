@@ -1,5 +1,5 @@
 ---
-description: Deep fundamental analysis of US stocks using financial statements
+description: Alias of stock-eval (kept for backwards compatibility) — redirects to stock-eval for fundamental, quality and valuation analysis of a US stock
 ---
 
 # Fundamental Analysis
@@ -23,11 +23,6 @@ For the full analysis framework — income statement line-item breakdown, workin
 
 ---
 
-## Standard Signal Output
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -46,6 +41,17 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Standard Signal Output
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "fundamental-analysis", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

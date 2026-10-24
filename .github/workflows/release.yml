@@ -1,5 +1,9 @@
 name: Release
 
+# The only release path. `npm run release` bumps the version, stamps the
+# CHANGELOG, commits and pushes the tag vX.Y.Z; this workflow re-runs the tests
+# on the tagged commit, packages the plugin and publishes the GitHub Release
+# with that version's CHANGELOG section.
 on:
   push:
     tags:
@@ -7,6 +11,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -18,12 +26,35 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '22'
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run the test suite on the tagged commit
+      run: npm test
+
     - name: Get version from tag
       id: get_version
       run: |
         VERSION=${GITHUB_REF#refs/tags/v}
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Check the tag matches every manifest version
+      run: |
+        V="${{ steps.get_version.outputs.version }}"
+        for f in "$(jq -r .version plugins/us-stock-analysis/.claude-plugin/plugin.json)" \
+                 "$(jq -r .metadata.version .claude-plugin/marketplace.json)" \
+                 "$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)" \
+                 "$(jq -r .version package.json)"; do
+          if [ "$f" != "$V" ]; then echo "::error::tag v$V but a manifest says $f"; exit 1; fi
+        done
+        grep -q "^## \[$V\]" CHANGELOG.md || { echo "::error::CHANGELOG.md has no [$V] section"; exit 1; }
 
     - name: Validate JSON files before release
       run: |
@@ -85,7 +116,7 @@ jobs:
         cat checksums.txt
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.get_version.outputs.tag }}
         name: Release ${{ steps.get_version.outputs.version }}

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Run an analysis on a ticker
+    url: https://yennj12.js.org/InvestSkill/choose-a-skill.html
+    about: InvestSkill runs in your own AI assistant — an issue can't run an analysis. Install it (one command) and pick a skill here.
+  - name: FAQ
+    url: https://yennj12.js.org/InvestSkill/faq.html
+    about: Installing, running, data accuracy and contributing — check here before asking.

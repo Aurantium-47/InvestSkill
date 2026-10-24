@@ -21,6 +21,19 @@ Data & Sources
 
 Comprehensive portfolio analysis and optimization recommendations.
 
+## Data Verification
+
+Before finalizing the analysis, verify:
+- [ ] Position weights sum to 100% (or account for cash)
+- [ ] Return figures use total return (dividends reinvested)
+- [ ] Benchmark used matches portfolio's investment universe
+- [ ] Correlation estimates based on at least 1 year of data
+- [ ] Tax calculations use correct marginal rate for the investor
+- [ ] Factor scores sourced from consistent data provider
+- [ ] VaR calculation uses current portfolio weights, not stale data
+
+---
+
 ## Phase 1 — Portfolio Snapshot
 
 Start with a high-level summary before diving into details:
@@ -185,11 +198,13 @@ Actionable rule: no single cluster should exceed 35% of portfolio weight.
 
 ## Phase 7 — Tax-Loss Harvesting Opportunities
 
+> Screening view only. For lot-level mechanics — the 61-day wash-sale window, DRIP and IRA purchases, specific-ID vs. FIFO, short- vs. long-term treatment, and non-US investors — run `tax-lens`, and let it overrule this phase where they differ.
+
 **Identification Criteria**
 
 Screen all positions for:
 1. Unrealized loss > 10% of cost basis
-2. Position held > 30 days (avoid wash-sale complications)
+2. No purchase of the same or a substantially identical security in the 30 days before the planned sale, and none planned in the 30 days after (including DRIP reinvestments and purchases in IRAs) — that is what the wash-sale rule tests, not how long the position has been held
 3. Realized gains available to offset in the current tax year
 
 **Wash-Sale Rule (30-Day Rule)**
@@ -200,7 +215,7 @@ Do not repurchase the same or substantially identical security within 30 days be
 
 ```
 Gross Tax Saving = Realized Loss × Marginal Tax Rate
-Transaction Cost  = (Bid-Ask Spread + Commission) × 2
+Transaction Cost  = 2 × (Commission + ½ × Bid-Ask Spread × Trade Size)   (sell the loser and buy the replacement)
 Net Benefit       = Gross Tax Saving − Transaction Cost
 Harvest if:       Net Benefit > 0 AND loss > $500 minimum threshold
 ```
@@ -212,7 +227,7 @@ Harvest if:       Net Benefit > 0 AND loss > $500 minimum threshold
 | Unrealized loss > 10%, gains to offset, loss > $500 | Harvest — sell and replace with correlated substitute |
 | Unrealized loss 5–10%, gains to offset | Evaluate: transaction cost vs. tax saving |
 | Unrealized loss > 10%, no offsetting gains | Hold or carry forward — harvest at year-end if gains materialize |
-| Position held < 30 days | Wait for 30-day window to avoid wash-sale |
+| Bought more of it (or a substantially identical fund) within the last 30 days, or DRIP is on | The loss would be washed — wait until 31 days after the last purchase, or turn DRIP off first; run `tax-lens` for the lot-level timeline |
 | Loss < $500 | Skip — transaction costs exceed benefit |
 | Short-term gain offset | Priority harvest — short-term rates are higher |
 
@@ -284,7 +299,7 @@ Before executing any rebalance, verify it clears the cost hurdle:
 
 ```
 Expected Drift Cost (annual) = Excess vol from drift × Sharpe ratio penalty
-Transaction Cost = Commission + (Bid-Ask Spread × Trade Size) + Tax Impact
+Transaction Cost = Commission + ½ × Bid-Ask Spread × Trade Size + Tax Impact   (per trade; same spread convention as the harvest calculation)
 Rebalance if: Drift Cost > Transaction Cost × 2 (safety margin)
 ```
 
@@ -315,6 +330,8 @@ Is drift > threshold?
 4. If still needed, sell overweight positions (minimize short-term gains)
 
 ## Phase 10 — Drawdown & Risk Budget Analysis
+
+> A first pass. For historical scenario replay (2008, March 2020, 2022, the 2025 tariff shock), parametric VaR/CVaR at 95/99 %, correlation-spike and rate/USD/oil sensitivity, and days-to-exit liquidity, run `risk-stress-test`.
 
 **Per-Position Maximum Drawdown**
 
@@ -404,17 +421,6 @@ Deliver the review as a structured report with these sections:
 
 Focus on actionable insights aligned with the investor's stated objectives and risk tolerance. Flag any positions or allocations that conflict with the investor profile.
 
-## Data Verification
-
-Before finalizing the analysis, verify:
-- [ ] Position weights sum to 100% (or account for cash)
-- [ ] Return figures use total return (dividends reinvested)
-- [ ] Benchmark used matches portfolio's investment universe
-- [ ] Correlation estimates based on at least 1 year of data
-- [ ] Tax calculations use correct marginal rate for the investor
-- [ ] Factor scores sourced from consistent data provider
-- [ ] VaR calculation uses current portfolio weights, not stale data
-
 ## Thesis Invalidation
 
 A portfolio review is a plan, and plans expire. After the signal, state what would make this review's action list wrong:
@@ -440,6 +446,12 @@ A portfolio review is a plan, and plans expire. After the signal, state what wou
 
 All analysis concludes with this standardized block:
 
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "portfolio-review", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
 ```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -454,8 +466,8 @@ All analysis concludes with this standardized block:
 ╚══════════════════════════════════════════════╝
 ```
 
-**Score Guide**: 8.0–10.0 Strongly Bullish | 6.0–7.9 Moderately Bullish | 4.0–5.9 Neutral | 2.0–3.9 Moderately Bearish | 0.0–1.9 Strongly Bearish
-**Confidence**: HIGH (strong data, clear signals) | MEDIUM (mixed signals) | LOW (limited data, conflicting signals)
-**Horizon**: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG-TERM (1+ years)
+Score Guide: 8.0–10.0 Strongly Bullish | 6.0–7.9 Moderately Bullish | 4.0–5.9 Neutral | 2.0–3.9 Moderately Bearish | 0.0–1.9 Strongly Bearish
+Confidence: HIGH (strong data, clear signals) | MEDIUM (mixed signals) | LOW (limited data, conflicting signals)
+Horizon: SHORT-TERM (1 week–3 months) | MEDIUM-TERM (3 months–1 year) | LONG-TERM (1+ years)
 
 **Disclaimer:** Educational analysis only. Not financial advice.
