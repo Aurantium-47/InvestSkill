@@ -3,7 +3,7 @@
  * lang-pairs.js — where the header language switcher (文A) sends a reader.
  *
  * Used by build-site.js for the switcher and the <link rel="alternate"> tags,
- * and by scripts/test-tooling.js, which checks the rule without a build.
+ * and by scripts/test-site.js, which unit-tests the rule and the rendered menu.
  *
  * A page with a counterpart in the other language links to it (LANG_PAIRS).
  * A page without one — every skill-<name>.html reference page, the demos that
@@ -69,7 +69,6 @@ function langOf(outFile) {
   if (ZH_CONTENT_DEMOS.has(outFile)) return 'zh';
   return (outFile === 'zh-tw.html' || outFile.endsWith('-zh-tw.html')) ? 'zh' : 'en';
 }
-
 
 // The counterpart of `outFile` in each language: { en, zh }. The page's own
 // language maps to itself.

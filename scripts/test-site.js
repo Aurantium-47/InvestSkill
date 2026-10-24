@@ -75,7 +75,11 @@ section('1. site/build/lang-pairs.js');
 section('2. Rendered switcher on every built page');
 {
   const i = process.argv.indexOf('--site');
-  let site = i > -1 ? path.resolve(process.argv[i + 1] || '') : null;
+  if (i > -1 && (!process.argv[i + 1] || process.argv[i + 1].startsWith('--'))) {
+    process.stderr.write('usage: node scripts/test-site.js [--site <built-site-dir>]\n');
+    process.exit(2);
+  }
+  let site = i > -1 ? path.resolve(process.argv[i + 1]) : null;
   let tmp = null;
   if (!site) {
     tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'investskill-site-'));
