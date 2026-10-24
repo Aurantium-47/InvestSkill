@@ -14,6 +14,7 @@ npm run verify              # Verify local setup is correct
 npm run release:dry-run     # Preview release without making changes
 npm run release             # Cut a release from main: bump 3 manifests, stamp CHANGELOG, commit, tag, push
 npm run test:tooling        # Release library, release workflow, new-skill.js smoke test (part of npm test)
+npm run test:site           # Site language switcher: lang-pairs.js + the rendered 文A menu on every page (part of npm test)
 npm run check:zh            # EN ⇄ zh-TW site-content parity (part of npm test)
 npm run integration-tests   # Run integration tests
 npm run test:llm-io         # Offline output-contract, prompt and eval-harness checks (part of npm test)

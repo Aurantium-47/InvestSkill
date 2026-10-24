@@ -1788,7 +1788,8 @@ PAGES.forEach(p => SERVED.add(p.outFile));
 // ---------------------------------------------------------------------------
 // Build all pages
 // ---------------------------------------------------------------------------
-const outDir = '_site';
+// SITE_OUT_DIR lets scripts/test-site.js build into a temp dir.
+const outDir = process.env.SITE_OUT_DIR || '_site';
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
 // Copy static assets

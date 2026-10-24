@@ -11,8 +11,6 @@
  *   3. the release workflow: one tag-triggered path, tests before publishing
  *   4. new-skill.js, run for real on a temp copy of the files it edits: the
  *      skill, its prompt and every index row appear, and the contract passes
- *   5. the site's language switcher (site/build/lang-pairs.js): a page with no
- *      twin goes to its parent index in the other language, not the home page
  */
 const fs = require('fs');
 const os = require('os');
@@ -110,27 +108,6 @@ section('4. new-skill.js on a temp copy');
   } finally {
     fs.rmSync(sandbox, { recursive: true, force: true });
   }
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-section('5. Language switcher routing (site/build/lang-pairs.js)');
-{
-  const lp = require('../site/build/lang-pairs');
-  const t = f => lp.switchTargets(f);
-  check(t('faq.html').zh === 'faq-zh-tw.html' && t('faq-zh-tw.html').en === 'faq.html', 'a paired page links to its twin both ways');
-  check(t('index.html').zh === 'zh-tw.html' && t('zh-tw.html').en === 'index.html', 'home ⇄ home');
-  check(t('faq.html').en === 'faq.html' && t('faq-zh-tw.html').zh === 'faq-zh-tw.html', 'the current language links to the page itself');
-  check(t('full-demo-amd.html').en === 'full-demo-nvda.html', 'a zh-content demo without the -zh-tw suffix maps to its English pair');
-  const skillPages = reg.listPromptNames().map(n => `skill-${n}.html`);
-  const strays = skillPages.filter(f => t(f).zh !== 'skills-zh-tw.html');
-  check(skillPages.length > 0 && strays.length === 0, `every skill-<name>.html (${skillPages.length}) switches to the zh Skill Reference, not the zh home`, strays);
-  check(t('full-demo-meta.html').zh === 'full-demo-zh-tw.html', 'an English-only demo switches to the zh demo overview');
-  check(t('changelog.html').zh === 'zh-tw.html', 'a page with neither twin nor parent still lands on the zh home');
-  const unpaired = lp.LANG_PARENTS.map(([, parent]) => parent).filter(p => !lp.EN_TO_ZH[p]);
-  check(unpaired.length === 0, 'every fallback parent has a zh twin', unpaired);
-  const build = fs.readFileSync(path.join(ROOT, 'site/build/build-site.js'), 'utf8');
-  check(/switchTargets\(outFile\)/.test(build) && !/\|\| 'zh-tw\.html'\)/.test(build), 'build-site.js routes the switcher through switchTargets');
-  check(/aria-current="true"/.test(build), 'the current language is marked aria-current');
 }
 
 process.stdout.write('\n' + '═'.repeat(60) + '\n  TOOLING TEST RESULTS\n' + '═'.repeat(60) + '\n');
