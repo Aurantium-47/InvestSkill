@@ -6,6 +6,8 @@
 >
 > English version: [IMPROVEMENT-ROADMAP.md](IMPROVEMENT-ROADMAP.md)
 >
+> **後續（2026-10-24）：** v1.13.0 的專案全面掃描 —— bug、改進項目、新功能，以及本路線圖未完成項目的目前狀態 —— 請見 [PROJECT-SCAN-2026-10-zh-TW.md](PROJECT-SCAN-2026-10-zh-TW.md)。
+>
 > 本文延續先前兩份審查 — [qa/PROJECT-REVIEW.md](../qa/PROJECT-REVIEW.md)（2026-07-02，結構與一致性）與 [SITE-ENRICHMENT-REVIEW.md](SITE-ENRICHMENT-REVIEW.md)（2026-06-15，網站內容）。它們的 P0/P1 項目多數已完成（術語表、概念、選擇技能、每技能頁面、搜尋、連結檢查、數量測試、學習課程）。本文從它們停下的地方接續。
 
 ---

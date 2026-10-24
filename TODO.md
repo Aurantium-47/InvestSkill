@@ -1,6 +1,6 @@
 # TODO — InvestSkill
 
-The curated top five. Everything else — with rationale, effort estimates, and release mapping — lives in the bilingual roadmap: [doc/IMPROVEMENT-ROADMAP.md](doc/IMPROVEMENT-ROADMAP.md) · [繁體中文](doc/IMPROVEMENT-ROADMAP-zh-TW.md). Progress against the roadmap's ten headline items is tracked in its §0 table.
+The curated top five. Everything else — with rationale, effort estimates, and release mapping — lives in the bilingual roadmap: [doc/IMPROVEMENT-ROADMAP.md](doc/IMPROVEMENT-ROADMAP.md) · [繁體中文](doc/IMPROVEMENT-ROADMAP-zh-TW.md). The latest full scan (2026-10-24, v1.13.0) — bugs found, improvements, and new feature ideas — is [doc/PROJECT-SCAN-2026-10.md](doc/PROJECT-SCAN-2026-10.md) · [繁體中文](doc/PROJECT-SCAN-2026-10-zh-TW.md). Progress against the roadmap's ten headline items is tracked in its §0 table.
 
 The previous long-form backlog (last updated 2026-02-24) is archived at [doc/archive/TODO-2026-02.md](doc/archive/TODO-2026-02.md).
 
