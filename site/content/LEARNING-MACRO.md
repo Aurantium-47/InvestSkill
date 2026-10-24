@@ -17,11 +17,11 @@
 
 ## What the Fed is trying to do
 
-The Federal Reserve's **dual mandate**, set by Congress, is **maximum employment** and **stable prices**. Since 2012 it has defined stable prices as **2% inflation over the longer run**, measured by the PCE price index (below). The two goals usually point the same way; when they conflict — inflation high *and* unemployment rising — the Fed has to choose which risk to tolerate, and markets spend months guessing which one it will pick.
+The Federal Reserve's **[dual mandate](glossary.html#dual-mandate)**, set by Congress, is **maximum employment** and **stable prices**. Since 2012 it has defined stable prices as **2% inflation over the longer run**, measured by the [PCE price index](glossary.html#pce--core-pce) (below). The two goals usually point the same way; when they conflict — inflation high *and* unemployment rising — the Fed has to choose which risk to tolerate, and markets spend months guessing which one it will pick.
 
-Its main tool is the **federal funds rate** — the overnight rate banks charge each other, set as a target range (for example 5.25–5.50%). The Fed also changes the size of its balance sheet: buying bonds (**quantitative easing**) pushes long-term yields down; letting them run off (**quantitative tightening**) does the opposite, more slowly.
+Its main tool is the **[federal funds rate](glossary.html#federal-funds-rate)** — the overnight rate banks charge each other, set as a target range (for example 5.25–5.50%). The Fed also changes the size of its balance sheet: buying bonds (**[quantitative easing](glossary.html#qe--qt-quantitative-easing--tightening)**) pushes long-term yields down; letting them run off (**quantitative tightening**) does the opposite, more slowly.
 
-The recent cycle in one line: the Fed held the range at 0–0.25% through 2021, began hiking in **March 2022** as CPI inflation climbed to a peak of about **9.1% (June 2022)**, reached **5.25–5.50% in July 2023** — 5.25 percentage points in sixteen months, the fastest tightening in four decades — held there for over a year, and made its first cut, of 0.50 points, in **September 2024**.
+The recent cycle in one line: the Fed held the range at 0–0.25% through 2021, began hiking in **March 2022** as [CPI](glossary.html#cpi-consumer-price-index) inflation climbed to a peak of about **9.1% (June 2022)**, reached **5.25–5.50% in July 2023** — 5.25 percentage points in sixteen months, the fastest tightening in four decades — held there for over a year, and made its first cut, of 0.50 points, in **September 2024**.
 
 > **Key idea:** The market prices the *path* of rates, not the level. A hike that was fully expected moves nothing; a "hold" accompanied by a hint that cuts are further away than hoped can move everything. What matters is the gap between what the Fed does and says and what was already priced.
 
@@ -46,7 +46,7 @@ The same one-point rise in the discount rate costs the growth stock more than tw
 
 ### Channel 2 — credit
 
-Higher policy rates make borrowing dearer and lenders stricter. Watch three things: **credit spreads** (the extra yield on corporate bonds over Treasuries — widening spreads mean lenders are getting nervous), **bank lending standards** (the Fed's quarterly Senior Loan Officer Survey), and the **refinancing wall** — companies that borrowed cheaply in 2020–2021 and must roll that debt at today's rates. Small caps, with more floating-rate debt, feel this channel first. Lesson 3's interest-coverage ratio is where it shows up in a single company.
+Higher policy rates make borrowing dearer and lenders stricter. Watch three things: **[credit spreads](glossary.html#credit-spread)** (the extra yield on corporate bonds over Treasuries — widening spreads mean lenders are getting nervous), **bank lending standards** (the Fed's quarterly Senior Loan Officer Survey), and the **[refinancing wall](glossary.html#maturity-wall)** — companies that borrowed cheaply in 2020–2021 and must roll that debt at today's rates. Small caps, with more floating-rate debt, feel this channel first. Lesson 3's interest-coverage ratio is where it shows up in a single company.
 
 ### Channel 3 — the dollar
 
@@ -56,7 +56,7 @@ Higher US rates relative to the rest of the world tend to strengthen the dollar.
 
 ## The yield curve and inversion
 
-The **yield curve** plots Treasury yields across maturities. Normally it slopes upward — lenders want more to lock money up for ten years than for three months. When short-term yields rise *above* long-term ones the curve is **inverted**: the market is betting that the Fed is tight now and will have to cut later, usually because growth will weaken. The two spreads most quoted are the **10-year minus 2-year** ("2s10s") and the **10-year minus 3-month** (the one the New York Fed uses for its recession-probability model).
+The **[yield curve](glossary.html#yield-curve--inversion)** plots Treasury yields across maturities. Normally it slopes upward — lenders want more to lock money up for ten years than for three months. When short-term yields rise *above* long-term ones the curve is **inverted**: the market is betting that the Fed is tight now and will have to cut later, usually because growth will weaken. The two spreads most quoted are the **10-year minus 2-year** ("2s10s") and the **10-year minus 3-month** (the one the New York Fed uses for its recession-probability model).
 
 **What it has predicted.** An inversion of the 10-year/3-month spread preceded every US recession since the late 1960s, with very few false alarms. But the lead time has ranged from roughly six months to two years, and many analysts consider the *re-steepening* — the curve turning positive again, usually because the Fed starts cutting — the more immediate warning.
 
@@ -91,7 +91,7 @@ Explanations offered afterward include pandemic-era household savings, large fis
 
 ## The business cycle and sector leadership
 
-The economy moves through four rough phases. Sectors have *tended* to lead in different ones, because their profits depend on different things — credit, capital spending, consumer confidence, or just people needing to buy groceries.
+The economy moves through [four rough phases](glossary.html#business-cycle-phases). Sectors have *tended* to lead in different ones, because their profits depend on different things — credit, capital spending, consumer confidence, or just people needing to buy groceries.
 
 | Phase | What's happening | Fed & curve | Sectors that have tended to lead |
 |---|---|---|---|
@@ -108,10 +108,10 @@ The economy moves through four rough phases. Sectors have *tended* to lead in di
 
 | Indicator | What it is | Rule of thumb | Recent record |
 |---|---|---|---|
-| **LEI** (Conference Board Leading Economic Index) | Monthly composite of ten forward-looking series — orders, claims, permits, the curve, credit, sentiment | A sustained six-month decline has historically preceded recessions | Fell for roughly two years from 2022; the Conference Board eventually dropped its recession call. No recession followed |
-| **ISM Manufacturing PMI** | Monthly survey of purchasing managers, first business day | Above 50 = expansion, below 50 = contraction; the **new orders** component leads the headline | Spent most of late 2022 through 2024 below 50 — a manufacturing slump inside a growing, services-led economy |
-| **Initial jobless claims** | Weekly first-time unemployment filings, Thursdays 8:30 am ET | Watch the four-week average; a sustained rise from the low matters, a single spike (a storm, a holiday) does not | The most timely labour gauge; noisy week to week |
-| **Sahm rule** | Triggers when the three-month average unemployment rate rises **0.50 points** or more above its low of the prior twelve months | Historically flagged the start of every US recession since 1970 (on revised data) | **Triggered with the July 2024 jobs report (released 2 August 2024)**; as of this writing no recession has been declared since |
+| **[LEI](glossary.html#lei-leading-economic-index)** (Conference Board Leading Economic Index) | Monthly composite of ten forward-looking series — orders, claims, permits, the curve, credit, sentiment | A sustained six-month decline has historically preceded recessions | Fell for roughly two years from 2022; the Conference Board eventually dropped its recession call. No recession followed |
+| **[ISM Manufacturing PMI](glossary.html#ism-pmi)** | Monthly survey of purchasing managers, first business day | Above 50 = expansion, below 50 = contraction; the **new orders** component leads the headline | Spent most of late 2022 through 2024 below 50 — a manufacturing slump inside a growing, services-led economy |
+| **[Initial jobless claims](glossary.html#initial-jobless-claims)** | Weekly first-time unemployment filings, Thursdays 8:30 am ET | Watch the four-week average; a sustained rise from the low matters, a single spike (a storm, a holiday) does not | The most timely labour gauge; noisy week to week |
+| **[Sahm rule](glossary.html#sahm-rule)** | Triggers when the three-month average unemployment rate rises **0.50 points** or more above its low of the prior twelve months | Historically flagged the start of every US recession since 1970 (on revised data) | **Triggered with the July 2024 jobs report (released 2 August 2024)**; as of this writing no recession has been declared since |
 
 The Sahm-rule episode is a useful lesson in reading an indicator rather than obeying it. Claudia Sahm, who devised the rule, pointed out at the time that unemployment was rising partly because the labour force was growing quickly — more people looking for work, not mainly more people being laid off — which is not how recessions usually begin. The rule's mechanics fired; its usual cause was not present. A signal is only as good as the reason behind it.
 
@@ -119,7 +119,7 @@ The Sahm-rule episode is a useful lesson in reading an indicator rather than obe
 
 ## FOMC mechanics
 
-The **Federal Open Market Committee** sets the policy rate. Twelve members vote (the seven Board governors, the New York Fed president, and four of the other eleven regional presidents on a rotating basis); all nineteen participate in the discussion.
+The **[Federal Open Market Committee](glossary.html#fomc--dot-plot)** sets the policy rate. Twelve members vote (the seven Board governors, the New York Fed president, and four of the other eleven regional presidents on a rotating basis); all nineteen participate in the discussion.
 
 - **Eight scheduled meetings a year**, each over two days. The calendar is published a year ahead — put the dates in your `catalyst-calendar`.
 - **Decision day:** the statement is released at **2:00 pm ET**; the Chair's press conference starts at **2:30 pm ET**. The statement's changed wording is often more market-moving than the rate decision itself, and the press conference often reverses the first reaction.

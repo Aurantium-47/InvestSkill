@@ -6,7 +6,7 @@
  * Usage:
  *   node scripts/new-skill.js <kebab-name> --category <core|reports|monitoring|advanced|meta> \
  *        --title "Human Title" --desc "One-line description" \
- *        [--zh-title "中文名"] [--goal "I want to …"] [--goal-zh "我想要…"] \
+ *        [--zh-title "中文名"] [--desc-zh "一句話中文摘要"] [--goal "I want to …"] [--goal-zh "我想要…"] \
  *        [--example "Usage example"] [--no-test]
  *
  * What it does:
@@ -20,6 +20,7 @@
  *   6. GEMINI.md · .cursor/rules/invest-skill.mdc · .github/copilot-instructions.md
  *                                                           — table row + directory-tree line
  *   7. CHANGELOG.md                                         — a line under [Unreleased] › Added
+ *   8. site/content/SKILL-SUMMARIES-zh-TW.json              — Chinese title (--zh-title) + a TODO summary for skills-zh-tw.html
  *   8. runs check-skill-contract.js + test-skills.js unless --no-test
  *
  * It does NOT write the analysis itself — open SKILL.md and replace every
@@ -111,6 +112,17 @@ Data & Sources
 - Mixed sources: list each with its own as-of date rather than blending them.
 - Sources disagree on the same figure (a closing price, a deal term): prefer the primary source (SEC filing, company release, exchange data) over an aggregator, then the most recent dated one. Show both values with their sources and dates, say which you used and why, and never average them.
 - Data the user pasted is reported as \`pasted by user\`; do not upgrade its confidence beyond what the user's own source supports.
+
+---
+
+## 🌐 Output Language — \`--lang zh-TW\`
+
+English is the default. With \`--lang zh-TW\` — or when the user writes in Traditional Chinese and asks for a Chinese answer — write the whole analysis in Traditional Chinese (繁體中文, Taiwan usage), keeping it machine-checkable:
+
+- **Translate** every heading, narrative paragraph, table header and bullet. Give each metric's English name in brackets the first time it appears — 自由現金流（Free Cash Flow, FCF） — so the reader can match it to the glossary and to English analyses.
+- **Keep in English** tickers, figures and units, SEC form and item names (10-K Item 7, Form 4), the four \`Data & Sources\` field labels (\`As of\`, \`Source\`, \`Retrieval\`, \`Confidence\` — the Retrieval value may be written in Chinese, e.g. 使用者提供), and the Investment Signal box and JSON footer exactly as specified — field names and the BULLISH / NEUTRAL / BEARISH, HIGH / MEDIUM / LOW, BUY / HOLD / SELL, STRONG / MODERATE / WEAK values. Tools parse them.
+- Title the invalidation section **論點失效條件（Thesis Invalidation）**, and close with the disclaimer in Chinese: **免責聲明：** 僅供教育用途，非投資建議。
+- Use Taiwan financial terms: 殖利率、本益比、營業利益率、自由現金流、聯準會、選擇權、買權／賣權、除息日、預扣稅.
 
 ---
 
@@ -300,7 +312,15 @@ edit('CHANGELOG.md', t => {
   return t.slice(0, at) + `- **\`${name}\`** — ${desc}. New analysis framework.\n` + t.slice(at);
 });
 
-// ── 8. tests ──────────────────────────────────────────────────────────────────
+// ── 8. zh Skill Reference entry ───────────────────────────────────────────────
+edit('site/content/SKILL-SUMMARIES-zh-TW.json', t => {
+  const j = JSON.parse(t);
+  j.skills[name] = { title: zhTitle, summary: flag('desc-zh', `TODO — ${zhTitle}的一句話中文摘要`) };
+  j.skills = Object.fromEntries(Object.entries(j.skills).sort(([a], [b]) => a.localeCompare(b)));
+  return `${JSON.stringify(j, null, 2)}\n`;
+});
+
+// ── 9. tests ──────────────────────────────────────────────────────────────────
 process.stdout.write(`\n━━━ new-skill: ${name} ${'─'.repeat(Math.max(0, 44 - name.length))}\n`);
 done.forEach(d => process.stdout.write(`  ✅ ${d}\n`));
 todo.forEach(d => process.stdout.write(`  ⚠️  ${d}\n`));

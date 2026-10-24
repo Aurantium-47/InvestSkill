@@ -9,21 +9,22 @@ How to contribute a new analysis skill. One script does the wiring; you write th
 ```bash
 node scripts/new-skill.js my-analysis --category advanced \
   --title "My Analysis" --desc "One-line description" \
-  --zh-title "中文名" --goal "I want to …" --goal-zh "我想要…"
+  --zh-title "中文名" --desc-zh "一句話中文摘要" --goal "I want to …" --goal-zh "我想要…"
 ```
 
 `--category` is one of `core`, `reports`, `monitoring`, `advanced`, `meta`. Run `node scripts/new-skill.js --help` for every option (`--example`, `--no-test`).
 
 The script:
 
-1. Creates `plugins/us-stock-analysis/skills/my-analysis/SKILL.md` from a template that already carries the full output contract — the Data Verification gate, the `Data & Sources` header, Thesis Invalidation, the Investment Signal block and the disclaimer — so the contract check passes from the start.
+1. Creates `plugins/us-stock-analysis/skills/my-analysis/SKILL.md` from a template that already carries the full output contract — the Data Verification gate, the `Data & Sources` header, the `--lang zh-TW` output section, Thesis Invalidation, the Investment Signal block with its JSON footer, and the disclaimer — so the contract check passes from the start.
 2. Generates `prompts/my-analysis.md` with `scripts/sync-prompts.js`.
 3. Adds the skill to `SKILL_CATEGORIES` in `site/build/build-site.js` (otherwise the site files it under "Other").
 4. Adds a "goal → skill" row to `site/content/CHOOSE-A-SKILL.md` and `CHOOSE-A-SKILL-zh-TW.md`.
 5. Adds the framework-table row to `README.md` and the category cell in `README-zh-TW.md`.
 6. Adds a table row and a directory-tree line to `GEMINI.md`, `.cursor/rules/invest-skill.mdc` and `.github/copilot-instructions.md`.
 7. Writes a line under `## [Unreleased]` › `### Added` in `CHANGELOG.md`.
-8. Runs the contract check and the structure tests (unless `--no-test`), and prints what is left to do.
+8. Adds the Chinese title (`--zh-title`) and summary (`--desc-zh`, or a TODO) to `site/content/SKILL-SUMMARIES-zh-TW.json` for the zh Skill Reference page.
+9. Runs the contract check and the structure tests (unless `--no-test`), and prints what is left to do.
 
 Then finish by hand:
 

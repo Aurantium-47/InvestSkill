@@ -1,6 +1,6 @@
 # InvestSkill — 改進路線圖
 
-*審查日期：2026-09-23 · 審查版本 v1.11.0 · 27 個技能目錄 / 26 個對外宣稱的分析框架 · 389 項測試通過 · 69 個網站頁面 · **進度見 §0**（最後更新 2026-09-24，PR #27）*
+*審查日期：2026-09-23 · 審查版本 v1.11.0 · 27 個技能目錄 / 26 個對外宣稱的分析框架 · 389 項測試通過 · 69 個網站頁面 · **進度見 §0**（最後更新 2026-10-24——P0–P2 全數完成）*
 
 > **範圍。** 從兩個角度對 InvestSkill 進行產品審查：作為美股投資人的**投資工具**，以及作為**學習金融知識的途徑**。本文提出新的 LLM 技能、既有技能的強化、網站內容，以及缺少的腳本，並列出審查過程中發現的一致性問題。僅為建議 — 本 PR 未修改任何技能、提示詞或網站頁面。
 >
@@ -29,7 +29,22 @@
 | 9 | `scripts/sync-prompts.js` + `scripts/new-skill.js`（§6.1、§6.2） | ✅ 完成 | [PR #26](https://github.com/yennanliu/InvestSkill/pull/26) | prompts 現在由 SKILL.md **產生**（`--check` 在 `npm test` 中）；腳手架一次把技能接進 11 個檔案。注意：重新產生後，先前手工精簡的 prompts 被 SKILL.md 全文取代 |
 | 10 | `scripts/eval-skills.js`（§6.4） | ✅ 完成 | [PR #26](https://github.com/yennanliu/InvestSkill/pull/26) | 以 `EVAL_CMD` 環境變數選擇啟用；樣本 `data/fixtures/ZEPH.md`（虛構公司）；硬性檢查透過共用解析器 `scripts/lib/signal-block.js`（§6.11），算術檢查為建議性；輸出 `qa/eval_YYYYMMDD.md` |
 
-一併出貨：§6.9（擴充 `COUNT_DOCS`）、§6.11（`scripts/lib/signal-block.js`）、§4.4 的 `result-validator` 契約檢查（PR #26）；`risk-stress-test` — 第一層的第六個技能、不在十大之列 — 於 [PR #27](https://github.com/yennanliu/InvestSkill/pull/27)。**§3.1 第一層六個技能全部出貨。** 路線圖之外新增：`fact-check`——逐條陳述層級的查核與引用，補上 `result-validator` 旁缺少的另一半信任機制——於 [PR #28](https://github.com/yennanliu/InvestSkill/pull/28)；學習區第二部（第 9–13 課、「當答案是不」案例、+32 條術語）於 [PR #29](https://github.com/yennanliu/InvestSkill/pull/29)，依據[學習區缺口審查](LEARNING-GAP-REVIEW-zh-TW.md)。§8 P0/P1 中仍待辦：§4.3（`full-report` 執行所有框架）、全技能 `--lang zh-TW`、JSON 頁尾、繁中 Skill Reference 索引（§5.6）。
+一併出貨：§6.9（擴充 `COUNT_DOCS`）、§6.11（`scripts/lib/signal-block.js`）、§4.4 的 `result-validator` 契約檢查（PR #26）；`risk-stress-test` — 第一層的第六個技能、不在十大之列 — 於 [PR #27](https://github.com/yennanliu/InvestSkill/pull/27)。**§3.1 第一層六個技能全部出貨。** 路線圖之外新增：`fact-check`——逐條陳述層級的查核與引用，補上 `result-validator` 旁缺少的另一半信任機制——於 [PR #28](https://github.com/yennanliu/InvestSkill/pull/28)；學習區第二部（第 9–13 課、「當答案是不」案例、+32 條術語）於 [PR #29](https://github.com/yennanliu/InvestSkill/pull/29)，依據[學習區缺口審查](LEARNING-GAP-REVIEW-zh-TW.md)。截至 2026-09-24，§8 P0/P1 中仍待辦：§4.3、全技能 `--lang zh-TW`、JSON 頁尾、繁中 Skill Reference 索引（§5.6）——下表皆已收尾。
+
+**§8 P0–P2 全數收尾（2026-10-24，`feat/roadmap-p0-p2`）。** 十大建議之外仍未完成的項目：
+
+| §8 列 | 項目 | 狀態 | 備註 |
+|-------|------|------|------|
+| P0 | §7 修正 · `COUNT_DOCS`（6.9）· 別名（§4.2 b）· `check-skill-contract.js`（6.3） | ✅ 完成 | PR #26 |
+| P1 | Data & Sources + 關卡（§4.1） | ✅ 完成 | PR #26 |
+| P1 | **所有技能支援 `--lang zh-TW`**（§4.1） | ✅ 完成 | 34 個框架都加入共用的「🌐 Output Language」段落：全文繁體中文，但 Data & Sources 欄位名稱、訊號方框與 JSON footer 維持英文以便解析。由 `check-skill-contract.js` 強制、`new-skill.js` 自動產生。（JSON footer 已在 [2026-10 掃描](PROJECT-SCAN-2026-10-zh-TW.md) PR 出貨） |
+| P1 | **`full-report` 執行所有框架**（§4.3） | ✅ 完成 | quick 5 個（每個計分面向各一）· standard 10 個 · comprehensive＝所有適用於單一個股的 25 個模組（20 個計分 + `10k-digest`、`position-ladder`、`chart-master`、`fact-check` → `result-validator`、`thesis-tracker`）；`--skip a,b`；不適用規則（ETF 代號、銀行、財報超過 45 天）；子分數為已定向方框分數的平均；並列出不適用於單一個股的框架 |
+| P1 | `sync-prompts.js`（6.1）· `new-skill.js`（6.2） | ✅ 完成 | PR #26 |
+| P1 | **繁中技能參考**（§5.6） | ✅ 完成 | `skills-zh-tw.html`：中文分類、標題與一句話摘要（`site/content/SKILL-SUMMARIES-zh-TW.json`，`test-skills.js` 要求每個技能都有、`new-skill.js` 自動寫入），由中文導覽、分頁、頁尾與首頁連結；技能頁仍為英文 |
+| P2 | `etf-analysis` + 課程 · `earnings-preview` + 課程 · `thesis-tracker` · `tax-lens` + 課程 · `learning-coach` · 虧損/放棄案例 | ✅ 完成 | PR #26、#27、#29 |
+| P2 | **非美國投資人指南**（§5.4） | ✅ 完成 | `non-us-guide.html`／`non-us-guide-zh-tw.html`——開戶管道（美國券商、複委託、UCITS）、W-8BEN、預扣稅與租稅協定、資本利得、6 萬美元遺產稅曝險、匯率、台北實例、自我檢測 |
+| P2 | **術語表 +25**（§5.3） | ✅ 完成 | §5.3 所有仍缺的詞，加上第 14–15 課的總經與選擇權詞彙、新技能的信用／鑑識會計詞彙——中英雙語 |
+
 
 ---
 

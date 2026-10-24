@@ -33,7 +33,7 @@ Get back:     Piotroski score · ROIC · moat rating · buy/hold/sell signal
   <span class="home-card-icon">🎓</span>
   <div class="home-card-body">
     <div class="home-card-title">New to investing? Start with the Learning guide</div>
-    <p>A thirteen-lesson field guide, in plain English and Traditional Chinese: Part I teaches the concepts behind every skill — reading a balance sheet, valuing a business, holding a portfolio — and Part II the practical foundations: accounts and orders, an ETF core, taxes (including for non-US investors), earnings season, and the psychology that protects the plan. No finance degree required.</p>
+    <p>A fifteen-lesson field guide, in plain English and Traditional Chinese: Part I teaches the concepts behind every skill — reading a balance sheet, valuing a business, holding a portfolio — and Part II the practical foundations: accounts and orders, an ETF core, taxes (including for non-US investors), earnings season, the psychology that protects the plan, the macro and Fed cycle, and options for stock holders. No finance degree required.</p>
     <p><a class="home-card-cta" href="https://yennj12.js.org/InvestSkill/learning.html">Start learning →</a></p>
   </div>
 </div>
@@ -111,6 +111,8 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 
 > Because there's no API, there's also no telemetry: InvestSkill never sees your tickers, your holdings, or your analysis. See [Data & Accuracy](site/content/DATA-AND-ACCURACY.md) for where the numbers actually come from.
 
+**In Traditional Chinese, too.** Add `--lang zh-TW` to any framework and the whole analysis comes back in 繁體中文 — headings, narrative and tables — while the Data & Sources labels, the signal box and its JSON footer stay in English so tools can still read them. The site has a [Chinese Skill Reference](https://yennj12.js.org/InvestSkill/skills-zh-tw.html) and a [Non-US Investor Guide](https://yennj12.js.org/InvestSkill/non-us-guide.html).
+
 **Bring your own data.** The filing skills (`10k-digest`, `financial-report-analyst`, `fact-check`) carry a keyless SEC EDGAR recipe a tool-enabled assistant can follow by itself. If yours can't browse, two optional zero-dependency scripts fetch the primary source for you to paste — `node scripts/fetch-edgar.js AAPL --form 10-K` saves the filing as text, `node scripts/fetch-fundamentals.js AAPL` builds a reconciled statement pack from the SEC's XBRL facts. Neither is part of the plugin. Details on the [Data & Accuracy](site/content/DATA-AND-ACCURACY.md#bring-your-own-data-the-keyless-edgar-path) page.
 
 ---
@@ -170,7 +172,7 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 
 | Skill | What it produces |
 |-------|-----------------|
-| `full-report` | Runs all 15 modules and saves a standalone HTML report |
+| `full-report` | Runs 5 / 10 / every applicable framework (`--depth quick` / `standard` / `comprehensive`, `--skip` to leave modules out) and saves a standalone HTML report |
 | `report-generator` | Converts any analysis into a professional HTML/PDF report |
 | `chart-master` | Mermaid · ASCII · Chart.js visualizations from financial data |
 | `result-validator` | Scores any analysis on data quality, methodology, and signal consistency |

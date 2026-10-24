@@ -12,7 +12,9 @@
  *   5. carry the "Not financial advice" disclaimer
  *   6. define the machine-readable JSON footer that follows the box
  *      ({"investskill": "1", "skill": …, "signal": …, "score": …, …})
- *   7. keep the signal block's code fence to the box alone — no heading inside
+ *   7. define Traditional Chinese output (`--lang zh-TW`) that keeps the
+ *      Data & Sources labels, the box and the JSON footer in English
+ *   8. keep the signal block's code fence to the box alone — no heading inside
  *      it (a fence opened too early once swallowed Thesis Invalidation in 19 skills)
  *
  * Exemptions live in scripts/lib/skill-registry.js (CONTRACT_EXEMPT): output
@@ -36,6 +38,7 @@ const CHECKS = [
   { key: 'thesisInvalidation', label: 'Thesis Invalidation',      test: sb.hasThesisInvalidation },
   { key: 'signalBlock',        label: 'Investment Signal block',  test: sb.hasSignalBlockTemplate },
   { key: 'disclaimer',         label: 'disclaimer',               test: sb.hasDisclaimer },
+  { key: 'langZhTw',           label: '--lang zh-TW output section', test: sb.hasLangZhTw },
   { key: 'jsonFooter',         label: 'JSON footer template',     test: sb.hasJsonFooterTemplate },
   { key: 'signalFence',        label: 'signal fence holding only the box (no heading inside it)', test: sb.signalFenceIsClean },
 ];

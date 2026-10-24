@@ -134,7 +134,7 @@ InvestSkill 是一套**結構化分析提示框架**，以 Claude Code 外掛的
 | `/earnings-call-analysis AMZN` | 解析財報電話會議的語氣、指引與關鍵主題 |
 | `/dividend-analysis JNJ` | 檢驗股息安全性、成長性與可持續性 |
 | `/chart-master AAPL` | 以 Mermaid、ASCII 或 HTML 格式生成財務圖表 |
-| `/full-report MSFT` | 協調 15 個分析模組，輸出完整 HTML 報告 |
+| `/full-report MSFT` | 協調所有適用的框架（預設 `--depth comprehensive` 共 25 個模組），輸出完整 HTML 報告 |
 | `/result-validator` | 審核任何分析結果並產生信心評分 |
 
 ### 技能如何運作
@@ -772,7 +772,7 @@ new Chart(document.getElementById('aaplChart'), {
 
 **功能說明：**
 
-`full-report` 技能協調執行 15 個分析模組，並將完整的 HTML 報告儲存至 `output/MSFT-full-report.html`。
+`full-report` 技能依階段協調執行分析模組——`--depth quick` 5 個、`standard` 10 個、`comprehensive`（預設）則是所有適用於單一個股的框架，可用 `--skip a,b` 排除模組——並將完整的 HTML 報告儲存至 `output/MSFT-full-report.html`。
 
 ```
 # 完整報告 — MSFT（微軟公司）
@@ -1959,7 +1959,7 @@ Samsung / Apple 設計案報導，取自 stockanalysis.com 新聞頁，2026/07/2
 > ▶ 看這個流程在 NVDA 上的實跑：[3.16](#316-工作流程-e--完整投資備忘錄實跑nvda)
 
 ```bash
-# 一個指令——產生包含 15 個分析模組的完整 HTML 報告
+# 一個指令——產生涵蓋所有適用框架的完整 HTML 報告
 /us-stock-analysis:full-report NVDA
 
 # 開啟方式：output/NVDA-full-report.html

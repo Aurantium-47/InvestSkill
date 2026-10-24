@@ -87,7 +87,7 @@ section('4. new-skill.js on a temp copy');
   const sandbox = fs.mkdtempSync(path.join(os.tmpdir(), 'investskill-newskill-'));
   try {
     const copy = rel => fs.cpSync(path.join(ROOT, rel), path.join(sandbox, rel), { recursive: true });
-    ['scripts', 'plugins', 'prompts', 'site/build', 'site/content/CHOOSE-A-SKILL.md', 'site/content/CHOOSE-A-SKILL-zh-TW.md',
+    ['scripts', 'plugins', 'prompts', 'site/build', 'site/content/CHOOSE-A-SKILL.md', 'site/content/CHOOSE-A-SKILL-zh-TW.md', 'site/content/SKILL-SUMMARIES-zh-TW.json',
       'README.md', 'README-zh-TW.md', 'GEMINI.md', '.cursor', '.github/copilot-instructions.md', 'CHANGELOG.md'].forEach(copy);
     const name = 'zz-smoke-skill';
     const res = spawnSync(process.execPath, [path.join(sandbox, 'scripts', 'new-skill.js'), name, '--category', 'meta',
@@ -97,6 +97,7 @@ section('4. new-skill.js on a temp copy');
     check(has(`plugins/us-stock-analysis/skills/${name}/SKILL.md`, 'description: A throwaway skill'), 'SKILL.md created from the contract template');
     check(has(`prompts/${name}.md`, '# Smoke (Test) Skill') && !has(`prompts/${name}.md`, 'description:'), 'prompt generated without frontmatter');
     check(has('site/build/build-site.js', `'${name}'`), 'added to SKILL_CATEGORIES');
+    check(has('site/content/SKILL-SUMMARIES-zh-TW.json', `"${name}"`), 'added to the zh Skill Reference summaries');
     check(['site/content/CHOOSE-A-SKILL.md', 'site/content/CHOOSE-A-SKILL-zh-TW.md', 'README.md', 'README-zh-TW.md', 'GEMINI.md', '.cursor/rules/invest-skill.mdc', '.github/copilot-instructions.md', 'CHANGELOG.md']
       .every(f => has(f, name)), 'wired into Choose-a-Skill (EN + zh), both READMEs, the three cross-AI configs and CHANGELOG');
     check(!/⚠️/.test(res.stdout), 'no "add it by hand" warnings', res.stdout.split('\n').filter(l => l.includes('⚠️')));

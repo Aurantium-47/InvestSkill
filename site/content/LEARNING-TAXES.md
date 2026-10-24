@@ -108,6 +108,8 @@ At year-end your broker reports it all on **Form 1099** (1099-B for sales, 1099-
 
 ## Part II — Non-US investors
 
+> **The practical side** — which broker or route to use (a US broker, 複委託 sub-brokerage, Irish UCITS ETFs), opening the account, FX and a worked example — is in the [Non-US Investor Guide](non-us-guide.html).
+
 If you live outside the United States and buy US stocks through a US or international broker, almost none of Part I applies to you, and a different set of rules does — rules that US-centric content almost never mentions. This section covers the **US side only**; your country of residence taxes the same income under its own rules, and that is a question for a local professional.
 
 ### W-8BEN: the form that sets your rate

@@ -1,6 +1,6 @@
 # InvestSkill — Improvement Roadmap
 
-*Review date: 2026-09-23 · Reviewed at v1.11.0 · 27 skill directories / 26 advertised frameworks · 389 tests passing · 69 built site pages · **Progress tracked in §0** (last updated 2026-09-24, PR #27)*
+*Review date: 2026-09-23 · Reviewed at v1.11.0 · 27 skill directories / 26 advertised frameworks · 389 tests passing · 69 built site pages · **Progress tracked in §0** (last updated 2026-10-24 — every P0–P2 item done)*
 
 > **Scope.** A product review of InvestSkill from two angles: as an **investment tool** for US-stock investors, and as a **way to learn finance**. It proposes new LLM skills, enhancements to existing skills, website content, and missing scripts, and lists the consistency issues found along the way. Recommendations only — no skill, prompt, or site page was changed in this PR.
 >
@@ -29,7 +29,22 @@ Status of the ten headline recommendations in §2. Update this table in the PR t
 | 9 | `scripts/sync-prompts.js` + `scripts/new-skill.js` (§6.1, §6.2) | ✅ Done | [PR #26](https://github.com/yennanliu/InvestSkill/pull/26) | Prompts are now **generated** from SKILL.md (`--check` in `npm test`); the scaffolder wires a skill into 11 files. Note: regeneration replaced the hand-condensed prompts with the full SKILL.md text |
 | 10 | `scripts/eval-skills.js` (§6.4) | ✅ Done | [PR #26](https://github.com/yennanliu/InvestSkill/pull/26) | Opt-in via `EVAL_CMD`; fixture `data/fixtures/ZEPH.md` (fictional company); hard checks via the shared parser `scripts/lib/signal-block.js` (§6.11), arithmetic checks advisory; writes `qa/eval_YYYYMMDD.md` |
 
-Also shipped alongside: §6.9 (extend `COUNT_DOCS`), §6.11 (`scripts/lib/signal-block.js`), the `result-validator` contract check from §4.4 (PR #26); `risk-stress-test` — the sixth Tier 1 skill, not in the top 10 — in [PR #27](https://github.com/yennanliu/InvestSkill/pull/27). **All six Tier 1 skills (§3.1) are shipped.** Added outside the roadmap: `fact-check` — claim-level verification with citations, the missing half of the trust story next to `result-validator` — in [PR #28](https://github.com/yennanliu/InvestSkill/pull/28); the Learning track's Part II (Lessons 9–13, the "No" case study, +32 glossary terms) in [PR #29](https://github.com/yennanliu/InvestSkill/pull/29) after the [Learning gap review](LEARNING-GAP-REVIEW.md). Still open from the P0/P1 rows of §8: §4.3 (`full-report` runs every framework), `--lang zh-TW` everywhere, the JSON footer, the zh Skill Reference index (§5.6).
+Also shipped alongside: §6.9 (extend `COUNT_DOCS`), §6.11 (`scripts/lib/signal-block.js`), the `result-validator` contract check from §4.4 (PR #26); `risk-stress-test` — the sixth Tier 1 skill, not in the top 10 — in [PR #27](https://github.com/yennanliu/InvestSkill/pull/27). **All six Tier 1 skills (§3.1) are shipped.** Added outside the roadmap: `fact-check` — claim-level verification with citations, the missing half of the trust story next to `result-validator` — in [PR #28](https://github.com/yennanliu/InvestSkill/pull/28); the Learning track's Part II (Lessons 9–13, the "No" case study, +32 glossary terms) in [PR #29](https://github.com/yennanliu/InvestSkill/pull/29) after the [Learning gap review](LEARNING-GAP-REVIEW.md). Still open from the P0/P1 rows of §8 as of 2026-09-24: §4.3, `--lang zh-TW` everywhere, the JSON footer, the zh Skill Reference index (§5.6) — all closed below.
+
+**§8 P0–P2, closed out (2026-10-24, `feat/roadmap-p0-p2`).** The items still open after the ten headline recommendations:
+
+| §8 row | Item | Status | Notes |
+|--------|------|--------|-------|
+| P0 | §7 fixes · `COUNT_DOCS` (6.9) · aliases (§4.2 b) · `check-skill-contract.js` (6.3) | ✅ Done | PR #26 |
+| P1 | Data & Sources + gate (§4.1) | ✅ Done | PR #26 |
+| P1 | **`--lang zh-TW` on every skill** (§4.1) | ✅ Done | A shared "🌐 Output Language" section in all 34 frameworks: everything in Traditional Chinese, but the Data & Sources labels, the signal box and the JSON footer stay in English so they still parse. `check-skill-contract.js` enforces it; `new-skill.js` scaffolds it. (The JSON footer shipped in the [2026-10 scan](PROJECT-SCAN-2026-10.md) PR) |
+| P1 | **`full-report` runs every framework** (§4.3) | ✅ Done | quick 5 (one module per scored component) · standard 10 · comprehensive = all 25 modules that apply to one stock (20 scored + `10k-digest`, `position-ladder`, `chart-master`, `fact-check` → `result-validator`, `thesis-tracker`); `--skip a,b`; not-applicable rules (ETF ticker, banks, earnings > 45 days); sub-scores are plain averages of oriented box Scores; the frameworks that don't apply to one stock are named |
+| P1 | `sync-prompts.js` (6.1) · `new-skill.js` (6.2) | ✅ Done | PR #26 |
+| P1 | **zh Skill Reference** (§5.6) | ✅ Done | `skills-zh-tw.html`: Chinese categories, titles and one-line summaries (`site/content/SKILL-SUMMARIES-zh-TW.json`, required for every skill by `test-skills.js` and written by `new-skill.js`), linked from the zh nav, tabs, footer and landing page; skill pages stay English |
+| P2 | `etf-analysis` + lesson · `earnings-preview` + lesson · `thesis-tracker` · `tax-lens` + lesson · `learning-coach` · loss/pass case | ✅ Done | PRs #26, #27, #29 |
+| P2 | **Non-US Investor Guide** (§5.4) | ✅ Done | `non-us-guide.html` / `non-us-guide-zh-tw.html` — access routes (US broker, 複委託, UCITS), W-8BEN, withholding and treaties, capital gains, the $60k estate-tax exposure, FX, a worked Taipei example, Check yourself |
+| P2 | **Glossary +25** (§5.3) | ✅ Done | Every §5.3 term still missing, plus the macro and options vocabulary of Lessons 14–15 and the credit/forensic terms of the new skills — both languages |
+
 
 ---
 
