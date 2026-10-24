@@ -2,7 +2,8 @@ name: CI
 
 # One workflow for every push and PR: the full offline suite (`npm test` —
 # structure, skill contract, prompt sync, LLM I/O contract, EDGAR helpers,
-# release/scaffold tooling, install script) and the site build + link check.
+# release/scaffold tooling, site language switcher, install script) and the
+# site build + switcher check on the real build + link check.
 # Specialised jobs stay in their own workflows: install-script.yml (shellcheck,
 # OS/node matrix, live curl | bash installs) and llm-eval.yml (prompt diff and
 # the live Claude eval).
@@ -50,5 +51,7 @@ jobs:
       - run: npm ci
       - name: Build the site
         run: npm run build:site
+      - name: Language switcher on the built pages
+        run: npm run test:site -- --site _site
       - name: Internal links and anchors
         run: node scripts/check-links.js
