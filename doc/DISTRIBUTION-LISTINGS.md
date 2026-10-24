@@ -34,36 +34,7 @@ None of these were submitted by us — there is no submission in the repo's comm
 
 ## 3. Getting into Anthropic's official directory
 
-The official directory takes submissions through the developer portal — there is no PR or form against `claude-plugins-official`. Docs: [Publish to the directory](https://claude.com/docs/directory/publish), [Pre-submission checklist](https://claude.com/docs/plugins/pre-submission-checklist), [Submit your plugin](https://claude.com/docs/plugins/submit).
-
-### Who can submit
-
-- A claude.ai **Pro, Max, Team, or Enterprise** account (not Free), with **GitHub connected** on claude.ai.
-- The connected GitHub account must have **push access** to `yennanliu/InvestSkill`. The listing belongs to the claude.ai organization that submits first, so submit from the account that should own it long term.
-
-### Readiness (`claude plugin validate ./plugins/us-stock-analysis`)
-
-| Check | Status |
-|-------|--------|
-| `plugin.json` schema, `name` / `description` / `author` / `version` | ✅ |
-| License (`"license": "MIT"` in `plugin.json`) | ✅ |
-| README ≥ 40 words in the plugin folder | ✅ `plugins/us-stock-analysis/README.md` — rewritten with this doc (the old one listed 6 of 34 skills), since the directory shows it as the listing description |
-| ≤ 512 files, every file < 256 KiB, text only, no `.DS_Store` / symlinks | ✅ 36 files, all Markdown/JSON |
-| No hooks, MCP servers, launchers, or credentials | ✅ Prompt files only — security scan has nothing to execute |
-| Icon | ⚠️ Warning only. Optional square PNG, 512–2048 px, at `.claude-plugin/icon.png`. It is taken **only on the first save** in the portal, so add it before submitting if we want one |
-| Name `us-stock-analysis` | ⚠️ Generic words; other authors use the same name elsewhere. Could be **held for a reviewer** ("Name may be confused with an existing listing"). Setting a `displayName` such as "InvestSkill — US Stock Analysis" helps without changing the install slug |
-
-### Steps
-
-1. Open [claude.ai/directory/manage](https://claude.ai/directory/manage) → **Submit new** → **Plugin bundle**.
-2. **Source:** Repository `yennanliu/InvestSkill`, Plugin path `plugins/us-stock-analysis`, Branch `main`. Select **Validate** and fix anything marked **Blocking**.
-3. **Listing details:** read from `plugin.json` and the plugin README — edit those in the repo, not in the portal.
-4. **Data handling:** no personal data read or stored; no data sent to other services; no retention; not intended for people under 18.
-5. **Compliance:** confirm the contact email and the four acknowledgements.
-6. **Review and submit:** keep **GitHub push webhook** (needs repo admin) so new releases on `main` are picked up, then **Submit for review**.
-7. When the version passes, select **Publish**; an Anthropic reviewer publishes the first version. Track status under **Submissions**.
-
-After it is listed, every merge to `main` becomes a new scanned version — bump `version` in `plugin.json` with each release, as the [Version Consistency Rule](../CLAUDE.md) already requires.
+Submission happens in Anthropic's developer portal, not by a PR to `claude-plugins-official`. It needs a paid claude.ai account with GitHub connected and push access to this repo. The full step-by-step guide, the readiness checklist and what to enter on each screen are in **[ANTHROPIC-DIRECTORY-ONBOARDING.md](ANTHROPIC-DIRECTORY-ONBOARDING.md)**.
 
 ## 4. Other platforms
 

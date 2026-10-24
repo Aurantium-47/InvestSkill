@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **`doc/DISTRIBUTION-LISTINGS.md`** — where InvestSkill is listed (third-party Claude plugin directories, auto-indexed from GitHub), where it is not (Anthropic's official directory, ChatGPT GPT Store), and the steps and readiness checklist for submitting to Anthropic's official directory.
+- **`doc/DISTRIBUTION-LISTINGS.md`** — where InvestSkill is listed (third-party Claude plugin directories, auto-indexed from GitHub) and where it is not (Anthropic's official directory, ChatGPT GPT Store).
+- **`doc/ANTHROPIC-DIRECTORY-ONBOARDING.md`** — step-by-step guide to listing `us-stock-analysis` in Anthropic's official directory: who can submit, readiness checklist, what to enter on each portal screen (including the data-handling answers), and keeping the listing current.
 
 ### Changed
 - **`plugins/us-stock-analysis/README.md`** rewritten — it listed 6 of 34 skills with pre-namespace commands. Now covers every skill, current `/us-stock-analysis:<skill>` usage, and a "what this plugin runs and sends" disclosure. Anthropic's directory shows this file as the listing description.
