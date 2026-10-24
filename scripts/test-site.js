@@ -97,7 +97,8 @@ section('2. Rendered switcher on every built page');
       const html = fs.readFileSync(path.join(site, f), 'utf8');
       const opts = [...html.matchAll(/<a href="([^"]*)" class="lang-opt( active)?"([^>]*)>/g)]
         .map(m => ({ href: m[1], active: !!m[2], current: /aria-current="true"/.test(m[3]), hreflang: (m[3].match(/hreflang="([^"]*)"/) || [])[1] }));
-      if (!opts.length) continue;  // 404.html has no switcher
+      if (f === '404.html') continue;  // the only page built without a switcher
+      if (!opts.length) { bad.push(`${f}: no language switcher`); continue; }
       withSwitcher++;
       const want = lp.switchTargets(f), lang = lp.langOf(f);
       const [en, zh] = opts;
