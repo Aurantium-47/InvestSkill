@@ -1,23 +1,28 @@
-## InvestSkill v1.13.0
+## InvestSkill v1.14.0
 
-**30 Professional Investment Analysis Frameworks** · 34 skills · 7 platforms · no API keys, no runtime, no telemetry
+**34 Professional Investment Analysis Frameworks** · 38 skills · 7 platforms · no API keys, no runtime, no telemetry
 
-Released 2026-10-11. Prompts are now tested like code, and every demo is a real, reproducible run with screenshots of the actual output.
+Released 2026-10-24. Four new frameworks, a machine-readable footer on every output, and every framework in Traditional Chinese.
 
 ## What's New
 
-**🧪 LLM checks in CI** — a new `LLM Eval` workflow runs on every PR that touches a skill, a prompt, a cross-AI system prompt, or the eval machinery:
-- **Offline, in `npm test`:** 12 unedited real model outputs must pass the output contract, broken variants must fail for the right reason, every prompt must close with the standard signal block (followed only by the guide lines, one note and the Disclaimer), skill descriptions stay short, and each prompt stays within 25% of its size budget (`scripts/test-llm-io.js`)
-- **Prompt diff in the job summary:** changed prompts, token deltas, description changes and contract status (`scripts/prompt-diff.js`)
-- **Live eval:** the changed skills run through Claude on the fictional ZEPH data pack and fail the job on any contract violation (`scripts/claude-complete.js`, on the official SDK). Needs an `ANTHROPIC_API_KEY` repository secret, scoped to the eval step; skipped, not failed, without it
+**🆕 Four new frameworks**
+- **`compare`**: 2–5 stocks head to head on one table (quality, growth, valuation, balance sheet, momentum, risks, catalysts), then a reasoned pick, what would flip it, and whether owning more than one adds anything
+- **`credit-check`**: maturity wall, interest coverage, leverage against covenants, liquidity runway, ratings and spreads, and the cost of refinancing at today's rates, scored as a Credit Health Score 0–10
+- **`forensic-accounting`**: Beneish M-Score, Altman Z, Sloan accruals, cash-vs-earnings divergence, SBC-adjusted FCF, revenue-recognition and auditor flags, scored as a Manipulation Risk Score 0–10
+- **`trade-postmortem`**: process vs. outcome, plan adherence, the biases that showed up, and the one lesson for the journal; reads closed `thesis-tracker` files
 
-**🎬 Real demos, step by step** — a new **Live Walkthrough** (English + 繁體中文) runs `stock-eval` → `bear-case` → `fact-check` → `learning-coach` on Microsoft. Every demo (META, NVDA, AMD, PLTR, RKLB) was re-run on 2026-10-11 against fresh SEC filings and rebuilt as command → screenshot → what to notice → result, with the full unedited outputs. The Demo Overview is now a hub in both languages.
+**🧾 JSON footer on every skill**: right after the signal box, a ```` ```json {"investskill": "1", "skill": …, "signal": …, "score": …} ```` block with the same values, so tools can read a result without scraping the box. A footer that disagrees with the box fails the output contract; a missing one is only a warning, so older outputs stay valid.
 
-**📊 More accurate SEC data packs** — `fetch-fundamentals` now counts debt tagged only in `LongTermDebt` (Rocket Lab's convertible notes), rebuilds SG&A from separate selling and G&A lines, uses continuing-operations cash flow for FCF, reports net cash including short-term investments, and labels where the share count came from. Commercial paper and short-term borrowings are named in the Notes.
+**🌐 `--lang zh-TW` on every framework**: the whole analysis comes back in Traditional Chinese. The Data & Sources labels, the signal box and the JSON footer stay in English so they still parse.
 
-**⚖️ One rule for conflicting sources** — all 28 analysis skills now say what to do when two sources disagree: prefer the primary source, then the most recent; show both values with dates; say which was used; never average.
+**🏦 Sector KPI packs**: `stock-eval --sector` and `financial-report-analyst --sector` (`bank`, `insurer`, `reit`, `biotech`, `saas`) use the metrics that matter for that sector (CET1/NIM, combined ratio, AFFO, cash runway, NRR / Rule of 40) and say which generic metrics to ignore.
 
-**🔧 Contract fixes** — `catalyst-calendar` and `stock-screener` now close with the standard Investment Signal block; the output parser understands Traditional Chinese outputs and validates `fact-check` by its own rules; `full-report` no longer runs alias stubs as modules; and a prompt audit removed dated patterns written for older models.
+**📑 `full-report` runs everything that applies**: quick = 5 modules, standard = 10, comprehensive = 25, with `--skip` and not-applicable rules. Components are re-weighted over the modules that ran, so a skipped module no longer counts as 5.0.
+
+**📚 Learning and site**: Lesson 14 (Macro & the Fed Cycle) and Lesson 15 (Options for Stock Investors), Check yourself quizzes on every lesson, a printable cheat sheet, a Non-US Investor Guide, a glossary that grows from 76 to 124 terms, a zh skill index, and FAQ pages, all in English and 繁體中文. The site also gains a sitemap, Open Graph tags, section-level search and WCAG AA contrast.
+
+**🔧 Fixes**: Thesis Invalidation was sitting inside the signal-box code fence in 19 skills, and has moved above the box. `full-report`'s composite bands now match the Score Guide. Factual corrections cover 13F scope, the wash-sale rule, the Sahm rule date, the 2025 tariff window and the 10b5-1 rules. The `npm run release` command now commits, tags and pushes itself.
 
 ## Quick Start
 
@@ -25,7 +30,7 @@ Released 2026-10-11. Prompts are now tested like code, and every demo is a real,
 ```bash
 /plugin marketplace add yennanliu/InvestSkill
 /plugin install us-stock-analysis@invest-skill
-/us-stock-analysis:stock-eval AAPL
+/us-stock-analysis:compare AAPL MSFT GOOGL
 ```
 
 ### Any agent via the installer
@@ -63,23 +68,22 @@ All releases include checksums for verification:
 
 ```bash
 # Download artifacts
-tar xzf invest-skill-marketplace-1.13.0.tar.gz
+tar xzf invest-skill-marketplace-1.14.0.tar.gz
 
 # Verify checksums
 sha256sum -c checksums.txt
 ```
 
 **Artifacts:**
-- `invest-skill-marketplace-1.13.0.tar.gz` — Full marketplace (all platforms)
-- `us-stock-analysis-1.13.0.tar.gz` — Claude Code plugin only
-- `checksums.txt` — SHA-256 verification file
+- `invest-skill-marketplace-1.14.0.tar.gz`: Full marketplace (all platforms)
+- `us-stock-analysis-1.14.0.tar.gz`: Claude Code plugin only
+- `checksums.txt`: SHA-256 verification file
 
 ## Full Changelog
 
-See [CHANGELOG.md → 1.13.0](CHANGELOG.md#1130---2026-10-11) for every entry.
+See [CHANGELOG.md → 1.14.0](CHANGELOG.md#1140---2026-10-24) for every entry.
 
 **Upgrade notes**
-- No breaking changes. Skill names, the signal block, and the plugin layout are unchanged.
-- `catalyst-calendar` and `stock-screener` outputs now end with the standard six-field signal block; their catalyst / screening summary moves to plain lines just above it.
-- Data packs gain `short_term_investments_m` and `net_debt_incl_investments_m`; regenerate existing packs to pick up the debt, SG&A and cash-flow fixes.
-- To enable the live eval on your fork, add an `ANTHROPIC_API_KEY` repository secret.
+- No breaking changes. Skill names, the signal block and the plugin layout are unchanged. The JSON footer is additive, and outputs without it still pass.
+- Removed workflows: `auto-deploy.yml`, `test.yml`, `pr-check.yml`, `validate.yml` and `install-test.yml`. Use `ci.yml` instead. A fork that relied on a version-bump merge to auto-tag must now run `npm run release`.
+- `full-report --lang` no longer lists `zh-CN` or `ja`. Use `zh-TW` or English.

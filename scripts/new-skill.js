@@ -306,10 +306,14 @@ edit('.github/copilot-instructions.md', t => insertTreeLine(bumpHeadingCount(
 
 // ── 7. CHANGELOG ──────────────────────────────────────────────────────────────
 edit('CHANGELOG.md', t => {
+  const entry = `- **\`${name}\`** — ${desc}. New analysis framework.\n`;
   const m = t.match(/## \[Unreleased\]\s*\n(?:\s*\n)?### Added\s*\n/);
-  if (!m) { todo.push('CHANGELOG.md: no "## [Unreleased] › ### Added" block'); return t; }
-  const at = m.index + m[0].length;
-  return t.slice(0, at) + `- **\`${name}\`** — ${desc}. New analysis framework.\n` + t.slice(at);
+  if (m) { const at = m.index + m[0].length; return t.slice(0, at) + entry + t.slice(at); }
+  // Right after a release [Unreleased] is empty — open its ### Added block.
+  const u = t.match(/## \[Unreleased\][^\n]*\n\s*/);
+  if (!u) { todo.push('CHANGELOG.md: no "## [Unreleased]" section'); return t; }
+  const at = u.index + u[0].length;
+  return t.slice(0, at) + `### Added\n${entry}\n` + t.slice(at);
 });
 
 // ── 8. zh Skill Reference entry ───────────────────────────────────────────────
