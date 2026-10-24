@@ -6,6 +6,8 @@
 >
 > 繁體中文版：[IMPROVEMENT-ROADMAP-zh-TW.md](IMPROVEMENT-ROADMAP-zh-TW.md)
 >
+> **Follow-up (2026-10-24):** a full project scan at v1.13.0 — bugs, improvements, and new features, with the current status of this roadmap's open items — is in [PROJECT-SCAN-2026-10.md](PROJECT-SCAN-2026-10.md).
+>
 > This document complements the two earlier reviews — [qa/PROJECT-REVIEW.md](../qa/PROJECT-REVIEW.md) (2026-07-02, structure & consistency) and [SITE-ENRICHMENT-REVIEW.md](SITE-ENRICHMENT-REVIEW.md) (2026-06-15, site content). Most of their P0/P1 items have shipped (glossary, concepts, skill picker, per-skill pages, search, link checker, count tests, Learning curriculum). This one picks up where they left off.
 
 ---
