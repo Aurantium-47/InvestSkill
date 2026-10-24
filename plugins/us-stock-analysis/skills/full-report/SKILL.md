@@ -30,106 +30,124 @@ Before rendering the final report, verify:
 
 ---
 
+
+## 🌐 Output Language — `--lang zh-TW`
+
+English is the default. With `--lang zh-TW` — or when the user writes in Traditional Chinese and asks for a Chinese answer — write the whole analysis in Traditional Chinese (繁體中文, Taiwan usage), keeping it machine-checkable:
+
+- **Translate** every heading, narrative paragraph, table header and bullet. Give each metric's English name in brackets the first time it appears — 自由現金流（Free Cash Flow, FCF） — so the reader can match it to the glossary and to English analyses.
+- **Keep in English** tickers, figures and units, SEC form and item names (10-K Item 7, Form 4), the four `Data & Sources` field labels (`As of`, `Source`, `Retrieval`, `Confidence` — the Retrieval value may be written in Chinese, e.g. 使用者提供), and the Investment Signal box and JSON footer exactly as specified — field names and the BULLISH / NEUTRAL / BEARISH, HIGH / MEDIUM / LOW, BUY / HOLD / SELL, STRONG / MODERATE / WEAK values. Tools parse them.
+- Title the invalidation section **論點失效條件（Thesis Invalidation）**, and close with the disclaimer in Chinese: **免責聲明：** 僅供教育用途，非投資建議。
+- Use Taiwan financial terms: 殖利率、本益比、營業利益率、自由現金流、聯準會、選擇權、買權／賣權、除息日、預扣稅.
+
+---
+
 ## Depth Flags
 
-Select how many modules to run with `--depth`:
+Select how many modules to run with `--depth`, and drop any with `--skip`:
 
 | Flag | Modules | Best For |
 |------|---------|----------|
-| `--depth quick` | 5 core modules | Rapid screen, time-constrained due diligence |
+| `--depth quick` | 5 modules — one per scored component | Rapid screen, time-constrained due diligence |
 | `--depth standard` | 10 modules | Balanced research before initiating a position |
-| `--depth comprehensive` | All 15 modules | Full pre-commitment due diligence (default) |
+| `--depth comprehensive` | **Every framework that applies to one stock** — 20 analysis modules + 5 that build the plan, the charts, the verification and the saved thesis (default) | Full pre-commitment due diligence |
+| `--skip a,b,…` | Removes the named modules at any depth (e.g. `--skip options-analysis,short-interest` for a stock without listed options). Skipped modules are listed as "skipped by request" and their component is re-weighted (below) | Cost control, or a module that does not apply |
 
 ---
 
 ## Module Sets by Depth
 
-### Quick (5 modules)
+### Quick (5 modules — every scored component covered once)
 
-| # | Module | Focus |
-|---|--------|-------|
-| 1 | `stock-eval` | Company overview, competitive position, relative valuation |
-| 2 | `technical-analysis` | MA, RSI, MACD, volume, support/resistance |
-| 3 | `stock-valuation` | DCF intrinsic value (bear/base/bull), P/E, EV/EBITDA, peer multiples |
-| 4 | `insider-trading` | SEC Form 4 patterns, net insider sentiment |
-| 5 | `earnings-call-analysis` | Management tone, guidance quality, key themes |
+| # | Module | Component | Focus |
+|---|--------|-----------|-------|
+| 1 | `stock-eval` | Business Quality | Company overview, financial strength, relative valuation |
+| 2 | `stock-valuation` | Valuation | DCF intrinsic value (bear/base/bull), P/E, EV/EBITDA, peer multiples |
+| 3 | `insider-trading` | Market Signals | SEC Form 4 patterns, net insider sentiment |
+| 4 | `technical-analysis` | Technical Setup | MA, RSI, MACD, volume, support/resistance |
+| 5 | `bear-case` | Risk Profile | Short-seller red-team, Thesis-Killers, downside target |
 
 ### Standard (10 modules — Quick + 5 more)
 
-| # | Module | Focus |
-|---|--------|-------|
-| 6 | `institutional-ownership` | 13F holdings, smart money flows |
-| 7 | `competitor-analysis` | Moat, market share, Porter's Five Forces |
-| 8 | `sector-analysis` | Sector rotation, relative strength |
-| 9 | `options-analysis` | IV, Put/Call ratio, max pain, strategies |
-| 10 | `short-interest` | Short ratio, squeeze risk, days-to-cover |
+| # | Module | Component | Focus |
+|---|--------|-----------|-------|
+| 6 | `competitor-analysis` | Business Quality | Moat, market share, Porter's Five Forces |
+| 7 | `financial-report-analyst` | Business Quality | 10-K/10-Q statement quality, red flags, risk factors |
+| 8 | `earnings-call-analysis` | Market Signals | Management tone, guidance quality, key themes |
+| 9 | `institutional-ownership` | Market Signals | 13F holdings, smart-money flows |
+| 10 | `catalyst-calendar` | Risk Profile | Dated events in the next 90 days and their expected impact |
 
-### Comprehensive (15 modules — Standard + 5 more)
+### Comprehensive (every framework that applies to one stock — Standard + 15 more)
 
-| # | Module | Focus |
-|---|--------|-------|
-| 11 | `bear-case` | Short-seller red-team, Thesis-Killers, downside target |
-| 12 | `catalyst-calendar` | Dated events in the next 90 days and their expected impact |
-| 13 | `economics-analysis` | Macro environment, rate sensitivity |
-| 14 | `financial-report-analyst` | 10-K/10-Q deep dive, risk factors |
-| 15 | `dividend-analysis` | Yield, payout ratio, sustainability |
+| # | Module | Component | Focus |
+|---|--------|-----------|-------|
+| 11 | `10k-digest` | *(input)* | Structured digest of the latest 10-K; `financial-report-analyst` reads it and the report's appendix cites it |
+| 12 | `industry-map` | Business Quality | Position in the value chain, chokepoints, margin pools |
+| 13 | `dividend-analysis` | Business Quality | Capital allocation: dividends, buybacks, FCF deployment, M&A, debt management |
+| 14 | `earnings-preview` | Market Signals | Consensus vs. whisper, implied move, three-scenario grid — **only if the next report is within 45 days**; otherwise listed as "not applicable this quarter" |
+| 15 | `sector-analysis` | Technical Setup | Sector rotation, relative strength vs. benchmark |
+| 16 | `short-interest` | Risk Profile | Short ratio, days to cover, squeeze risk |
+| 17 | `options-analysis` | Risk Profile | IV and IV rank, put/call, what the options market prices in |
+| 18 | `economics-analysis` | Risk Profile | Macro regime and rate sensitivity |
+| 19 | `forensic-accounting` | Risk Profile | Beneish, Altman, accruals, cash conversion — earnings quality |
+| 20 | `credit-check` | Risk Profile | Maturity wall, coverage, refinancing cost — skipped automatically for banks and insurers |
+| 21 | `position-ladder` | *(plan)* | The Entry Strategy: rungs, share-count floor and ceiling, thesis-break exit |
+| 22 | `chart-master` | *(charts)* | The report's MA / RSI / MACD / volume / scorecard charts |
+| 23 | `fact-check` | *(verification)* | Every figure checked against the filing and market data, with citations |
+| 24 | `result-validator` | *(verification)* | Confidence across data quality, methodology and signal consistency |
+| 25 | `thesis-tracker` | *(saved thesis)* | Writes `output/thesis/<TICKER>.md` from the composite so `--update` can re-check it later |
+
+Modules in *(italics)* produce inputs, the plan, the charts or the verification; they do not get a weight in the composite.
+
+**Frameworks that do not apply to a single-stock report** (run them on their own):
+- `etf-analysis` — if the ticker is an ETF, stop and run it instead of this report
+- `portfolio-review`, `risk-stress-test`, `tax-lens` — they need the user's holdings or lots
+- `stock-screener`, `compare` — they rank or weigh several tickers
+- `trade-postmortem` — it reviews a closed trade
+- `learning-coach` — run it on the finished report to have every metric explained
 
 ---
 
 ## Research Process (5 Phases)
 
-Modules are grouped into phases regardless of depth. Earlier phases inform later-phase assumptions.
+Modules are grouped into phases regardless of depth; each phase's sub-score is the component of the same name. Earlier phases inform later-phase assumptions.
 
-### Phase 1 — Business & Competitive Foundation
+### Phase 1 — Business & Competitive Foundation → Business Quality
 
-Establish qualitative and quantitative foundation before attempting valuation.
-
-- **stock-eval** — Company overview, competitive position, relative valuation vs. peers
+- **stock-eval** — Company overview, financial strength, relative valuation vs. peers
 - **competitor-analysis** *(standard+)* — Moat depth, Porter's Five Forces, pricing power
+- **financial-report-analyst** *(standard+)* — Statement quality and red flags; at comprehensive depth it reads the **10k-digest** first
+- **industry-map** *(comprehensive)* — Where the company sits in its value chain and who holds the pricing power
 - **dividend-analysis** *(comprehensive)* — Capital allocation: dividend and buyback sustainability, FCF deployment, M&A record, debt management
 
-Output: **Business Quality Score (0–10)**
-Score reflects durability of competitive advantages, financial health, capital allocation, and consistency of returns.
+### Phase 2 — Valuation → Valuation
 
-### Phase 2 — Valuation
+- **stock-valuation** — DCF intrinsic value with Bull/Base/Bear scenarios, plus P/E, EV/EBITDA, P/S, P/FCF peer multiples. At comprehensive depth, the `bear-case` downside target sets the Bear scenario
 
-Determine intrinsic and relative worth of the business.
+10 = deep discount to intrinsic value; 5 = fair value; 0 = extreme overvaluation.
 
-- **stock-valuation** — DCF intrinsic value with Bull/Base/Bear scenarios, plus P/E, EV/EBITDA, P/S, P/FCF peer multiples
-
-Output: **Valuation Score (0–10)** — 10 = deep discount to intrinsic value; 5 = fair value; 0 = extreme overvaluation.
-
-### Phase 3 — Market Signals
-
-Understand what sophisticated market participants are signaling.
+### Phase 3 — Market Signals → Market Signals
 
 - **insider-trading** — SEC Form 4 patterns, net insider sentiment
-- **institutional-ownership** *(standard+)* — Smart money 13F changes, concentration
-- **earnings-call-analysis** — Management tone, guidance quality, forward signals
+- **earnings-call-analysis** *(standard+)* — Management tone, guidance quality, forward signals
+- **institutional-ownership** *(standard+)* — Smart-money 13F changes, concentration
+- **earnings-preview** *(comprehensive, report within 45 days)* — What the price already assumes going into the print
 
-Output: **Market Signal Score (0–10)** — High = insider buying + institutional accumulation + positive management tone.
-
-### Phase 4 — Technical Timing
-
-Identify current technical setup to optimize entry timing.
+### Phase 4 — Technical Timing → Technical Setup
 
 - **technical-analysis** — Trend structure, support/resistance, volume, momentum
-- **sector-analysis** *(standard+)* — Sector rotation, relative strength vs. benchmark
+- **sector-analysis** *(comprehensive)* — Sector rotation, relative strength vs. benchmark
 
-Output: **Technical Setup Score (0–10)** — Strong (8–10), Moderate (4–7), Weak (0–3).
+### Phase 5 — Risk Assessment → Risk Profile
 
-### Phase 5 — Risk Assessment
+- **bear-case** — Short-seller red-team: Thesis-Killers and a downside target. Its Thesis-Killers become the Bear Case section of the thesis narrative, and the Thesis Invalidation checks whether they are refuted
+- **catalyst-calendar** *(standard+)* — Dated events in the next 90 days; high-impact binary events lower the Risk Profile, and the dates populate "next catalyst dates" in the Monitoring Plan
+- **short-interest**, **options-analysis**, **economics-analysis** *(comprehensive)* — Positioning pressure, what the options market prices in, macro and rate sensitivity
+- **forensic-accounting**, **credit-check** *(comprehensive)* — Can the earnings be trusted, and can the balance sheet carry the plan
 
-Quantify downside risks and positioning pressure.
+### After the phases (comprehensive)
 
-- **short-interest** *(standard+)* — Short positioning, days-to-cover, squeeze risk
-- **options-analysis** *(standard+)* — Implied volatility, put/call ratios, options flow
-- **economics-analysis** *(comprehensive)* — Macro environment, rate sensitivity
-- **financial-report-analyst** *(comprehensive)* — 10-K/10-Q risk factors
-- **bear-case** *(comprehensive)* — Short-seller red-team: Thesis-Killers and a downside target. Its downside target sets the Bear scenario in the Valuation Summary and Exit Strategy, its Thesis-Killers become the Bear Case section of the thesis narrative, and the Thesis Invalidation checks whether they are refuted
-- **catalyst-calendar** *(comprehensive)* — Dated events in the next 90 days and their expected price impact. High-impact binary events lower the Risk Profile score, and the dated events populate "next catalyst dates" in the Monitoring Plan
-
-Output: **Risk Profile Score (0–10)** — Inverse of risk: Low risk = high score (8–10), High risk = low score (0–3).
+- **position-ladder** writes the Entry Strategy; **chart-master** draws the charts; **fact-check** then **result-validator** verify the composite (see Data Verification above); **thesis-tracker** saves the thesis, its KPIs and the invalidation triggers to `output/thesis/<TICKER>.md`.
 
 ---
 
@@ -140,11 +158,11 @@ Full Report Score = Weighted Composite
 
 Component                Weight    Sub-Score (0-10)
 ─────────────────────────────────────────────────────
-Business Quality          25%      [Phase 1 modules]
-Valuation                 25%      [Phase 2 modules]
-Market Signals            20%      [Phase 3 modules]
-Technical Setup           15%      [Phase 4 modules]
-Risk Profile              15%      [Phase 5 modules]
+Business Quality          25%      [Phase 1 modules that ran]
+Valuation                 25%      [Phase 2]
+Market Signals            20%      [Phase 3 modules that ran]
+Technical Setup           15%      [Phase 4 modules that ran]
+Risk Profile              15%      [Phase 5 modules that ran]
 ─────────────────────────────────────────────────────
 COMPOSITE SCORE          100%      X.X / 10
 
@@ -158,14 +176,9 @@ Composite Interpretation (the standard Score Guide — the box at the end uses t
 
 The composite *is* the box Score, so the box Signal follows from it: ≥ 6.0 BULLISH, 4.0–5.9 NEUTRAL, < 4.0 BEARISH. Action and Conviction are a judgement on top (a 6.2 can be BULLISH / HOLD / WEAK when the valuation is stretched), but never contradict the Signal.
 
-Sub-score derivation:
-- Business Quality: average of the modules that ran — financial strength (stock-eval), moat score (competitor-analysis, standard+), capital-allocation score (dividend-analysis, comprehensive)
-- Valuation: 10 = deep discount to intrinsic value; 5 = at fair value; 0 = extreme overvaluation
-- Market Signals: weighted average of insider, institutional, and earnings call scores
-- Technical Setup: Strong=8–10, Moderate=4–7, Weak=0–3
-- Risk Profile: inverse of risk — Low risk = 8–10, High risk = 0–3; at comprehensive depth this includes the `bear-case` downside severity and the `catalyst-calendar` event risk
+Sub-score derivation — **a sub-score is the plain average of the box Scores of the modules in its component that ran.** Every module's box Score is already oriented so that higher is better for a holder: `bear-case` reports `min(10 − Bear Case Strength, 6.5)`, `forensic-accounting` reports `10 − Manipulation Risk Score`, `credit-check` reports its Credit Health Score, and `catalyst-calendar`, `short-interest`, `options-analysis` and `economics-analysis` score the setup for a holder. No module is inverted a second time here.
 
-**Missing modules are never scored as 5.0.** A sub-score is the average of the modules in its phase that actually ran. If a whole component has no module at the chosen depth (Risk Profile at `--depth quick`), drop it and re-weight the remaining components proportionally (quick: Business Quality 29.4% · Valuation 29.4% · Market Signals 23.5% · Technical Setup 17.6%). The scorecard lists every skipped module as "not assessed" and states the weights actually used, so a quick-depth composite is never presented as if it had weighed the risks.
+**Missing modules are never scored as 5.0.** Quick depth covers each component once, so all five weights apply. If `--skip` (or "not applicable", e.g. `earnings-preview` outside the 45-day window, `credit-check` for a bank) removes every module of a component, drop that component and re-weight the rest proportionally — e.g. without Market Signals: Business Quality 31.25% · Valuation 31.25% · Technical Setup 18.75% · Risk Profile 18.75%. The scorecard lists every module as run / skipped by request / not applicable and states the weights actually used.
 
 ---
 
@@ -223,12 +236,14 @@ The output file is a standalone HTML document (no external dependencies except C
 /full-report NVDA --depth quick
 /full-report MSFT --depth standard
 /full-report TSLA --depth comprehensive --lang zh-TW
+/full-report JPM --skip credit-check,options-analysis
 /full-report AMZN --output ~/Desktop/
 ```
 
 **Arguments:**
 - `<TICKER>` — required, any US-listed stock
 - `--depth` — `quick` | `standard` | `comprehensive` (default: `comprehensive`)
+- `--skip` — comma-separated module names to leave out at any depth; the scorecard re-weights (see Composite Scoring)
 - `--lang` — output language, default `en`, supports `zh-TW`
 - `--output` — custom save path, default `output/`
 
@@ -246,13 +261,14 @@ Example: `output/AAPL_report_2026-10-24.html`
 
 ## Workflow
 
-1. Parse `--depth` flag and determine which modules to run
+1. Parse `--depth` and `--skip`; determine which modules run, and mark the not-applicable ones (ETF ticker → stop and suggest `etf-analysis`; bank/insurer → no `credit-check`; next report > 45 days away → no `earnings-preview`)
 2. Gather all available data for `<TICKER>` (financials, price, filings, macro)
 3. Execute modules in phase order; each phase's output informs the next
-4. Compute composite weighted score (0–10) using framework above
+4. Compute composite weighted score (0–10) using framework above, re-weighting for any component with no module
 5. Build investment thesis narrative with bull/bear case
-6. Render complete HTML with all sections, charts, and scorecard
-7. Write file to output path and confirm location
+6. At comprehensive depth: Entry Strategy from `position-ladder`, charts from `chart-master`, then `fact-check` → `result-validator` on the composite
+7. Render complete HTML with all sections, charts, and scorecard
+8. Write the file to the output path, save the thesis with `thesis-tracker` (comprehensive), and confirm both locations
 
 ---
 

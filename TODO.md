@@ -6,13 +6,17 @@ The previous long-form backlog (last updated 2026-02-24) is archived at [doc/arc
 
 ## Top 5
 
-1. **`full-report --depth comprehensive` runs every framework** — add the frameworks missing since v1.8 (`bear-case` above all) plus the new Tier 1 skills where they fit, swap the alias modules for their targets, add `--skip <skill>`. → roadmap §4.3
-2. **`--lang zh-TW` on every skill** — the last open item of the skill contract (§4.1); the JSON footer has shipped.
-3. **Non-US Investor Guide page** — Lesson 11's non-US section is the core; the page adds brokers, FX, and account opening (§5.4). Glossary: the filing / technical / macro / options terms still missing (§5.3).
-4. **zh Skill Reference index** — `skills-zh-tw.html` with Chinese category headings, so the language switch never dead-ends to English (§5.6).
-5. **Tier 2 skills as demand shows** — `proxy-governance`, `investment-policy`, `ipo-analysis`, `pair-trade`; and `special-situations` / `watchlist` from the [2026-10 scan](doc/PROJECT-SCAN-2026-10.md) §4.1. → roadmap §3.2
+Every P0–P2 item of the roadmap (§8) has shipped. Next, from roadmap P3 and the [2026-10 scan](doc/PROJECT-SCAN-2026-10.md):
+
+1. **Tier 2 skills as demand shows** — `proxy-governance`, `investment-policy`, `ipo-analysis`, `pair-trade`; and `special-situations` / `watchlist` (scan §4.1 — `watchlist` reads the saved `thesis-tracker` files and their JSON footers). → roadmap §3.2
+2. **Interactive, zero-runtime tools** — DCF-sensitivity and position-size calculators, a prompt builder, and a "paste your output" checker that runs `signal-block.js` in the browser. → roadmap §5.5
+3. **Targeted skill upgrades** — `stock-valuation --reverse`, `stock-screener` presets, broker-CSV column maps in `portfolio-review`, ex-dividend / options-expiry dates in `catalyst-calendar`, one regime verdict in `economics-analysis`, relative strength in `technical-analysis`. → roadmap §4.4
+4. **Behaviour over time** — a scheduled, cost-capped live eval of every single-ticker skill with a pass-rate trend; `check-glossary-coverage.js` (6.5) and `check-demo-freshness.js` + "as-of" banners on the demos (6.7). → scan §4.4, roadmap §6
+5. **Maintainability** — move `report-generator`'s HTML template out of the prompt (scan B7); eslint and `// @ts-check` on `scripts/lib/`, `engines` ≥ 20 (scan B15).
 
 ## Recently shipped from the roadmap
+
+- Roadmap P0–P2 closed out (§0 there): `--lang zh-TW` on every framework, `full-report` running every framework that applies to one stock with `--skip`, the zh Skill Reference index, the Non-US Investor Guide, and the glossary gaps
 
 - From the [2026-10 project scan](doc/PROJECT-SCAN-2026-10.md) (§8 there): the Thesis Invalidation fence bug in 19 skills, `full-report` scoring fixes, a working `npm run release` and one release path, one CI workflow, the JSON footer, four new skills (`trade-postmortem`, `forensic-accounting`, `compare`, `credit-check`) and `--sector` KPI packs, Lessons 14–15 (Macro & the Fed, Options), Check-yourself for Lessons 1–8, the cheat sheet, the FAQ on the site, sitemap / Open Graph / hreflang / section-level search, and parity, fence and anchor checks
 

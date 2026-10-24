@@ -134,7 +134,7 @@ Think of each skill as a **specialized analyst** you can summon with a command:
 | `/earnings-call-analysis AMZN` | Parse tone, guidance, and key themes from earnings calls |
 | `/dividend-analysis JNJ` | Check dividend safety, growth, and sustainability |
 | `/chart-master AAPL` | Generate financial charts in Mermaid, ASCII, or HTML |
-| `/full-report MSFT` | Orchestrate all 15 modules into one HTML report |
+| `/full-report MSFT` | Orchestrate every applicable framework (25 modules at the default `--depth comprehensive`) into one HTML report |
 | `/result-validator` | Audit any analysis output and produce a confidence score |
 
 ### How Skills Work
@@ -787,7 +787,7 @@ new Chart(document.getElementById('aaplChart'), {
 
 **What it does:**
 
-The `full-report` skill orchestrates 15 analysis modules sequentially and saves a single professional HTML report to `output/MSFT-full-report.html`.
+The `full-report` skill orchestrates its analysis modules in phase order — 5 at `--depth quick`, 10 at `standard`, and every framework that applies to one stock at `comprehensive` (the default; `--skip a,b` leaves modules out) — and saves a single professional HTML report to `output/MSFT-full-report.html`.
 
 ```
 # Full Report — MSFT (Microsoft Corporation)
@@ -1999,7 +1999,7 @@ Real-world investor scenarios showing how to combine multiple skills.
 > ▶ See this run live on NVDA: [3.16](#316-workflow-e--full-investment-memo-live-run-nvda)
 
 ```bash
-# One command — produces a full HTML report with all 15 analysis modules
+# One command — produces a full HTML report covering every applicable framework
 /us-stock-analysis:full-report NVDA
 
 # Opens as: output/NVDA-full-report.html

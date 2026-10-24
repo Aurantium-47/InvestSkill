@@ -192,6 +192,12 @@ function signalFenceIsClean(text) {
   return !lines.slice(open + 1, top).some(l => /^#{1,6}\s/.test(l));
 }
 
+/** Does a skill file define Traditional Chinese output (`--lang zh-TW`) with the machine-readable fields kept in English? */
+function hasLangZhTw(text) {
+  const t = text || '';
+  return t.includes('--lang zh-TW') && /(Output Language|Language Mode)/.test(t) && /繁體中文/.test(t);
+}
+
 function hasThesisInvalidation(text) {
   return /Thesis Invalidation/i.test(text || '') || /論點失效條件/.test(text || '');
 }
@@ -283,6 +289,6 @@ module.exports = {
   SIGNAL_BLOCK_TOP, JSON_FOOTER_KEY, JSON_FOOTER_FIELDS, parseJsonFooter, hasJsonFooterTemplate, SIGNALS, CONFIDENCES, ACTIONS, CONVICTIONS, RETRIEVALS, DATA_SOURCES_FIELDS, VERIFICATION_SCORE_SKILLS,
   confidenceTierForScore,
   expectedSignalForScore, extractBoxes, parseSignalBlock, parseDataSources,
-  hasDataSourcesTemplate, hasSignalBlockTemplate, signalFenceIsClean, hasThesisInvalidation, hasDataVerification, hasDisclaimer,
+  hasDataSourcesTemplate, hasSignalBlockTemplate, signalFenceIsClean, hasLangZhTw, hasThesisInvalidation, hasDataVerification, hasDisclaimer,
   validateOutput,
 };

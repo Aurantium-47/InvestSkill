@@ -36,7 +36,7 @@ Two parts. **Part I — Analyze a business (Lessons 1–8)** covers everything t
 | 15 | [**Options for Stock Investors**](learning-options.html) | Calls and puts, the Greeks in plain words, implied volatility and the expected move, covered calls, cash-secured and protective puts, collars, liquidity, what not to do | `options-analysis`, `earnings-preview`, `tax-lens` |
 | ★ | [**Case Study: When the Answer Is No**](learning-case-pass.html) | The same loop ending in a *pass*, twice — PFE (a value trap) and UPST (a no-trade) — and what would have made each a yes | *all of them* |
 
-Every lesson (1–13) ends with a five-question **Check yourself**; `learning-coach --quiz <lesson>` generates more on demand.
+Every lesson (1–15) ends with a five-question **Check yourself**; `learning-coach --quiz <lesson>` generates more on demand.
 
 For a one-page summary to print — the signal block, the key metrics with their ranges, the pre-trade checklist, and the red flags — see the [**Cheat Sheet**](cheatsheet.html).
 

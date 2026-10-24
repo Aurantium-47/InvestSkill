@@ -17,17 +17,17 @@
 
 ## Calls, puts, and the contract
 
-A **call** is the right, not the obligation, to **buy** 100 shares at a fixed price — the **strike** — until the **expiration** date. A **put** is the right to **sell** 100 shares at the strike. The buyer pays a **premium** for that right; the seller (the "writer") collects the premium and takes on the obligation. US equity options are **American-style**: the buyer can exercise at any time before expiration, and the seller can be **assigned** at any time.
+A **[call](glossary.html#call-option)** is the right, not the obligation, to **buy** 100 shares at a fixed price — the **[strike](glossary.html#strike-price)** — until the **expiration** date. A **[put](glossary.html#put-option)** is the right to **sell** 100 shares at the strike. The buyer pays a **premium** for that right; the seller (the "writer") collects the premium and takes on the obligation. US equity options are **American-style**: the buyer can exercise at any time before expiration, and the seller can be **[assigned](glossary.html#assignment--early-exercise)** at any time.
 
 One contract covers **100 shares**, so a premium quoted at $1.10 costs $110 per contract. Options are described by where the strike sits relative to the stock price:
 
-- **In the money (ITM):** a call with the strike below the stock price, or a put with the strike above it — exercising it now would be worth something.
+- **[In the money (ITM)](glossary.html#moneyness-itm--atm--otm):** a call with the strike below the stock price, or a put with the strike above it — exercising it now would be worth something.
 - **At the money (ATM):** strike about equal to the stock price.
 - **Out of the money (OTM):** a call with the strike above the price, or a put with the strike below it — worth nothing if exercised now; its whole price is hope plus time.
 
 ### Intrinsic value vs. time value (illustrative, rounded)
 
-Every premium splits into two parts. **Intrinsic value** is what the option would be worth if exercised right now (never below zero). **Time value** is everything else — what the market charges for the chance the option becomes more valuable before it expires. Time value shrinks to zero at expiration.
+Every premium splits into two parts. **[Intrinsic value](glossary.html#intrinsic--time-value)** is what the option would be worth if exercised right now (never below zero). **Time value** is everything else — what the market charges for the chance the option becomes more valuable before it expires. Time value shrinks to zero at expiration.
 
 ZEPH (the fictional Zephyr Robotics from Lesson 12) trades at a round **$50**. Options expiring in **45 days**, with implied volatility around 40%:
 
@@ -49,10 +49,10 @@ The [Greeks](glossary.html#greeks-options) describe how an option's price reacts
 
 | Greek | Plain words | ZEPH example (45-day options at $50) | What it's good for |
 |---|---|---|---|
-| **Delta** | How much the option moves for a $1 move in the stock | $55 call: delta ≈ **0.27** → about $0.27 per $1; the ATM call ≈ 0.53 | **Hedge ratio:** one 0.27-delta call behaves like ~27 shares. **Rough odds:** a 0.27 delta is often read as about a one-in-four chance of finishing in the money — a shorthand, not an exact probability |
-| **Theta** | How much value the option loses per day, all else equal | ATM call loses about **$0.03 a day** with 45 days left, about **$0.07 a day** with 10 days left | Time decay **accelerates** in the last weeks — it works for the seller and against the buyer |
-| **Vega** | How much the option moves for a 1-point change in implied volatility | ATM call: about **$0.07** per vol point; if IV falls from 40% to 30%, it loses ≈ **$0.70** with the stock unchanged | Explains why an option can lose money even when you guessed the direction right |
-| **Gamma** | How fast delta itself changes as the stock moves | ATM call: delta rises from ≈ 0.53 to ≈ 0.59 on a $1 rise | Highest at the money near expiration — positions there swing fastest, in both directions |
+| **[Delta](glossary.html#delta)** | How much the option moves for a $1 move in the stock | $55 call: delta ≈ **0.27** → about $0.27 per $1; the ATM call ≈ 0.53 | **Hedge ratio:** one 0.27-delta call behaves like ~27 shares. **Rough odds:** a 0.27 delta is often read as about a one-in-four chance of finishing in the money — a shorthand, not an exact probability |
+| **[Theta](glossary.html#theta)** | How much value the option loses per day, all else equal | ATM call loses about **$0.03 a day** with 45 days left, about **$0.07 a day** with 10 days left | Time decay **accelerates** in the last weeks — it works for the seller and against the buyer |
+| **[Vega](glossary.html#vega)** | How much the option moves for a 1-point change in implied volatility | ATM call: about **$0.07** per vol point; if IV falls from 40% to 30%, it loses ≈ **$0.70** with the stock unchanged | Explains why an option can lose money even when you guessed the direction right |
+| **[Gamma](glossary.html#gamma)** | How fast delta itself changes as the stock moves | ATM call: delta rises from ≈ 0.53 to ≈ 0.59 on a $1 rise | Highest at the money near expiration — positions there swing fastest, in both directions |
 
 > **Key idea:** An option is a bet on three things at once — direction (delta), timing (theta), and how much movement the market expects (vega). A stock is a bet on one. That is why options feel easy to win and are easy to lose.
 
@@ -64,7 +64,7 @@ The [Greeks](glossary.html#greeks-options) describe how an option's price reacts
 
 Because "40% IV" means nothing in isolation — 40% is calm for a small biotech and wild for a utility — compare it with the stock's own history. **[IV rank](glossary.html#iv-rank--iv-percentile)** places today's IV within its 52-week range:
 
-*ZEPH's IV ranged from 25% to 65% over the past year and is 40% today: IV rank = (40 − 25) ÷ (65 − 25) = **37.5**.* Options are middling-priced versus their own history. A high IV rank (above ~50) favours *selling* premium (covered calls, cash-secured puts); a low one favours *buying* it (protective puts are cheaper then).
+*ZEPH's IV ranged from 25% to 65% over the past year and is 40% today: IV rank = (40 − 25) ÷ (65 − 25) = **37.5**.* Options are middling-priced versus their own history. A high IV rank (above ~50) favours *selling* premium ([covered calls](glossary.html#covered-call), [cash-secured puts](glossary.html#cash-secured-put)); a low one favours *buying* it ([protective puts](glossary.html#protective-put--collar) are cheaper then).
 
 ### What IV means for a holder
 
@@ -74,7 +74,7 @@ Even if you never trade an option, IV gives you the market's own estimate of the
 
 For ZEPH over 30 days: 50 × 0.40 × √(30 ÷ 365) = 50 × 0.40 × 0.287 ≈ **±$5.73**, or about **±11.5%**. Roughly two times in three, ZEPH should finish the month inside $44–$56 if the market is right; one time in three, outside. A stop 5% below the price is inside ordinary noise.
 
-Around earnings the same idea becomes the [implied move](glossary.html#implied-move) from Lesson 12: ZEPH's at-the-money straddle for the expiration right after the print costs $3.00, so the market expects about **±6%** on the day — size, not direction. Front-month IV rises into the print and **collapses** the morning after (the "IV crush"), because the uncertainty has been resolved. An option with a vega of $0.07 whose IV drops 30 points overnight loses about 0.07 × 30 = **$2.10** with the stock unchanged — which is why buying calls before earnings can lose money on a correct "beat" call.
+Around earnings the same idea becomes the [implied move](glossary.html#implied-move) from Lesson 12: ZEPH's at-the-money straddle for the expiration right after the print costs $3.00, so the market expects about **±6%** on the day — size, not direction. Front-month IV rises into the print and **collapses** the morning after (the "[IV crush](glossary.html#iv-crush)"), because the uncertainty has been resolved. An option with a vega of $0.07 whose IV drops 30 points overnight loses about 0.07 × 30 = **$2.10** with the stock unchanged — which is why buying calls before earnings can lose money on a correct "beat" call.
 
 ---
 
@@ -133,7 +133,7 @@ A **collar** pays for the put by selling a call. Add a **$57.50 call**, 90 days,
 | Worst case at expiration | (50 − 45) + 1.80 = **−$680** | (50 − 45) + 0.30 = **−$530** |
 | Best case at expiration | Unlimited minus $180 | (57.50 − 50) − 0.30 = **+$720** |
 
-The collar is cheap because you have sold your upside above $57.50. It is a reasonable tool for a concentrated position you cannot sell yet — a lock-up, a tax reason — and a poor one for a stock you expect to compound.
+The collar is cheap because you have sold your upside above $57.50. It is a reasonable tool for a concentrated position you cannot sell yet — a [lock-up](glossary.html#lock-up-expiry), a tax reason — and a poor one for a stock you expect to compound.
 
 ---
 
@@ -141,7 +141,7 @@ The collar is cheap because you have sold your upside above $57.50. It is a reas
 
 On a busy stock, an option's [bid-ask spread](glossary.html#bid-ask-spread) may be a cent or two. On a thinly traded one it can be a large share of the premium. Suppose ZEPH's $55 call is quoted **$1.00 bid / $1.20 ask**: the midpoint is $1.10 and the spread is $0.20 — **18% of the premium**. Buy at the ask and sell at the bid and you have lost $20 per contract before the stock moves.
 
-- **Open interest** — the number of contracts outstanding at that strike — should be in the hundreds or more; a strike with open interest of 12 may have no real buyer when you need one.
+- **[Open interest](glossary.html#open-interest)** — the number of contracts outstanding at that strike — should be in the hundreds or more; a strike with open interest of 12 may have no real buyer when you need one.
 - **Volume** on the day shows whether anyone is trading it now.
 - Always use a **limit order** at or near the midpoint, never a market order, and prefer the monthly expirations and round strikes where liquidity concentrates.
 

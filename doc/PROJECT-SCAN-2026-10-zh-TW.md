@@ -227,8 +227,8 @@ roadmap §9 的立場不變：技能內不接即時資料或券商 API、不做�
 | 2 · 發版與 CI | ✅ 完成 | `fix/project-scan-batches` | A2（`scripts/lib/release.js`）、A3–A5（`release.yml` 是唯一發版路徑；移除 `auto-deploy.yml`）、A12、A13、B9–B11、B13、B14、B16；`ci.yml` 取代四個 workflow；B12 的檢查（錨點、fence lint、選擇技能覆蓋率、`new-skill.js` smoke test） |
 | 3 · 文件更新 | ✅ 完成 | `fix/project-scan-batches` | B17–B21；`COUNT_DOCS` 擴充（平台指南、ADDING-NEW-SKILLS、SECURITY、中文 FAQ、外掛 README）並新增「過時目前版本」測試；C2 描述；外掛圖示；issue 模板。**仍需維護者處理：** 回覆並關閉 #5（已無法重現）、#2 與 #6–#10；決定 #24；為 #11 提交 |
 | 4 · 網站 | ✅ 完成 | `fix/project-scan-batches` | B22–B25、B27（雙語 FAQ、雙語 404） |
-| 5 · 契約功能 | ◐ 部分 | `fix/project-scan-batches` | 每個技能的 JSON footer + parser + 測試；B1–B4。全面 `--lang zh-TW` 與 `full-report` comprehensive + `--skip` 屬於 roadmap §4.1／§4.3 → 由 roadmap P0–P2 PR（`feat/roadmap-p0-p2`）出貨 |
+| 5 · 契約功能 | ✅ 完成 | `fix/project-scan-batches` + `feat/roadmap-p0-p2` | 每個技能的 JSON footer + parser + 測試；B1–B4；接著全面 `--lang zh-TW` 與 `full-report` comprehensive＝所有適用框架 + `--skip`（roadmap §4.1／§4.3） |
 | 6 · 新技能 | ✅ 完成 | `fix/project-scan-batches` | `trade-postmortem`、`forensic-accounting`、`compare`、`credit-check`，以及 `stock-eval`／`financial-report-analyst` 的 `--sector` 產業 KPI 包 —— 34 個框架 |
-| 7 · 學習內容 | ◐ 部分 | `fix/project-scan-batches` | 第 14–15 課（中英）、第 1–8 課自我檢測、速查表、中文 Cookbook 一致性、`check-zh-parity.js`。詞彙表、非美國投資人指南與中文技能參考索引屬於 roadmap §5.3／§5.4／§5.6 → roadmap P0–P2 PR |
+| 7 · 學習內容 | ✅ 完成 | `fix/project-scan-batches` + `feat/roadmap-p0-p2` | 第 14–15 課（中英）、第 1–8 課自我檢測、速查表、中文 Cookbook 一致性、`check-zh-parity.js`；接著詞彙表缺口、非美國投資人指南與中文技能參考索引（roadmap §5.3／§5.4／§5.6） |
 
 兩個 PR 都未處理：B7（把 `report-generator` 的 HTML 模板移出 prompt）與 B15（eslint／`@ts-check`、`.editorconfig`／`.nvmrc`、`engines` ≥ 20）。

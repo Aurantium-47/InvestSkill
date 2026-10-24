@@ -60,6 +60,7 @@ const NAV = {
         { label: 'Choose a Skill',  href: 'choose-a-skill.html', page: 'choose-a-skill' },
         { label: 'Use Cases',       href: 'use-cases.html',     page: 'use-cases' },
         { label: 'Cheat Sheet',     href: 'cheatsheet.html',    page: 'cheatsheet' },
+        { label: 'Non-US Investor Guide', href: 'non-us-guide.html', page: 'non-us-guide' },
         { label: 'FAQ',             href: 'faq.html',           page: 'faq' },
       ],
     },
@@ -133,6 +134,7 @@ const NAV = {
         { label: '選擇技能',         href: 'choose-a-skill-zh-tw.html', page: 'choose-a-skill-zh-tw' },
         { label: '使用情境',         href: 'use-cases-zh-tw.html',      page: 'use-cases-zh-tw' },
         { label: '投資速查表',       href: 'cheatsheet-zh-tw.html',     page: 'cheatsheet-zh-tw' },
+        { label: '非美國投資人指南', href: 'non-us-guide-zh-tw.html',  page: 'non-us-guide-zh-tw' },
         { label: '常見問題',         href: 'faq-zh-tw.html',            page: 'faq-zh-tw' },
       ],
     },
@@ -141,6 +143,7 @@ const NAV = {
       links: [
         { label: '實機演練',         href: 'walkthrough-zh-tw.html',   page: 'walkthrough-zh-tw' },
         { label: '操作手冊',         href: 'cookbook-zh-tw.html',      page: 'cookbook-zh-tw' },
+        { label: '技能參考',         href: 'skills-zh-tw.html',        page: 'skills-zh-tw' },
       ],
     },
     {
@@ -184,6 +187,7 @@ const LANG_PAIRS = [
   ['learning-macro.html', 'learning-macro-zh-tw.html'],
   ['learning-options.html', 'learning-options-zh-tw.html'],
   ['cheatsheet.html', 'cheatsheet-zh-tw.html'],
+  ['non-us-guide.html', 'non-us-guide-zh-tw.html'],
   ['faq.html', 'faq-zh-tw.html'],
   ['concepts.html', 'concepts-zh-tw.html'],
   ['glossary.html', 'glossary-zh-tw.html'],
@@ -191,6 +195,7 @@ const LANG_PAIRS = [
   ['use-cases.html', 'use-cases-zh-tw.html'],
   ['data-and-accuracy.html', 'data-and-accuracy-zh-tw.html'],
   ['cookbook.html', 'cookbook-zh-tw.html'],
+  ['skills.html', 'skills-zh-tw.html'],
   ['walkthrough.html', 'walkthrough-zh-tw.html'],
   // The demo overview (English) pairs with the RKLB full demo (Traditional Chinese).
   ['full-demo.html', 'full-demo-zh-tw.html'],
@@ -272,6 +277,7 @@ const MD_TO_HTML = {
   'LEARNING-MACRO.md': 'learning-macro.html',
   'LEARNING-OPTIONS.md': 'learning-options.html',
   'CHEATSHEET.md': 'cheatsheet.html',
+  'NON-US-GUIDE.md': 'non-us-guide.html',
   'FAQ.md': 'faq.html',
   'LEARNING-zh-TW.md':              'learning-zh-tw.html',
   'LEARNING-FOUNDATIONS-zh-TW.md':  'learning-foundations-zh-tw.html',
@@ -291,6 +297,7 @@ const MD_TO_HTML = {
   'LEARNING-MACRO-zh-TW.md': 'learning-macro-zh-tw.html',
   'LEARNING-OPTIONS-zh-TW.md': 'learning-options-zh-tw.html',
   'CHEATSHEET-zh-TW.md': 'cheatsheet-zh-tw.html',
+  'NON-US-GUIDE-zh-TW.md': 'non-us-guide-zh-tw.html',
   'FAQ-zh-TW.md': 'faq-zh-tw.html',
 };
 
@@ -300,7 +307,7 @@ const SERVED = new Set(['index.html','cookbook.html','cookbook-zh-tw.html',
   'walkthrough.html','walkthrough-zh-tw.html',
   'contributing.html','changelog.html','zh-tw.html','style.css','main.js',
   'concepts.html','glossary.html','choose-a-skill.html','use-cases.html',
-  'data-and-accuracy.html','skills.html','full-demo.html','full-demo-zh-tw.html','full-demo-pltr.html','full-demo-rklb.html','full-demo-nvda.html','full-demo-amd.html','full-demo-meta.html',
+  'data-and-accuracy.html','skills.html','skills-zh-tw.html','full-demo.html','full-demo-zh-tw.html','full-demo-pltr.html','full-demo-rklb.html','full-demo-nvda.html','full-demo-amd.html','full-demo-meta.html',
   'concepts-zh-tw.html','glossary-zh-tw.html','choose-a-skill-zh-tw.html',
   'use-cases-zh-tw.html','data-and-accuracy-zh-tw.html',
   'learning.html','learning-foundations.html','learning-statements.html',
@@ -430,6 +437,12 @@ for (const name of promptFiles) {
   skillMeta[name] = { raw, ...describePrompt(raw, name) };
 }
 
+
+// Traditional Chinese title + one-line summary per skill for skills-zh-tw.html
+// (the per-skill pages stay in English). test-skills.js requires every skill.
+const SKILL_ZH = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'content', 'SKILL-SUMMARIES-zh-TW.json'), 'utf8')).skills || {}; } catch { return {}; }
+})();
 
 // Presentation metadata per category (icon, accent slot, blurbs). Kept apart
 // from SKILL_CATEGORIES so that array stays a plain title + skills list
@@ -744,6 +757,20 @@ const PAGES = [
     subtitle: '一頁可列印的總整理：訊號區塊解碼、關鍵指標與好壞區間、交易前檢查表、技能對照與警訊',
   },
   {
+    key: 'non-us-guide',
+    outFile: 'non-us-guide.html',
+    srcFile: 'site/content/NON-US-GUIDE.md',
+    title: 'Non-US Investor Guide',
+    subtitle: 'Buying US stocks from Taiwan, Hong Kong, Singapore, Japan or Europe: brokers, W-8BEN, withholding, estate tax, FX and the UCITS route',
+  },
+  {
+    key: 'non-us-guide-zh-tw',
+    outFile: 'non-us-guide-zh-tw.html',
+    srcFile: 'site/content/NON-US-GUIDE-zh-TW.md',
+    title: '非美國投資人指南',
+    subtitle: '從台灣、香港、新加坡、日本或歐洲買美股：券商與複委託、W-8BEN、預扣稅、遺產稅、匯率與 UCITS 路線',
+  },
+  {
     key: 'faq',
     outFile: 'faq.html',
     srcFile: 'FAQ.md',
@@ -1008,6 +1035,7 @@ const TABS = {
     { label: '學習',       section: '學習',         href: 'learning-zh-tw.html' },
     { label: '學習資源',   section: '學習資源',     href: 'concepts-zh-tw.html' },
     { label: '指南',       section: '指南',         href: 'cookbook-zh-tw.html' },
+    { label: '技能',       section: '指南',         href: 'skills-zh-tw.html' },
     { label: '示範',       section: '示範',         href: 'full-demo-zh-tw.html' },
     { label: '信任',       section: '信任',         href: 'data-and-accuracy-zh-tw.html' },
   ],
@@ -1026,6 +1054,7 @@ const TAB_ICONS = {
   '學習':       '<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 2 2.7 3 6 3s6-1 6-3v-5"/>',
   '學習資源':   '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
   '指南':       '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/>',
+  '技能':       '<path d="M14.7 6.3a4 4 0 0 0-5.6 5.6L3 18v3h3l6.1-6.1a4 4 0 0 0 5.6-5.6l-2.9 2.9-2-2z"/>',
   '示範':       '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
   '信任':       '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
 };
@@ -1035,8 +1064,10 @@ function buildSubnav(lang, currentPage) {
   const tabs = TABS[lang].map(tab => {
     // "Skills" tab is active only on skill pages; "Guides" for other Guides pages.
     let active = false;
-    if (tab.label === 'Skills')        active = currentPage === 'skills';
-    else if (tab.section === 'Guides') active = activeSection === 'Guides' && currentPage !== 'skills';
+    const isSkillsTab = tab.label === 'Skills' || tab.label === '技能';
+    const onSkills = currentPage === 'skills' || currentPage === 'skills-zh-tw';
+    if (isSkillsTab)                   active = onSkills;
+    else if (tab.section === 'Guides' || tab.section === '指南') active = activeSection === tab.section && !onSkills;
     else                               active = tab.section === activeSection;
     const icon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${TAB_ICONS[tab.label] || ''}</svg>`;
     return `      <a href="${tab.href}" class="subnav-tab${active ? ' active' : ''}">${icon}<span>${tab.label}</span></a>`;
@@ -1203,7 +1234,7 @@ const UI = {
     footerTag: '給任何 AI 助理的結構化投資分析框架。純 markdown——沒有 API 金鑰、沒有執行環境。',
     footerCols: [
       { title: '學習',   links: [['學習中心','learning-zh-tw.html'],['概念','concepts-zh-tw.html'],['術語表','glossary-zh-tw.html'],['選擇技能','choose-a-skill-zh-tw.html'],['使用情境','use-cases-zh-tw.html']] },
-      { title: '指南',   links: [['快速開始','zh-tw.html'],['操作手冊','cookbook-zh-tw.html'],['技能參考（英文）','skills.html'],['示範','full-demo-zh-tw.html'],['資料與準確性','data-and-accuracy-zh-tw.html']] },
+      { title: '指南',   links: [['快速開始','zh-tw.html'],['操作手冊','cookbook-zh-tw.html'],['技能參考','skills-zh-tw.html'],['示範','full-demo-zh-tw.html'],['資料與準確性','data-and-accuracy-zh-tw.html']] },
       { title: '專案',   links: [['GitHub','https://github.com/yennanliu/InvestSkill'],['更新紀錄（英文）','changelog.html'],['參與貢獻（英文）','contributing.html'],['回報問題','https://github.com/yennanliu/InvestSkill/issues'],['MIT 授權','https://github.com/yennanliu/InvestSkill/blob/main/LICENSE']] },
     ],
     disclaimer: '僅供教育用途的框架——不構成投資建議。',
@@ -1342,7 +1373,7 @@ function buildLandingHero(lang) {
         <p class="hero-lead">${T.lead}</p>
         <div class="hero-ctas">
           <a class="btn btn-primary btn-lg" href="#install">${T.ctaPrimary} ${svg(ARROW_R, 15)}</a>
-          <a class="btn btn-lg" href="skills.html">${T.ctaSecondary}</a>
+          <a class="btn btn-lg" href="${lang === 'zh' ? 'skills-zh-tw.html' : 'skills.html'}">${T.ctaSecondary}</a>
           <a class="btn btn-ghost btn-lg" href="${lang === 'zh' ? 'learning-zh-tw.html' : 'learning.html'}">${T.ctaLearn}</a>
         </div>
         <div class="hero-platforms">
@@ -1394,17 +1425,17 @@ function buildLandingSections(lang) {
             <span class="cat-icon">${svg(m.icon, 20)}</span>
             <span class="cat-count">${present.length}</span>
           </div>
-          <h3><a href="skills.html#${m.slug}">${zh && m.zh ? m.zh : c.title}</a></h3>
+          <h3><a href="${zh ? 'skills-zh-tw.html' : 'skills.html'}#${m.slug}">${zh && m.zh ? m.zh : c.title}</a></h3>
           <p>${m.blurb[lang] || ''}</p>
           <div class="cat-chips">
             ${shown.map(n => `<a class="chip" href="skill-${n}.html">${n}</a>`).join('\n            ')}
-            ${more > 0 ? `<a class="chip chip-more" href="skills.html#${m.slug}">+${more}</a>` : ''}
+            ${more > 0 ? `<a class="chip chip-more" href="${zh ? 'skills-zh-tw.html' : 'skills.html'}#${m.slug}">+${more}</a>` : ''}
           </div>
         </div>`;
   }).join('\n        ');
   const cats = `
     <section class="landing-section" id="frameworks">
-      ${sectionHead(T.catEyebrow, T.catTitle, { href: 'skills.html', label: T.catLink })}
+      ${sectionHead(T.catEyebrow, T.catTitle, { href: zh ? 'skills-zh-tw.html' : 'skills.html', label: T.catLink })}
       <div class="cat-grid">
         ${cards}
       </div>
@@ -1548,8 +1579,9 @@ function buildSkillExtras(name) {
 // ---------------------------------------------------------------------------
 // Skill Reference index — filterable card grid
 // ---------------------------------------------------------------------------
-function buildSkillsIndex() {
-  const U = UI.en;
+function buildSkillsIndex(lang = 'en') {
+  const U = UI[lang];
+  const zh = lang === 'zh';
   const categorized = new Set(SKILL_CATEGORIES.flatMap(c => c.skills));
   const otherSkills = promptFiles.filter(n => !categorized.has(n));
   const sections = [...SKILL_CATEGORIES];
@@ -1561,32 +1593,51 @@ function buildSkillsIndex() {
   const chips = [`<button type="button" class="filter-chip active" data-cat="all">${U.filterAll} <span>${total}</span></button>`]
     .concat(present.map(s => {
       const m = CATEGORY_META[s.title] || { slug: githubSlug(s.title), color: 6 };
-      return `<button type="button" class="filter-chip" data-cat="${m.slug}" style="--c: var(--cat-${m.color})">${s.title} <span>${s.skills.length}</span></button>`;
+      return `<button type="button" class="filter-chip" data-cat="${m.slug}" style="--c: var(--cat-${m.color})">${zh && m.zh ? m.zh : s.title} <span>${s.skills.length}</span></button>`;
     })).join('\n        ');
 
   const groups = present.map(s => {
     const m = CATEGORY_META[s.title] || { slug: githubSlug(s.title), color: 6, blurb: {} };
     const cards = s.skills.map(n => {
-      const { title, summary } = skillMeta[n];
+      const en = skillMeta[n];
+      const z = zh ? (SKILL_ZH[n] || {}) : {};
+      const title = z.title || en.title;
+      const summary = z.summary || en.summary;
       const isAlias = skillRegistry.ALIAS_SKILLS.includes(n);
-      const haystack = `${n} ${title} ${summary}`.toLowerCase();
+      const haystack = `${n} ${title} ${summary} ${zh ? `${en.title} ${en.summary}` : ''}`.toLowerCase();
       return `<a class="skill-card${isAlias ? ' is-alias' : ''}" href="skill-${n}.html" data-cat="${m.slug}" data-text="${escapeHtml(haystack)}" style="--c: var(--cat-${m.color})">
             <span class="skill-card-name">${n}</span>
             <span class="skill-card-title">${escapeHtml(title || n)}</span>
             <span class="skill-card-desc">${escapeHtml(summary || 'Investment analysis framework.')}</span>
-            <span class="skill-card-foot">${isAlias ? 'redirect' : `/${n} AAPL`} ${svg(ARROW_R, 13)}</span>
+            <span class="skill-card-foot">${isAlias ? (zh ? '轉向' : 'redirect') : `/${n} AAPL`} ${svg(ARROW_R, 13)}</span>
           </a>`;
     }).join('\n          ');
     return `<section class="skill-group" data-cat="${m.slug}">
-        <h2 id="${m.slug}">${s.title} <span class="group-count">${s.skills.length}</span></h2>
-        ${m.blurb && m.blurb.en ? `<p class="group-blurb">${m.blurb.en}</p>` : ''}
+        <h2 id="${m.slug}">${zh && m.zh ? m.zh : s.title} <span class="group-count">${s.skills.length}</span></h2>
+        ${m.blurb && m.blurb[lang] ? `<p class="group-blurb">${m.blurb[lang]}</p>` : ''}
         <div class="skill-grid">
           ${cards}
         </div>
       </section>`;
   }).join('\n      ');
 
-  const html = `
+  const lead = zh
+    ? `<p class="lead">每個框架都有一頁可瀏覽——${FRAMEWORK_COUNT} 個分析框架，另有 ${ALIAS_COUNT} 個別名會轉向吸收它的技能。卡片上的名稱與摘要為中文，點進去的技能頁是英文原文（技能本身支援 <code>--lang zh-TW</code> 輸出繁體中文）。不知道該用哪個？請看<a href="choose-a-skill-zh-tw.html">選擇技能</a>，或從<a href="concepts-zh-tw.html">概念</a>了解背後的想法。</p>`
+    : '';
+  const html = zh ? `
+      ${lead}
+      <div class="skill-filter" role="search">
+        <label class="skill-search-wrap">
+          ${svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>', 15)}
+          <input type="search" class="skill-search" placeholder="${escapeHtml(U.filterPlaceholder)}" aria-label="篩選框架">
+        </label>
+        <div class="filter-chips">
+        ${chips}
+        </div>
+      </div>
+      ${groups}
+      <p class="skill-empty" hidden>${U.noMatch}</p>
+      <p class="fineprint"><em>僅供教育用途的分析框架，非投資建議。</em></p>` : `
       <p class="lead">Every framework as a browsable page — ${FRAMEWORK_COUNT} analysis frameworks, plus ${ALIAS_COUNT} aliases that redirect to the skill that absorbed them. New here? See <a href="choose-a-skill.html">Choose a Skill</a> to find the right one for your goal, or <a href="concepts.html">Concepts</a> for the ideas behind them.</p>
       <div class="skill-filter" role="search">
         <label class="skill-search-wrap">
@@ -1600,7 +1651,7 @@ function buildSkillsIndex() {
       ${groups}
       <p class="skill-empty" hidden>${U.noMatch}</p>
       <p class="fineprint"><em>Educational frameworks only. Not financial advice.</em></p>`;
-  const text = present.flatMap(s => s.skills.map(n => `${n} ${skillMeta[n].summary}`)).join(' ');
+  const text = present.flatMap(s => s.skills.map(n => `${n} ${zh && SKILL_ZH[n] ? `${SKILL_ZH[n].title} ${SKILL_ZH[n].summary}` : skillMeta[n].summary}`)).join(' ');
   return { html, text };
 }
 
@@ -1875,6 +1926,17 @@ const skillsPage = {
 fs.writeFileSync(path.join(outDir, 'skills.html'), htmlPage(skillsPage, skillsIndex.html));
 searchIndex.push({ title: 'Skill Reference', url: 'skills.html', lang: 'en', section: 'Skill Reference', text: skillsIndex.text.slice(0, 1600) });
 console.log('✓ skills.html');
+
+// …and its Traditional Chinese counterpart (skills-zh-tw.html): Chinese
+// categories, titles and summaries; the cards link to the English skill pages.
+const skillsIndexZh = buildSkillsIndex('zh');
+const skillsPageZh = {
+  key: 'skills-zh-tw', outFile: 'skills-zh-tw.html', srcFile: 'site/content/SKILL-SUMMARIES-zh-TW.json',
+  title: '技能參考', subtitle: `全部 ${FRAMEWORK_COUNT} 個框架（另有 ${ALIAS_COUNT} 個別名），每個一頁`,
+};
+fs.writeFileSync(path.join(outDir, 'skills-zh-tw.html'), htmlPage(skillsPageZh, skillsIndexZh.html));
+searchIndex.push({ title: '技能參考', url: 'skills-zh-tw.html', lang: 'zh', section: '指南', text: skillsIndexZh.text.slice(0, 1600) });
+console.log('✓ skills-zh-tw.html');
 
 // 404 page (minimal, shares stylesheet)
 const html404 = `<!DOCTYPE html>

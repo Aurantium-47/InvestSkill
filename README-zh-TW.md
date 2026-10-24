@@ -32,7 +32,7 @@ InvestSkill 是企業級投資分析工具包，為各 AI 平台帶來機構級�
   <span class="home-card-icon">🎓</span>
   <div class="home-card-body">
     <div class="home-card-title">投資新手？從學習指南開始</div>
-    <p>十三堂課的實戰指南，提供繁體中文與英文：第一部用白話講清楚每一項技能背後的概念——讀懂資產負債表、為一門生意估值、持有一個投資組合；第二部是實務基礎——帳戶與下單、ETF 核心、稅（含非美國投資人）、財報季，以及保護計畫的心理學。不需財金背景。</p>
+    <p>十五堂課的實戰指南，提供繁體中文與英文：第一部用白話講清楚每一項技能背後的概念——讀懂資產負債表、為一門生意估值、持有一個投資組合；第二部是實務基礎——帳戶與下單、ETF 核心、稅（含非美國投資人）、財報季、保護計畫的心理學、總經與聯準會循環，以及給持股人的選擇權。不需財金背景。</p>
     <p><a class="home-card-cta" href="https://yennj12.js.org/InvestSkill/learning-zh-tw.html">開始學習 →</a></p>
   </div>
 </div>
@@ -128,6 +128,8 @@ gemini     # Gemini CLI：> @prompts/stock-eval.md 評估蘋果公司
 **你唯一需要的，是手上已經在用的 AI 助理。** 可以是付費方案（Claude Code、Cursor、Copilot）、免費方案（ChatGPT、Gemini、Claude.ai），也可以是透過 [Ollama](README-ollama.md) 完全離線的本機模型——用後者跑完所有框架，總成本就是 0。
 
 > 因為沒有 API，也就沒有任何遙測：InvestSkill 不會看到你的股票代號、你的持股，或你的分析內容。數字實際從何而來，請見[資料與準確性](site/content/DATA-AND-ACCURACY-zh-TW.md)。
+
+**也能用繁體中文。** 在任何框架後面加上 `--lang zh-TW`，整份分析——標題、內文與表格——都會以繁體中文輸出；Data & Sources 的欄位名稱、訊號方框與 JSON footer 則維持英文，讓工具仍能讀取。網站另有[中文技能參考](https://yennj12.js.org/InvestSkill/skills-zh-tw.html)與[非美國投資人指南](https://yennj12.js.org/InvestSkill/non-us-guide-zh-tw.html)。
 
 **自備資料。** 申報文件類技能（`10k-digest`、`financial-report-analyst`、`fact-check`）內建一份無金鑰的 SEC EDGAR 取檔步驟，具工具能力的助理可自行照做。若你的助理無法上網，倉庫另附兩支可選、零相依的腳本替你抓取第一手來源供貼上——`node scripts/fetch-edgar.js AAPL --form 10-K` 把文件存成純文字，`node scripts/fetch-fundamentals.js AAPL` 從 SEC 的 XBRL 數據產生已對帳的財報資料包。兩者都不屬於外掛本體。詳見[資料與準確性](site/content/DATA-AND-ACCURACY-zh-TW.md#自備資料無金鑰的-edgar-路徑)頁。
 

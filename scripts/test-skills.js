@@ -726,6 +726,18 @@ section('16. Choose-a-Skill lists every framework (both languages)');
   else pass('plugins/us-stock-analysis/README.md — lists every skill');
 }
 
+// The zh Skill Reference index (skills-zh-tw.html) reads a Chinese title and
+// summary per skill; a new skill without one would show English on that page.
+{
+  let zhSummaries = {};
+  try { zhSummaries = JSON.parse(readFile(path.join(ROOT, 'site/content/SKILL-SUMMARIES-zh-TW.json')) || '{}').skills || {}; } catch (e) { fail(`site/content/SKILL-SUMMARIES-zh-TW.json — not valid JSON (${e.message})`); }
+  const missing = actualSkillDirs.filter(n => !(zhSummaries[n] && zhSummaries[n].title && zhSummaries[n].summary));
+  const extra = Object.keys(zhSummaries).filter(n => !actualSkillDirs.includes(n));
+  if (missing.length) fail(`site/content/SKILL-SUMMARIES-zh-TW.json — no Chinese title/summary for: ${missing.join(', ')}`);
+  else if (extra.length) fail(`site/content/SKILL-SUMMARIES-zh-TW.json — entries for skills that don't exist: ${extra.join(', ')}`);
+  else pass(`site/content/SKILL-SUMMARIES-zh-TW.json — every skill has a Chinese title and summary`);
+}
+
 // ─── Test 17: Code Fences Are Balanced ───────────────────────────────────────
 
 section('17. Code fences are balanced (skills, prompts, site content, root docs)');

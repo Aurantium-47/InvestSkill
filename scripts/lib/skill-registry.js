@@ -36,6 +36,7 @@ const CONTRACT_EXEMPT = {
   disclaimer:         [...OUTPUT_TOOLS],
   signalFence:        [...OUTPUT_TOOLS],
   jsonFooter:         [...OUTPUT_TOOLS],
+  langZhTw:           [...OUTPUT_TOOLS, ...ALIAS_SKILLS],
 };
 
 function listSkillDirs() {
