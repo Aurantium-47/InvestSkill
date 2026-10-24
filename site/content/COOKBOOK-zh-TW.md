@@ -40,7 +40,7 @@ InvestSkill 的實用範例、安裝指南與核心概念。
 ### 前置需求
 
 - 已安裝 [Claude Code](https://code.claude.com)（`npm install -g @anthropic-ai/claude-code`）
-- 有效的 Anthropic API 金鑰
+- 可執行 Claude Code 的 Claude 方案或 Anthropic 帳號（其他 AI 工具請用下方的一行指令安裝——InvestSkill 本身不需要任何 API 金鑰）
 
 ### 一行指令安裝（所有工具通用）
 
@@ -70,7 +70,7 @@ claude
 /plugin list
 ```
 
-確認在清單中看到 `us-stock-analysis`，並顯示 34 個可用技能（30 個分析框架、3 個別名，以及 `report-generator` 輸出工具），即表示安裝成功。
+確認在清單中看到 `us-stock-analysis`，並顯示 38 個可用技能（34 個分析框架、3 個別名，以及 `report-generator` 輸出工具），即表示安裝成功。
 
 ### 快速測試
 
@@ -124,11 +124,13 @@ InvestSkill 是一套**結構化分析提示框架**，以 Claude Code 外掛的
 | 指令 | 功能說明 |
 |------|---------|
 | `/stock-eval AAPL` | 全方位評估：質量、估值、護城河、風險 |
-| `/dcf-valuation NVDA` | 嚴謹的內在價值模型，含 3 種情境分析 |
 | `/stock-valuation MSFT` | 多方法估值：DCF + 比較公司分析 + EV 倍數 |
+| `/compare AAPL MSFT GOOGL` | 2–5 檔股票放在同一張表正面比較，最後給出選擇 |
 | `/financial-report-analyst GOOGL 10-K` | 深度閱讀年報，找出紅旗警訊 |
-| `/research-bundle TSLA` | 依序執行所有技能，整合成完整投資論點 |
+| `/forensic-accounting XYZ` | 盈餘品質鑑識：Beneish M 分數、Altman Z、應計項目 |
+| `/credit-check XYZ` | 債務到期牆、利息保障倍數、再融資風險 |
 | `/portfolio-review` | 分析配置、績效與再平衡需求 |
+| `/trade-postmortem` | 檢討已結束的交易：流程 vs. 結果，以及那一個教訓 |
 | `/earnings-call-analysis AMZN` | 解析財報電話會議的語氣、指引與關鍵主題 |
 | `/dividend-analysis JNJ` | 檢驗股息安全性、成長性與可持續性 |
 | `/chart-master AAPL` | 以 Mermaid、ASCII 或 HTML 格式生成財務圖表 |
@@ -150,9 +152,9 @@ plugins/us-stock-analysis/skills/
 ├── dcf-valuation/SKILL.md
 ├── stock-valuation/SKILL.md
 ├── financial-report-analyst/SKILL.md
-├── chart-master/SKILL.md           ← v1.6.0 新增
-├── full-report/SKILL.md            ← v1.6.0 新增
-└── ...（共 34 個技能）
+├── chart-master/SKILL.md
+├── full-report/SKILL.md
+└── ...（共 38 個技能）
 ```
 
 ### 標準訊號區塊
@@ -192,7 +194,7 @@ prompts/
 ├── financial-report-analyst.md
 ├── chart-master.md
 ├── full-report.md
-└── ...（共 21 個檔案）
+└── ...（共 38 個檔案，每個技能一個）
 ```
 
 只需將檔案內容複製貼上到任何 AI 對話作為系統提示即可使用。
@@ -268,6 +270,8 @@ ROIC − WACC 利差：  +1,950 bps（顯著的價值創造）
 
 ### 3.2 DCF 估值分析
 
+> `dcf-valuation` 現為 `stock-valuation` 的別名，DCF 是後者的方法一——`/stock-valuation NVDA --methods dcf` 會得到同一個模型。
+
 **指令：**
 ```bash
 /us-stock-analysis:dcf-valuation NVDA --scenarios
@@ -279,17 +283,22 @@ ROIC − WACC 利差：  +1,950 bps（顯著的價值創造）
 # DCF 估值 — NVDA（輝達公司）
 
 ## 基本指標（過去 12 個月）
-營收：    1,220 億美元    自由現金流：608 億美元
-FCF 利潤率：49.8%          淨現金：   385 億美元
-加權資本成本（WACC）：13.8%
+營收：      1,220 億美元    自由現金流：  608 億美元
+FCF 利潤率：49.8%           淨現金：      385 億美元
+股票薪酬（SBC）：35 億美元  真實 FCF*：   573 億美元
+流通股數：  244 億股        *已扣除股票薪酬
+
+## WACC 計算
+股權成本：無風險利率 4.4% + β 1.72 × 股權風險溢酬 5.5% = 13.9%
+WACC：13.8%
 
 ## 情境假設
 
-| 情境 | 機率 | 第1-5年營收CAGR | 第6-10年營收CAGR | 終端成長率 |
-|------|------|-----------------|-----------------|------------|
-| 樂觀 | 20%  | 42%             | 18%             | 3.0%       |
-| 基本 | 60%  | 28%             | 10%             | 2.5%       |
-| 悲觀 | 20%  | 12%             | 5%              | 1.5%       |
+| 情境 | 機率 | 第1-5年營收CAGR | 第6-10年營收CAGR | 第10年FCF利潤率 | 終端成長率 |
+|------|------|-----------------|-----------------|-----------------|------------|
+| 樂觀 | 20%  | 42%             | 18%             | 48%             | 3.0%       |
+| 基本 | 60%  | 28%             | 10%             | 40%             | 2.5%       |
+| 悲觀 | 20%  | 12%             | 5%              | 28%             | 1.5%       |
 
 ## 內在價值結果
 
@@ -299,6 +308,15 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 | 基本 | 785 美元    | −10.3%               | 溢價    |
 | 悲觀 | 320 美元    | −63.4%               | 溢價    |
 | 加權 | 768 美元    | −12.2%               | 溢價    |
+
+## 敏感度表（基本情境，每股美元）
+
+              終端成長率
+WACC     1.5%    2.0%    2.5%    3.0%    3.5%
+11.0%    $910    $960   $1,020  $1,090  $1,180
+12.0%    $830    $875    $920    $975   $1,040
+13.8%    $710    $745    $785    $825    $875  ← 基本情境
+15.0%    $625    $655    $685    $720    $760
 
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -326,6 +344,12 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 
 ```
 # 財報分析 — AAPL 10-K（FY2024）
+
+## 文件概覽
+申報類型：  10-K 年報（會計年度截至 2024 年 9 月 28 日）
+簽證會計師：Ernst & Young LLP——無保留意見
+申報日期：  2024 年 10 月 25 日（準時）
+財報重編：  無
 
 ## 財務健康儀表板
 ┌──────────────────────┬──────────────────────────────────────┐
@@ -358,6 +382,8 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 
 ### 3.4 完整研究包
 
+> `research-bundle` 現為 `full-report` 的別名——新的分析請改用 `/full-report AMZN --depth standard`。以下範例保留，作為多模組綜合評分卡的示範。
+
 **指令：**
 ```bash
 /us-stock-analysis:research-bundle AMZN
@@ -379,8 +405,13 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 | 風險等級   | 15%  | 8.0    | 1.20 |
 | 綜合       | 100% | 7.18/10|      |
 
-## 進場策略
-理想進場：205–215 美元 | 多頭目標：275 美元 | 停損：195 美元
+## 投資論點
+AWS 回溫（成長率重新加速至 19%）加上利潤率最高的廣告業務規模擴大到 500 億美元以上，
+構成未來 3 年強勁的獲利槓桿故事。
+
+## 進出場策略
+理想進場：205–215 美元（回檔時的關鍵支撐區）
+多頭目標：275 美元 | 基本目標：250 美元 | 停損：195 美元
 
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -411,11 +442,20 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 
 ## 趨勢分析
 主要趨勢：    空頭（股價在 200 日均線下方）
+次要趨勢：    中性（在 50 日均線上方盤整）
 多時間框架：  混合 → 謹慎操作
 
 ## 關鍵價位
-支撐：195 美元——強支撐（測試 4 次）
-阻力：240 美元——強阻力（頭頂賣壓）
+支撐：195 美元——強支撐（測試 4 次，吸籌區）
+阻力：240 美元——強阻力（先前跌破點，現為頭頂賣壓）
+
+## 指標訊號
+
+| 指標       | 數值     | 訊號 |
+|------------|----------|------|
+| RSI (14)   | 48.2     | 中性 |
+| MACD       | −2.1     | 中性 |
+| OBV        | 下滑中   | 空頭 |
 
 ## 交易設定
 進場：197–202 美元 | 停損：188 美元 | 目標：240 美元（風險報酬 1:3.5）
@@ -587,6 +627,7 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 年化股息：     每股 4.96 美元
 連續配息年數：  62 年（股息王）
 5 年股息 CAGR：5.8%
+下次除息日：   約 2 月 18 日（每季）
 
 ## 安全性評分卡
 
@@ -609,6 +650,11 @@ FCF 利潤率：49.8%          淨現金：   385 億美元
 2023    $4.76     +5.3%
 2024    $4.96     +4.2%
 2025E   $5.20E    +4.8%（預測）
+
+## 風險因素
+• 訴訟陰影：滑石粉嬰兒爽身粉和解案——仍在進行，但已隔離處理
+• 醫療器材（MedTech）部門成長放緩（骨科面臨 Stryker 競爭）
+• 分拆 Kenvue（消費者健康）後，營收多元化程度降低
 
 ## 同業比較（殖利率 vs. 安全性）
 
@@ -675,13 +721,24 @@ AAPL — 6 個月股價（八月至二月）
 • 十月至十一月回調期間成交量萎縮——健康整理，非分配賣壓
 • 支撐區間：178–182 美元（測試兩次均守住）
 
-## 其他可用圖表類型
-```bash
-/chart-master NVDA --type fair-value-range      # 樂觀/基本/悲觀估值區間
-/chart-master MSFT --type multi-factor-signal   # 六維訊號雷達圖
-/chart-master AMZN --type revenue-breakdown     # 業務部門營收長條圖
-/chart-master TSLA --type rsi-macd             # 技術指標雙面板
-```
+## HTML 圖表（互動式——貼到瀏覽器開啟，或匯出到報告）
+<!-- Chart.js 片段——任何瀏覽器都能開啟 -->
+<canvas id="aaplChart"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+new Chart(document.getElementById('aaplChart'), {
+  type: 'bar',
+  data: {
+    labels: ['八月','九月','十月','十一月','十二月','一月','二月'],
+    datasets: [
+      { type: 'line', label: '股價', data: [162,155,171,184,196,188,212],
+        borderColor: '#3b82f6', tension: 0.3, yAxisID: 'y' },
+      { type: 'bar', label: '成交量（百萬股）', data: [82,65,91,55,78,105,112],
+        backgroundColor: 'rgba(99,102,241,0.4)', yAxisID: 'y1' }
+    ]
+  }
+});
+</script>
 
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -694,6 +751,14 @@ AAPL — 6 個月股價（八月至二月）
 ║ Action:      BUY（買進）                      ║
 ║ Conviction:  MODERATE（溫和）                 ║
 ╚══════════════════════════════════════════════╝
+```
+
+**其他可用的圖表類型：**
+```bash
+/chart-master NVDA --type fair-value-range      # 樂觀/基本/悲觀估值區間
+/chart-master MSFT --type multi-factor-signal   # 六維訊號雷達圖
+/chart-master AMZN --type revenue-breakdown     # 業務部門營收長條圖
+/chart-master TSLA --type rsi-macd             # 技術指標雙面板
 ```
 
 ---
@@ -1817,7 +1882,7 @@ Samsung / Apple 設計案報導，取自 stockanalysis.com 新聞頁，2026/07/2
 # 重點關注：風險因素變化、管理層語氣、會計質量
 
 # 步驟 4：採用保守假設建立估值模型
-/us-stock-analysis:dcf-valuation PFE --scenarios
+/us-stock-analysis:stock-valuation PFE --methods dcf
 # 即使保守假設下仍便宜，才是真正有趣的機會
 
 # 步驟 5：驗證輸出結果
@@ -2023,7 +2088,7 @@ Samsung / Apple 設計案報導，取自 stockanalysis.com 新聞頁，2026/07/2
 
 ## 5. 跨 AI 工具使用
 
-InvestSkill 適用於任何 AI 助手。`prompts/` 目錄包含所有 30 個分析框架（另含 3 個別名與 report-generator 輸出工具）的獨立檔案。
+InvestSkill 適用於任何 AI 助手。`prompts/` 目錄包含所有 34 個分析框架（另含 3 個別名與 report-generator 輸出工具）的獨立檔案。
 
 ### Gemini CLI
 
@@ -2052,7 +2117,7 @@ gemini
 使用 stock-valuation 框架分析 NVDA
 
 # 引用特定提示
-使用 @workspace /prompts/dcf-valuation.md 中的框架估算 MSFT 的價值
+使用 @workspace /prompts/stock-valuation.md 中的框架估算 MSFT 的價值
 
 # 投資組合審查
 使用 @workspace /prompts/portfolio-review.md 評估此組合：[貼上持倉]
@@ -2064,7 +2129,7 @@ gemini
 
 ```
 # Cursor AI 對話
-@prompts/fundamental-analysis.md 分析 GOOGL 的財務報表
+@prompts/stock-eval.md 分析 GOOGL 的財務報表
 
 # 或直接詢問——Cursor 會套用框架
 使用 InvestSkill 方法論對 AMZN 進行 DCF 估值
@@ -2095,7 +2160,7 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 ```bash
 # 良好
 /stock-eval NVDA                    # 明確的股票代碼
-/dcf-valuation MSFT --scenarios     # 加上旗標取得更豐富輸出
+/stock-valuation MSFT --methods all # 加上旗標取得更豐富輸出
 
 # 更好——加入上下文
 /financial-report-analyst AAPL      # 然後貼上實際的 10-K 文字
@@ -2105,10 +2170,10 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 **串接技能進行深度分析：**
 ```bash
 # 步驟 1：取得基本面
-/fundamental-analysis MSFT
+/stock-eval MSFT
 
 # 步驟 2：估算企業價值
-/dcf-valuation MSFT --scenarios
+/stock-valuation MSFT --methods all
 
 # 步驟 3：檢視競爭定位
 /competitor-analysis MSFT
@@ -2116,28 +2181,30 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 # 步驟 4：驗證輸出結果
 /result-validator    # 貼入分析結果——行動前找出遺漏項目
 
-# 步驟 5：或一次執行所有分析
-/research-bundle MSFT
-# 或生成完整 HTML 報告：
-/full-report MSFT
+# 步驟 5：或一次執行所有分析，輸出完整 HTML 報告
+/full-report MSFT --depth comprehensive
 ```
 
 ### 選擇正確的技能
 
 | 你的問題 | 最適合的技能 |
 |---------|------------|
-| 「這支股票便宜還是貴？」 | `/dcf-valuation` + `/stock-valuation` |
+| 「這支股票便宜還是貴？」 | `/stock-valuation` |
+| 「這幾檔股票該買哪一檔？」 | `/compare`（2–5 檔）或 `/stock-screener`（更長的清單） |
 | 「這是好的企業嗎？」 | `/stock-eval` + `/competitor-analysis` |
 | 「整個產業如何運作，誰賺走利潤？」 | `/industry-map` |
 | 「這份財報裡有什麼？」 | `/financial-report-analyst` |
+| 「這家公司的盈餘可信嗎？」 | `/forensic-accounting` |
+| 「這家公司還得起債嗎？」 | `/credit-check` |
 | 「管理層在電話會議說了什麼？」 | `/earnings-call-analysis` |
 | 「內部人士在做什麼？」 | `/insider-trading` |
 | 「這個股息安全嗎？」 | `/dividend-analysis` |
 | 「股票目前技術面如何？」 | `/technical-analysis` |
-| 「投資前的完整盡職調查」 | `/research-bundle` 或 `/full-report` |
+| 「投資前的完整盡職調查」 | `/full-report` |
 | 「這支股票有軋空潛力嗎？」 | `/short-interest` |
 | 「我的投資組合是否平衡？」 | `/portfolio-review` |
-| 「這份分析可以信任嗎？」 | `/result-validator` |
+| 「這份分析可以信任嗎？」 | `/fact-check` + `/result-validator` |
+| 「這筆交易讓我學到什麼？」 | `/trade-postmortem` |
 | 「我需要一張圖表做報告」 | `/chart-master` |
 
 ### 解讀訊號評分

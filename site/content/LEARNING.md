@@ -8,7 +8,7 @@
 
 ## The learning path
 
-Two parts. **Part I — Analyze a business (Lessons 1–8)** covers everything the plugin measures — from what a share is, to what a business is worth, to how to hold a portfolio without getting hurt — and puts it all together on real stocks. **Part II — Practical foundations (Lessons 9–13 and a capstone)** covers what a person meets in the first months of actually investing: accounts and orders, an ETF core, taxes, earnings season, and the psychology that protects the plan — ending with a case where the right answer is *no*.
+Two parts. **Part I — Analyze a business (Lessons 1–8)** covers everything the plugin measures — from what a share is, to what a business is worth, to how to hold a portfolio without getting hurt — and puts it all together on real stocks. **Part II — Practical foundations (Lessons 9–15 and a capstone)** covers what a person meets in the first months of actually investing: accounts and orders, an ETF core, taxes, earnings season, the psychology that protects the plan, the macro backdrop, and options as a stock holder's tool — ending with a case where the right answer is *no*.
 
 ### Part I — Analyze a business
 
@@ -32,9 +32,13 @@ Two parts. **Part I — Analyze a business (Lessons 1–8)** covers everything t
 | 11 | [**Taxes & Account Types**](learning-taxes.html) | Short vs. long-term, wash sale, qualified dividends, lots, harvesting, placement — and a full **non-US investor** section (W-8BEN, withholding, estate tax, UCITS) | `tax-lens`, `dividend-analysis` |
 | 12 | [**Earnings Season, Explained**](learning-earnings.html) | The quarterly cycle, consensus and guidance, beat-and-drop, the implied move, what's priced in, the scenario grid, what not to do | `earnings-preview`, `earnings-call-analysis`, `thesis-tracker` |
 | 13 | [**Psychology & Process**](learning-psychology.html) | Process vs. outcome, the biases that cost most and their antidotes, pre-mortems, checklists, a journal template, sell rules | `thesis-tracker`, `bear-case`, `learning-coach` |
+| 14 | [**Macro & the Fed Cycle**](learning-macro.html) | The dual mandate, how rates reach a stock's value, the yield curve and the 2022–24 inversion, CPI vs. core PCE, cycle phases and sector leadership, leading indicators, FOMC mechanics | `economics-analysis`, `sector-analysis`, `risk-stress-test` |
+| 15 | [**Options for Stock Investors**](learning-options.html) | Calls and puts, the Greeks in plain words, implied volatility and the expected move, covered calls, cash-secured and protective puts, collars, liquidity, what not to do | `options-analysis`, `earnings-preview`, `tax-lens` |
 | ★ | [**Case Study: When the Answer Is No**](learning-case-pass.html) | The same loop ending in a *pass*, twice — PFE (a value trap) and UPST (a no-trade) — and what would have made each a yes | *all of them* |
 
-Every Part II lesson ends with a five-question **Check yourself**; `learning-coach --quiz <lesson>` generates more on demand.
+Every lesson (1–13) ends with a five-question **Check yourself**; `learning-coach --quiz <lesson>` generates more on demand.
+
+For a one-page summary to print — the signal block, the key metrics with their ranges, the pre-trade checklist, and the red flags — see the [**Cheat Sheet**](cheatsheet.html).
 
 > **How to use this guide:** if you're brand new, start at Lesson 1 and go in order — later lessons assume the vocabulary from earlier ones. If you already invest, skim the table and jump to the gaps. Lesson 7 is the Part I capstone: it runs the whole process on one company, so read it once you've met the ideas in 1–6. If you are about to open an account, read Lesson 9 first — it is the only lesson that comes *before* the first trade. Each lesson ends with key takeaways and a link to the next.
 

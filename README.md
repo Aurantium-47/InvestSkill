@@ -10,9 +10,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/yennanliu/InvestSkill?style=flat-square&color=gold)](https://github.com/yennanliu/InvestSkill/stargazers)
 [![Release](https://img.shields.io/github/v/release/yennanliu/InvestSkill?style=flat-square&color=22c55e)](https://github.com/yennanliu/InvestSkill/releases)
-[![Tests](https://img.shields.io/github/actions/workflow/status/yennanliu/InvestSkill/test.yml?style=flat-square&label=tests)](https://github.com/yennanliu/InvestSkill/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/yennanliu/InvestSkill/ci.yml?style=flat-square&label=tests)](https://github.com/yennanliu/InvestSkill/actions)
 
-[Documentation](https://yennanliu.github.io/InvestSkill/) · [Learn Investing](https://yennanliu.github.io/InvestSkill/learning.html) · [Cookbook](https://yennanliu.github.io/InvestSkill/cookbook.html) · [繁體中文](README-zh-TW.md)
+[Documentation](https://yennj12.js.org/InvestSkill/) · [Learn Investing](https://yennj12.js.org/InvestSkill/learning.html) · [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) · [繁體中文](README-zh-TW.md)
 
 </div>
 
@@ -20,7 +20,7 @@
 
 ## What is InvestSkill?
 
-InvestSkill is a collection of **30 structured analysis frameworks** that turn any AI assistant into an institutional-quality investment analyst. There is no runtime — every skill is a prompt that works in Claude Code, Cursor, Gemini CLI, GitHub Copilot, ChatGPT, or any other LLM.
+InvestSkill is a collection of **34 structured analysis frameworks** that turn any AI assistant into an institutional-quality investment analyst. There is no runtime — every skill is a prompt that works in Claude Code, Cursor, Gemini CLI, GitHub Copilot, ChatGPT, or any other LLM.
 
 **Nothing to sign up for, nothing to pay for.** No API key, no data-vendor subscription, no billing setup — you bring the AI assistant you already use (a free tier or a local model works too) and InvestSkill is just markdown. See [No API keys, no cost](#no-api-keys-no-cost).
 
@@ -34,7 +34,7 @@ Get back:     Piotroski score · ROIC · moat rating · buy/hold/sell signal
   <div class="home-card-body">
     <div class="home-card-title">New to investing? Start with the Learning guide</div>
     <p>A thirteen-lesson field guide, in plain English and Traditional Chinese: Part I teaches the concepts behind every skill — reading a balance sheet, valuing a business, holding a portfolio — and Part II the practical foundations: accounts and orders, an ETF core, taxes (including for non-US investors), earnings season, and the psychology that protects the plan. No finance degree required.</p>
-    <p><a class="home-card-cta" href="https://yennanliu.github.io/InvestSkill/learning.html">Start learning →</a></p>
+    <p><a class="home-card-cta" href="https://yennj12.js.org/InvestSkill/learning.html">Start learning →</a></p>
   </div>
 </div>
 
@@ -70,7 +70,7 @@ Add `-g` to install for your user instead of one project, `-d DIR` to target ano
 ```bash
 claude
 /plugin marketplace add yennanliu/InvestSkill
-/plugin install us-stock-analysis
+/plugin install us-stock-analysis@invest-skill
 /us-stock-analysis:stock-eval AAPL
 ```
 
@@ -115,7 +115,7 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 
 ---
 
-## The 30 Frameworks
+## The 34 Frameworks
 
 ### Core Stock Analysis
 
@@ -125,6 +125,7 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 | `technical-analysis` | MA chart (30/60/90/200/365d) with trade entry/target/stop, chart patterns, RSI/MACD, MTF alignment, Ichimoku |
 | `stock-valuation` | P/E · P/S · EV/EBITDA · comparable company multiples |
 | `economics-analysis` | Macro indicators, recession probability, rate sensitivity |
+| `compare` | Compare 2–5 stocks head to head on one table — business quality, growth, valuation, balance sheet, momentum, risks and catalysts — then argue the pick: which one, why, what would flip it, and whether owning more than one adds anything |
 
 ### Financial Reports
 
@@ -133,6 +134,8 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 | `financial-report-analyst` | 10-K / 10-Q key findings, red flags, accounting quality |
 | `10k-digest` | Structured markdown digest — abstract, section summaries, metrics table, refs (EN / 繁中) |
 | `earnings-call-analysis` | Management tone, guidance delta, hidden risks |
+| `forensic-accounting` | Earnings-quality forensics — Beneish M-Score, Altman Z, Sloan accruals ratio, cash-vs-earnings divergence, SBC-adjusted FCF, revenue-recognition and capitalisation checks, auditor and related-party flags, scored as a Manipulation Risk Score 0–10 |
+| `credit-check` | Balance-sheet solvency and refinancing risk — debt maturity wall, interest coverage trend, leverage vs. covenants, liquidity runway, ratings and spreads, the cost of refinancing at today's rates, and an equity-holder verdict, scored as a Credit Health Score 0–10 |
 
 ### Market Monitoring
 
@@ -161,6 +164,7 @@ InvestSkill is **completely free to use** — there is nothing to buy, register,
 | `earnings-preview` | The before-earnings skill — consensus vs. whisper, 8-quarter beat rate and post-print move distribution, options-implied vs. realized move, what the current price already assumes, the KPIs to watch, and a three-scenario grid (beat-and-raise / beat-and-lower / miss) with expected reaction and a position rule for each |
 | `tax-lens` | US tax mechanics for a position or portfolio — short- vs. long-term treatment, wash-sale window check, qualified-dividend holding-period test, lot selection (specific-ID vs. FIFO), tax-loss-harvesting pairs, account placement, estimated annual tax drag — plus a --non-us module (W-8BEN, dividend withholding and treaty rates, capital-gains treatment, US estate-tax exposure, UCITS alternatives). Educational only, never tax advice |
 | `risk-stress-test` | Portfolio and position risk report — beta-weighted exposure, historical scenario replay (2008, March 2020, 2022 rate shock, 2025 tariff shock), parametric VaR / CVaR at 95 / 99 %, max-drawdown estimate, correlation-spike scenario, rate / USD / oil sensitivity, liquidity (days to exit at 20 % of ADV), and a Risk Budget Score 0–10 |
+| `trade-postmortem` | Review a closed trade or a year of trades — process vs. outcome matrix, plan adherence, the biases that showed up, what the pre-trade skills said, and the one lesson for the journal; reads closed thesis-tracker files |
 
 ### Meta & Output
 
@@ -246,13 +250,17 @@ HTML reports render this as a styled dark panel with a score progress bar, ghost
 
 | Platform | Setup | How it works |
 |----------|-------|-------------|
-| **Claude Code** | Marketplace install | 34 native slash commands (30 frameworks + 3 aliases + 1 output tool) |
-| **Cursor IDE** | Clone repo, open folder | Auto-loads `.cursor/rules/` |
-| **Gemini CLI** | Clone repo, `cd` into it | Auto-loads `GEMINI.md` |
-| **GitHub Copilot** | Clone repo, open in VS Code | Auto-loads `.github/copilot-instructions.md` |
-| **Ollama (local models)** | Clone repo, run a local model | Offline open-source models, no API key — [guide](README-ollama.md) |
-| **ChatGPT / Claude.ai** | Paste any `prompts/*.md` file | Works in any chat interface |
-| **Any other LLM** | Reference or paste prompt files | Platform-agnostic markdown |
+Every platform installs with the same one-command [installer](install.sh) — only the `-a` agent changes (see [Quick Start](#quick-start)).
+
+| Platform | Setup | How it works |
+|----------|-------|-------------|
+| **Claude Code** | `install.sh -a claude`, or the plugin marketplace | 38 native slash commands (34 frameworks + 3 aliases + 1 output tool) |
+| **Cursor IDE** | `install.sh -a cursor` | Auto-loads `.cursor/rules/investskill.mdc` |
+| **Gemini CLI** | `install.sh -a gemini` | Auto-loads `GEMINI.md` |
+| **GitHub Copilot** | `install.sh -a copilot` | Auto-loads `.github/copilot-instructions.md` |
+| **Codex / OpenCode** | `install.sh -a codex` / `-a opencode` | Auto-loads `AGENTS.md` |
+| **Ollama (local models)** | `install.sh -a any`, run a local model | Offline open-source models, no API key — [guide](README-ollama.md) |
+| **ChatGPT / Claude.ai / any LLM** | `install.sh -a any`, paste a `prompts/*.md` file | Platform-agnostic markdown |
 
 ---
 
@@ -274,15 +282,15 @@ New to investing, or unsure which skill to reach for? Start here:
 
 | Resource | Description |
 |----------|-------------|
-| [Live Docs Site](https://yennanliu.github.io/InvestSkill/) | Full documentation with dark-theme UI |
-| [Cookbook](https://yennanliu.github.io/InvestSkill/cookbook.html) | Walkthrough examples and use cases |
-| [Skill Reference](https://yennanliu.github.io/InvestSkill/skills.html) | All 30 frameworks, one browsable page each |
+| [Live Docs Site](https://yennj12.js.org/InvestSkill/) | Full documentation — light / dark theme, English and 繁體中文 |
+| [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) | Walkthrough examples and use cases |
+| [Skill Reference](https://yennj12.js.org/InvestSkill/skills.html) | All 34 frameworks, one browsable page each |
 | [Claude Code Guide](README-claude-code.md) | Plugin install + all slash commands |
 | [Cursor Guide](README-cursor.md) | Auto-loading rules + `@prompts/` usage |
 | [Gemini CLI Guide](README-gemini.md) | File references + multi-framework chains |
 | [Ollama Guide](README-ollama.md) | Local open-source models, offline & no API key |
-| [Adding Skills](ADDING-NEW-SKILLS.md) | 12-step contributor walkthrough |
-| [FAQ](FAQ.md) | 50+ answers covering all platforms |
+| [Adding Skills](ADDING-NEW-SKILLS.md) | Contributor walkthrough — `new-skill.js` scaffolds and wires a skill |
+| [FAQ](FAQ.md) | 45+ answers on install, platforms, usage and versions |
 | [Changelog](CHANGELOG.md) | Version history |
 
 ---
@@ -299,7 +307,7 @@ See [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md) for the full process. The short
 
 ---
 
-**Version:** 1.13.0 · **Frameworks:** 30 analysis frameworks (+ 3 aliases, 1 output tool) · **Skills:** 34 · **Platforms:** 7 · **License:** MIT · **Tests:** all passing
+**Version:** latest — see [CHANGELOG](CHANGELOG.md) · **Frameworks:** 34 analysis frameworks (+ 3 aliases, 1 output tool) · **Skills:** 38 · **Platforms:** 7 · **License:** MIT · **Tests:** all passing
 
 ---
 

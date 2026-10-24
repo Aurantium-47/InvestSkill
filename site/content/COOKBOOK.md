@@ -40,7 +40,7 @@ Practical examples, setup guide, and core concepts for getting the most out of I
 ### Prerequisites
 
 - [Claude Code](https://code.claude.com) installed (`npm install -g @anthropic-ai/claude-code`)
-- An active Anthropic API key
+- A Claude plan or Anthropic account that can run Claude Code (other agents: see the one-command installer below — InvestSkill itself needs no API key)
 
 ### Install with one command (any agent)
 
@@ -70,7 +70,7 @@ claude
 /plugin list
 ```
 
-You should see `us-stock-analysis` in the list with 34 available skills (30 analysis frameworks, 3 aliases, and the `report-generator` output tool).
+You should see `us-stock-analysis` in the list with 38 available skills (34 analysis frameworks, 3 aliases, and the `report-generator` output tool).
 
 ### Quick Test
 
@@ -124,11 +124,13 @@ Think of each skill as a **specialized analyst** you can summon with a command:
 | Command | What it does |
 |---------|-------------|
 | `/stock-eval AAPL` | Holistic evaluation: quality, valuation, moat, risk |
-| `/dcf-valuation NVDA` | Rigorous intrinsic value model with 3 scenarios |
 | `/stock-valuation MSFT` | Multi-method valuation: DCF + comps + EV multiples |
+| `/compare AAPL MSFT GOOGL` | 2–5 stocks head to head on one table, then the pick |
 | `/financial-report-analyst GOOGL 10-K` | Deep-read an annual filing, find red flags |
-| `/research-bundle TSLA` | Run all skills in sequence, synthesize into one thesis |
+| `/forensic-accounting XYZ` | Earnings-quality forensics: Beneish M-Score, Altman Z, accruals |
+| `/credit-check XYZ` | Debt maturity wall, interest coverage, refinancing risk |
 | `/portfolio-review` | Analyze allocation, performance, and rebalancing needs |
+| `/trade-postmortem` | Review a closed trade: process vs. outcome, the one lesson |
 | `/earnings-call-analysis AMZN` | Parse tone, guidance, and key themes from earnings calls |
 | `/dividend-analysis JNJ` | Check dividend safety, growth, and sustainability |
 | `/chart-master AAPL` | Generate financial charts in Mermaid, ASCII, or HTML |
@@ -150,9 +152,9 @@ plugins/us-stock-analysis/skills/
 ├── dcf-valuation/SKILL.md
 ├── stock-valuation/SKILL.md
 ├── financial-report-analyst/SKILL.md
-├── chart-master/SKILL.md           ← v1.6.0
-├── full-report/SKILL.md            ← v1.6.0
-└── ... (34 skills total)
+├── chart-master/SKILL.md
+├── full-report/SKILL.md
+└── ... (38 skills total)
 ```
 
 ### The Signal Block
@@ -192,7 +194,7 @@ prompts/
 ├── financial-report-analyst.md
 ├── chart-master.md
 ├── full-report.md
-└── ... (21 files)
+└── ... (38 files, one per skill)
 ```
 
 Use them by copying the file content into any AI chat as a system prompt.
@@ -268,6 +270,8 @@ ROIC − WACC Spread:   +1,950 bps  (significant value creation)
 ---
 
 ### 3.2 DCF Valuation
+
+> `dcf-valuation` is now an alias of `stock-valuation`, where DCF is Method 1 — `/stock-valuation NVDA --methods dcf` gives the same model.
 
 **Command:**
 ```bash
@@ -378,6 +382,8 @@ Restatements:   None
 ---
 
 ### 3.4 Research Bundle
+
+> `research-bundle` is now an alias of `full-report` — for new work run `/full-report AMZN --depth standard`. The sample below is kept as an example of a multi-module composite scorecard.
 
 **Command:**
 ```bash
@@ -1916,7 +1922,7 @@ Real-world investor scenarios showing how to combine multiple skills.
 # Look for: risk factor changes, management tone, accounting quality
 
 # Step 4: Build the valuation with appropriate discount
-/us-stock-analysis:dcf-valuation PFE --scenarios
+/us-stock-analysis:stock-valuation PFE --methods dcf
 # Use conservative assumptions — if it's still cheap, that's interesting
 
 # Step 5: Validate the output
@@ -2125,7 +2131,7 @@ demand compounds for two more years and the market is pricing a one-off cycle
 
 ## 5. Cross-AI Usage
 
-InvestSkill works with any AI assistant. The `prompts/` directory contains all 30 analysis frameworks (plus 3 aliases and the report-generator output tool) as standalone files.
+InvestSkill works with any AI assistant. The `prompts/` directory contains all 34 analysis frameworks (plus 3 aliases and the report-generator output tool) as standalone files.
 
 ### Gemini CLI
 
@@ -2154,7 +2160,7 @@ The `.github/copilot-instructions.md` file is automatically loaded as workspace 
 Analyze NVDA using the stock-valuation framework
 
 # Reference a specific prompt
-Use the framework in @workspace /prompts/dcf-valuation.md to value MSFT
+Use the framework in @workspace /prompts/stock-valuation.md to value MSFT
 
 # Portfolio review
 Use @workspace /prompts/portfolio-review.md to evaluate this portfolio: [paste holdings]
@@ -2166,7 +2172,7 @@ The `.cursor/rules/invest-skill.mdc` file is auto-applied in Cursor.
 
 ```
 # Cursor AI Chat
-@prompts/fundamental-analysis.md Analyze GOOGL's financial statements
+@prompts/stock-eval.md Analyze GOOGL's financial statements
 
 # Or just ask naturally — Cursor knows the frameworks
 Run a DCF valuation of AMZN using the InvestSkill methodology
@@ -2197,7 +2203,7 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 ```bash
 # Good
 /stock-eval NVDA                    # Clear ticker
-/dcf-valuation MSFT --scenarios     # With flag for richer output
+/stock-valuation MSFT --methods all # With flag for richer output
 
 # Even better — add context
 /financial-report-analyst AAPL      # Then paste the actual 10-K text
@@ -2207,10 +2213,10 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 **Chain skills for deeper analysis:**
 ```bash
 # Step 1: Get the fundamentals
-/fundamental-analysis MSFT
+/stock-eval MSFT
 
 # Step 2: Value the business
-/dcf-valuation MSFT --scenarios
+/stock-valuation MSFT --methods all
 
 # Step 3: Check competitive position
 /competitor-analysis MSFT
@@ -2218,28 +2224,30 @@ cat prompts/stock-eval.md | pbcopy   # macOS
 # Step 4: Validate the output
 /result-validator    # paste the analysis — catch gaps before acting
 
-# Step 5: Or run everything at once
-/research-bundle MSFT
-# Or generate a full HTML report:
-/full-report MSFT
+# Step 5: Or run everything at once, as a full HTML report
+/full-report MSFT --depth comprehensive
 ```
 
 ### Choosing the Right Skill
 
 | Your Question | Best Skill |
 |---------------|-----------|
-| "Is this stock cheap or expensive?" | `/dcf-valuation` + `/stock-valuation` |
+| "Is this stock cheap or expensive?" | `/stock-valuation` |
+| "Which of these stocks should I buy?" | `/compare` (2–5 names) or `/stock-screener` (a longer list) |
 | "Is this a good business?" | `/stock-eval` + `/competitor-analysis` |
 | "How does this whole industry work, and who profits?" | `/industry-map` |
 | "What's in this earnings report?" | `/financial-report-analyst` |
+| "Can I trust these earnings?" | `/forensic-accounting` |
+| "Can this company pay its debts?" | `/credit-check` |
 | "What did management say on the call?" | `/earnings-call-analysis` |
 | "What are insiders doing?" | `/insider-trading` |
 | "Is this dividend safe?" | `/dividend-analysis` |
 | "Where is the stock technically?" | `/technical-analysis` |
-| "Full deep-dive before I invest" | `/research-bundle` or `/full-report` |
+| "Full deep-dive before I invest" | `/full-report` |
 | "Is this a squeeze candidate?" | `/short-interest` |
 | "Is my portfolio balanced?" | `/portfolio-review` |
-| "Can I trust this analysis?" | `/result-validator` |
+| "Can I trust this analysis?" | `/fact-check` + `/result-validator` |
+| "What did I learn from that trade?" | `/trade-postmortem` |
 | "I need a chart for my report" | `/chart-master` |
 
 ### Interpreting Signal Scores

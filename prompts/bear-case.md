@@ -5,7 +5,7 @@
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — the latest quarter's revenue, margins and guidance, the valuation multiples the bull case leans on (EV/EBIT, P/FCF, P/S), net debt, share count trend, and short interest — each with its filing or quote date.
 3. **State your data source** — fill in the `Data & Sources` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -173,7 +173,7 @@ Bear Case Strength   Interpretation
 ```
 
 ### 4. Detailed Findings
-Cover pillars 1–7 above, each with the evidence and its severity.
+Cover pillars 1–6 above, each with the evidence and its severity (pillar 7 feeds §5, pillar 8 is §6).
 
 ### 5. Downside Target & Risk/Reward
 Bear price target with the math, scenario tree, and asymmetry assessment.
@@ -181,13 +181,6 @@ Bear price target with the math, scenario tree, and asymmetry assessment.
 ### 6. Thesis-Killers
 The mandatory list of what would prove the bear wrong.
 
-## Signal Output
-
-The Bear Case Strength Score maps to the standard signal as follows: a **stronger bear case (higher score) means a more BEARISH signal**. A strong/severe bear case → BEARISH / SELL; a weak bear case → the bear failed to make its point, leaning NEUTRAL-to-constructive. Because this skill argues one side, state the mapping explicitly so the user reads the block correctly.
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -207,6 +200,25 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Signal Output
+
+The Bear Case Strength Score maps to the standard signal as follows: a **stronger bear case (higher score) means a more BEARISH signal**. A strong/severe bear case → BEARISH / SELL; a weak bear case → the bear failed to make its point, leaning NEUTRAL-to-constructive. Because this skill argues one side, state the mapping explicitly so the user reads the block correctly:
+
+```
+Box Score = min(10 − Bear Case Strength, 6.5)
+```
+
+Strength 8.0 → Score 2.0 (BEARISH) · Strength 5.0 → Score 5.0 (NEUTRAL) · Strength 1.5 → Score 6.5 (BULLISH, WEAK). The cap is deliberate: a bear case that fails to land means the bull thesis survived scrutiny, not that it is strong — run `stock-eval` or `stock-valuation` for the positive case. Print both numbers: "Bear Case Strength 7.2 → Score 2.8".
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "bear-case", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

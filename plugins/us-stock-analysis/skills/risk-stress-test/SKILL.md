@@ -89,14 +89,14 @@ Say plainly what the book is: "this is a 1.3-beta, 62 %-technology portfolio" is
 
 ### Phase 2 — Historical scenario replay
 
-Replay four regimes. **Measure every holding over the scenario's common date window** (the dates in the first column, index peak to index trough) — not each holding's own peak-to-trough, which would combine losses that never happened at the same time. Where a holding existed through the episode, use its actual return over that window; where it did not (or the data is not available), use **β_i × index move** or the sector ETF's return over the same window, and mark the row `proxy`. For the 2025 tariff shock, **write down the window you are using before computing** (the pre-announcement close to the trough) and confirm it with the user — it is recent enough that the dates are not yet a convention. Index magnitudes below are approximate figures for orientation — the user confirms any that drive the conclusion.
+Replay four regimes. **Measure every holding over the scenario's common date window** (the dates in the first column, index peak to index trough) — not each holding's own peak-to-trough, which would combine losses that never happened at the same time. Where a holding existed through the episode, use its actual return over that window; where it did not (or the data is not available), use **β_i × index move** or the sector ETF's return over the same window, and mark the row `proxy`. For the 2025 tariff shock use the index window below (the 2025-02-19 record close to the 2025-04-08 closing low); if the user prefers the announcement-to-trough window (2025-04-02 → 2025-04-08), say so and use it consistently. Index magnitudes below are approximate figures for orientation — the user confirms any that drive the conclusion.
 
 | Scenario | Market move (approx.) | Portfolio est. move | Worst position | Note |
 |----------|-----------------------|---------------------|----------------|------|
 | **2008 GFC** (Oct-07 → Mar-09) | SPX ≈ −57 %, ~17 months; financials −80 %+, credit frozen | Σ Weight_i × replay_i | | Long duration of decline matters as much as depth |
 | **March 2020** (Feb-19 → Mar-23) | SPX ≈ −34 % in ~5 weeks; VIX > 80; everything sold at once | | | Speed: correlations went to ~1; liquidity vanished for a fortnight |
 | **2022 rate shock** (Jan → Oct) | SPX ≈ −25 %; Nasdaq-100 ≈ −35 %; long-duration growth −60–80 %; bonds fell *with* stocks | | | Growth / unprofitable tech and 60/40 diversification were the casualties |
-| **2025 tariff shock** (recent regime) | Sharp, policy-driven gap lower and partial recovery; magnitude and dates to be confirmed by the reader | | | Import-cost and China-revenue exposure, not beta, decided the losers |
+| **2025 tariff shock** (Feb-19 → Apr-8, 2025) | SPX ≈ −19 % close to close, ≈ −10 % in the two sessions after the 2 April announcement; a sharp rebound began with the 9 April pause | | | Import-cost and China-revenue exposure, not beta, decided the losers |
 
 ```
 Portfolio scenario move = Σ Weight_i × Replay_i
@@ -269,6 +269,12 @@ After delivering the analysis signal, specify what would reverse it:
 This skill measures **whether the portfolio's risk fits the investor's budget, not whether its holdings will rise**, so state the mapping: `Signal: BULLISH` means the measured risk is inside the stated drawdown budget with margin; `NEUTRAL` means it sits at the edge; `BEARISH` means the worst plausible scenario breaches it. `Action: BUY` here means "the current risk level is acceptable to hold" — never "buy more." `Action: SELL` means "reduce risk," not that any holding is a short. Read the direction of the individual holdings from `stock-eval` or `bear-case`, not from this block.
 
 All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "risk-stress-test", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
 
 ```
 ╔══════════════════════════════════════════════╗

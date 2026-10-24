@@ -242,6 +242,6 @@
 
 ---
 
-> **下一步／相關：** 上一課——[財報季，講清楚](learning-earnings-zh-tw.html)。下一課：[**案例研究：當答案是「不」**](learning-case-pass-zh-tw.html)展示這套循環兩次都以「放棄」收尾。或回到[學習中心](learning-zh-tw.html)，再前往[選擇技能](choose-a-skill-zh-tw.html)付諸實行。另可參閱[概念](concepts-zh-tw.html)與[術語表](glossary-zh-tw.html)。
+> **下一步／相關：** 上一課——[財報季，講清楚](learning-earnings-zh-tw.html)。下一課：[**第 14 課 · 總體經濟與聯準會循環 →**](learning-macro-zh-tw.html)。總結案例[**案例研究：當答案是「不」**](learning-case-pass-zh-tw.html)展示這套循環兩次都以「放棄」收尾。或回到[學習中心](learning-zh-tw.html)，再前往[選擇技能](choose-a-skill-zh-tw.html)付諸實行。另可參閱[概念](concepts-zh-tw.html)與[術語表](glossary-zh-tw.html)。
 
 *僅供教育用途，並非投資建議。*

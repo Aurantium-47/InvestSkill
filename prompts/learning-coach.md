@@ -57,7 +57,7 @@ Pairs with: every analysis skill (as input), `result-validator` (when the reader
 | Mode | Invocation | What it does |
 |------|------------|--------------|
 | **Explain** (default) | paste any InvestSkill output, optionally `--level beginner \| intermediate` and `--lang zh-TW` | Explanation card per metric → how the pieces connect → common misreadings → Socratic ladder → "what would change your mind?" |
-| **Quiz** | `--quiz <lesson>` where lesson ∈ Foundations · Statements · Quality · Valuation · Market · Portfolio · Playbook · Case AMD · Setup (Before Your First Trade) · ETFs · Taxes · Earnings Season · Psychology · Case Pass (When the Answer Is No) | Five questions on one Learning lesson (recall · calculation · judgment), answers hidden under an **Answers** heading, one line on what to re-read |
+| **Quiz** | `--quiz <lesson>` where lesson ∈ Foundations · Statements · Quality · Valuation · Market · Portfolio · Playbook · Case AMD · Setup (Before Your First Trade) · ETFs · Taxes · Earnings Season · Psychology · Macro & the Fed · Options · Case Pass (When the Answer Is No) | Five questions on one Learning lesson (recall · calculation · judgment), answers hidden under an **Answers** heading, one line on what to re-read |
 
 Flags:
 - `--level beginner` (default) — no term is used before it is defined in one sentence; analogies allowed; at most one formula per card.
@@ -126,6 +126,14 @@ Mapping metrics to lessons (use these slugs):
 | Signal block, thesis, invalidation triggers, catalysts, "when to sell" | Playbook | `learning-playbook` |
 | The whole loop on one real company | Case AMD | `learning-case-amd` |
 | Compounding, risk vs. return, what a stock *is* | Foundations | `learning-foundations` |
+| Account types, order types, settlement (T+1), the IPS, risk capacity vs. tolerance | Setup | `learning-setup` |
+| Expense ratio, tracking difference, ETF liquidity, holdings overlap, leveraged/inverse structure | ETFs | `learning-etfs` |
+| Short- vs. long-term gains, wash sale, qualified dividends, lots, harvesting, W-8BEN, withholding | Taxes | `learning-taxes` |
+| Consensus, guidance, beat rate, implied move, "beat and drop", post-earnings drift | Earnings Season | `learning-earnings` |
+| Biases, process vs. outcome, pre-mortem, journal, sell rules, trade review | Psychology | `learning-psychology` |
+| Policy rate, yield curve, CPI/PCE, PMI, LEI, Sahm rule, cycle phase, sector rotation | Macro & the Fed | `learning-macro` |
+| Calls, puts, the Greeks, IV and IV rank, covered calls, cash-secured and protective puts | Options | `learning-options` |
+| A thesis that ends in *no* — value traps, no-trade setups | Case Pass | `learning-case-pass` |
 
 ### Phase 3 — How the pieces connect
 
@@ -283,6 +291,12 @@ This skill explains a reading rather than making a call, so what can be invalida
 This skill **does not produce a signal of its own**. The block below mirrors the pasted analysis's Investment Signal exactly — same Signal, Confidence, Horizon, Score, Action, and Conviction — so the reader sees the conclusion they were just taught to read, unchanged. If the pasted material has no signal block (or the run is a `--quiz`), fill every field with `n/a` and say so in the note.
 
 All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "learning-coach", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
 
 ```
 ╔══════════════════════════════════════════════╗

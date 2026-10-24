@@ -1,230 +1,92 @@
 # InvestSkill Release Quick Reference
 
-Fast-track guide for releasing new versions to all platforms.
+How a release is cut. The rules behind it (which number to bump, when to tag) are the Version Consistency and Release Timing rules in [CLAUDE.md](CLAUDE.md).
 
-## 30-Second Release
+## The Short Version
 
 ```bash
-# 1. Update version (two files)
-# .claude-plugin/marketplace.json → "version": "X.Y.Z"
-# plugins/us-stock-analysis/.claude-plugin/plugin.json → "version": "X.Y.Z"
-
-# 2. Update CHANGELOG.md
-# Add section: ## [X.Y.Z] - YYYY-MM-DD
-
-# 3. Commit
-git add .claude-plugin/marketplace.json plugins/us-stock-analysis/.claude-plugin/plugin.json CHANGELOG.md
-git commit -m "chore: bump version to X.Y.Z"
-git push origin main
-
-# ✅ Done! Auto-deploy handles everything else
+git checkout main && git pull         # releases are cut from an up-to-date main, after the PR is merged
+npm run release:dry-run               # preview: next version, files touched, CHANGELOG section
+npm run release                       # bump → stamp CHANGELOG → commit → tag → push (asks before pushing)
 ```
 
-## What Gets Released
+Pushing the tag `vX.Y.Z` triggers [`.github/workflows/release.yml`](.github/workflows/release.yml), which publishes the GitHub Release. Nothing else needs to happen by hand.
 
-| Platform | Method | Status |
-|----------|--------|--------|
-| Claude Code | GitHub Release | ✅ Auto-published |
-| Cursor | Rules packaging | ✅ Auto-published |
-| Gemini CLI | Prompts packaging | ✅ Auto-published |
-| Copilot | Repository (.github/) | ✅ Auto-published |
-| Universal | GitHub artifacts | ✅ Auto-published |
+## What `npm run release` Does
 
-## Release Steps Checklist
+`scripts/release-interactive.js`:
 
-### Before Release
-- [ ] All features implemented and tested
-- [ ] CHANGELOG.md written with details
-- [ ] README.md updated if needed
-- [ ] Documentation (GEMINI.md, etc.) updated
-- [ ] Tests passing: `npm test`
-- [ ] No uncommitted changes: `git status`
+1. **Checks preconditions** — the working tree is clean, the branch is `main`, `main` is identical to `origin/main`, and `CHANGELOG.md` has entries under `## [Unreleased]`.
+2. **Runs `npm run pre-release`** — `pre-release-check` + `validate` + `npm test`.
+3. **Bumps the version in all three manifests** — `plugins/us-stock-analysis/.claude-plugin/plugin.json` (`version`), `.claude-plugin/marketplace.json` (`metadata.version` **and** the plugin entry's `version`), and `package.json` (`version`).
+4. **Stamps the CHANGELOG** — `## [Unreleased]` becomes `## [X.Y.Z] - <today>`.
+5. **Commits** `chore(release): vX.Y.Z` and creates the annotated tag `vX.Y.Z`.
+6. **Pushes** `main` and the tag, after asking.
 
-### During Release
-- [ ] Update `marketplace.json` version
-- [ ] Update `plugin.json` version  
-- [ ] Update `CHANGELOG.md`
-- [ ] Commit changes
-- [ ] Push to main branch
+Flags: `--type patch|minor|major` skips the prompt, `--yes` answers yes to every confirmation, `--no-push` stops after the local commit and tag, `--skip-tests` skips step 2 (don't use it for a real release).
 
-### After Release (Automatic)
-- [ ] ✅ Tests run automatically
-- [ ] ✅ Version change detected
-- [ ] ✅ Release artifacts created
-- [ ] ✅ Published to all 5 platforms
-- [ ] ✅ DEPLOYMENTS.md updated
-- [ ] ✅ Release notes generated
+## What `release.yml` Does
 
-## Verify Release
+On a pushed `v*` tag:
 
-**Check GitHub Actions**:
-1. Visit: https://github.com/yennanliu/InvestSkill/actions
-2. Click latest "Auto Deploy" workflow
-3. Wait for all jobs to complete (green checkmarks)
+1. Runs `npm test`.
+2. Validates the JSON manifests.
+3. Extracts the `## [X.Y.Z]` section of `CHANGELOG.md` as the release notes.
+4. Packages the tarballs (`invest-skill-marketplace-X.Y.Z.tar.gz`, `us-stock-analysis-X.Y.Z.tar.gz`) and `checksums.txt`.
+5. Creates the GitHub Release `vX.Y.Z` with those notes and artifacts.
 
-**Check Release**:
-1. Visit: https://github.com/yennanliu/InvestSkill/releases
-2. Latest release should be: `InvestSkill vX.Y.Z`
-3. Artifacts should include:
-   - `invest-skill-marketplace-X.Y.Z.tar.gz`
-   - `us-stock-analysis-X.Y.Z.tar.gz`
-   - `cursor-rules-X.Y.Z.mdc`
-   - `gemini-prompts-X.Y.Z.tar.gz`
-   - Platform release notes
+Every platform picks the release up from the repository itself: Claude Code through the marketplace (`/plugin marketplace update invest-skill`), every other agent through `install.sh` (which installs from `main`, or from a tag with `-r vX.Y.Z`).
 
-**Check Deployment Record**:
-1. Visit: [DEPLOYMENTS.md](DEPLOYMENTS.md)
-2. Latest entry should be v**X.Y.Z**
-3. All platforms should show ✅
+## Before You Release
 
-## Common Version Numbers
+- [ ] The changes are merged to `main` and CI is green
+- [ ] Every change is listed under `## [Unreleased]` in `CHANGELOG.md` (keep the date off — the release step stamps it)
+- [ ] `npm run pre-release` passes locally
+- [ ] Counts and docs are current (`npm test` enforces the framework counts; see the Framework Count Rule in CLAUDE.md)
+- [ ] `npm run release:dry-run` shows the version you expect
 
-- **X.Y.0** — Major version (new skills, breaking changes)
-- **X.0.Z** — Minor version (new features)
-- **0.0.Z** — Patch version (bug fixes, documentation)
+## Which Number to Bump
 
-Examples:
-- `1.3.0` — Minor release (new documentation, multi-platform support)
-- `1.2.1` — Patch release (bug fix)
-- `2.0.0` — Major release (major new features or breaking changes)
+| Change | Bump | Example |
+|--------|------|---------|
+| New skill / framework, or a meaningful new capability | MINOR | 1.13.0 → 1.14.0 |
+| Fixes, doc / site tweaks, prompt refinements with no new skill | PATCH | 1.14.0 → 1.14.1 |
+| Breaking change to skill names, the output contract, or the plugin layout | MAJOR | 1.x → 2.0.0 |
 
-## Semantic Versioning
+Batch small changes into one coherent release rather than tagging every commit. Feature branches may bump the manifest version (tests require CHANGELOG ↔ manifest parity), but the **tag waits for the release** — never tag ahead of the merge.
 
-Follow [Semantic Versioning](https://semver.org/):
-
-- **Major** (1.0.0 → 2.0.0): Breaking changes
-  - Removing skills
-  - Changing output format significantly
-  - Major architecture changes
-
-- **Minor** (1.0.0 → 1.1.0): New features
-  - Adding new skills
-  - New analysis frameworks
-  - New platform support
-
-- **Patch** (1.0.0 → 1.0.1): Bug fixes
-  - Documentation fixes
-  - Small improvements
-  - Performance improvements
-
-## Version Consistency Check
-
-Before pushing:
+## Verify a Release
 
 ```bash
-# Verify versions match
-jq '.metadata.version' .claude-plugin/marketplace.json
+# The three manifests agree
 jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json
-
-# They must be identical!
+jq '.metadata.version, .plugins[0].version' .claude-plugin/marketplace.json
+jq '.version' package.json
 ```
 
-## Rollback (If Needed)
+- **Actions**: https://github.com/yennanliu/InvestSkill/actions — the `Release` run for the tag is green.
+- **Release page**: https://github.com/yennanliu/InvestSkill/releases — `vX.Y.Z` with the CHANGELOG section, both tarballs and `checksums.txt`.
 
+## If Something Goes Wrong
+
+**The release workflow failed.** Fix the cause on `main` in a normal PR. Then move the tag to the fixed commit — or, simpler and safer, cut the next patch release.
+
+**You tagged by mistake and nothing was published yet:**
 ```bash
-# Delete the last tag
 git tag -d vX.Y.Z
 git push origin :refs/tags/vX.Y.Z
-
-# Revert version bumps
-git revert HEAD
-
-# Or reset to previous commit
-git reset --hard HEAD~1
-git push origin main
 ```
+Then revert the `chore(release)` commit with a normal PR. Once a GitHub Release exists, prefer a new patch release over rewriting history.
 
-## Release Notification
-
-After release completes, notify:
-
-1. **GitHub Issues** — Link to release in pinned issue
-2. **GitHub Discussions** — Post release announcement
-3. **Social Media** — Tweet/share the release
-
-Template:
-```
-🚀 InvestSkill vX.Y.Z released!
-
-✨ What's new:
-- Feature 1
-- Feature 2
-- Bug fix 1
-
-📦 Available on:
-✅ Claude Code
-✅ Cursor
-✅ Gemini CLI
-✅ GitHub Copilot
-✅ Universal prompts
-
-📖 See release notes: [link]
-```
-
-## Troubleshooting
-
-**Q: Version not detected?**
-```bash
-# Verify version consistency
-jq '.metadata.version' .claude-plugin/marketplace.json
-jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json
-```
-
-**Q: Tests failing?**
-```bash
-# Run locally
-npm test
-node scripts/test-skills.js
-```
-
-**Q: Artifacts not created?**
-```bash
-# Check GitHub Actions logs:
-# https://github.com/yennanliu/InvestSkill/actions
-```
-
-**Q: Deployment record missing?**
-```bash
-# Manual update:
-node scripts/record-deploy.js
-```
+**Version drift reported by `npm test`:** one of the three manifests was edited by hand. Set all three to the same value (or let `npm run release` do it).
 
 ## Script Reference
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
-| `scripts/test-skills.js` | Unit tests | `node scripts/test-skills.js` |
-| `scripts/publish-cursor-rules.js` | Cursor publishing | Auto (in CI) |
-| `scripts/publish-gemini.js` | Gemini publishing | Auto (in CI) |
-| `scripts/generate-platform-release-notes.js` | Release notes | Auto (in CI) |
-| `scripts/record-deploy.js` | Deployment record | Auto (in CI) |
+| Command | What it does |
+|---------|--------------|
+| `npm run release` | Interactive release (`scripts/release-interactive.js`) |
+| `npm run release:dry-run` | Preview without changing anything (`scripts/release-dry-run.js`) |
+| `npm run pre-release` | `pre-release-check` + `validate` + `npm test` |
+| `npm test` | Every offline suite: structure and counts, skill contract, prompt sync, LLM I/O, EDGAR helpers, install script |
 
-## Advanced: Enable Registry Publishing
-
-To publish directly to platform registries:
-
-```bash
-# Add GitHub Secrets:
-CURSOR_REGISTRY_TOKEN=<token>
-GEMINI_REGISTRY_TOKEN=<token>
-GEMINI_REGISTRY_URL=<url>
-
-# Then releases publish to registries automatically
-```
-
-See [CI-CD-GUIDE.md](CI-CD-GUIDE.md) for details.
-
-## Need Help?
-
-1. **Read** [CI-CD-GUIDE.md](CI-CD-GUIDE.md) for complete documentation
-2. **Check** GitHub Actions logs
-3. **Review** workflow files in `.github/workflows/`
-4. **Open** an issue on GitHub
-
----
-
-**Quick Links**:
-- 📖 [Full CI/CD Guide](CI-CD-GUIDE.md)
-- 🚀 [Releases Page](https://github.com/yennanliu/InvestSkill/releases)
-- 📊 [Deployment History](DEPLOYMENTS.md)
-- ⚙️ [GitHub Actions](https://github.com/yennanliu/InvestSkill/actions)
+See [CI-CD-GUIDE.md](CI-CD-GUIDE.md) for every workflow.

@@ -110,6 +110,22 @@ for (const [name, text, opts, expected] of MUTATIONS) {
   const r = sb.validateOutput(text, opts);
   check(!r.ok && r.issues.some(i => i.includes(expected)), `${name} → fails with "${expected}"`, r.issues);
 }
+// JSON footer: optional (older outputs pass without it, with a warning), but when present it must agree with the box.
+{
+  const parsed = sb.parseSignalBlock(base);
+  const footer = obj => `${parsed.raw}\n\n\`\`\`json\n${JSON.stringify(obj)}\n\`\`\``;
+  const good = { investskill: '1', skill: 'stock-eval', ticker: 'MSFT', as_of: '2026-10-09', signal: parsed.signal, confidence: parsed.confidence, horizon: parsed.horizon, score: parsed.score, action: parsed.action, conviction: parsed.conviction, retrieval: 'pasted by user', sources: ['SEC EDGAR 10-K FY2026'] };
+  const withFooter = base.replace(parsed.raw, footer(good));
+  let r = sb.validateOutput(withFooter, { skill: 'stock-eval' });
+  check(r.ok && r.footer && r.footer.score === parsed.score && !r.warnings.some(w => w.includes('JSON footer')), 'JSON footer that matches the box → passes and is parsed', r.issues.concat(r.warnings));
+  check(sb.validateOutput(base).warnings.some(w => w.includes('no JSON footer')), 'no JSON footer → a warning, not a failure (pre-footer outputs stay valid)');
+  r = sb.validateOutput(base.replace(parsed.raw, footer({ ...good, score: parsed.score + 2 })));
+  check(!r.ok && r.issues.some(i => i.includes('JSON footer score')), 'JSON footer score that disagrees with the box → fails', r.issues);
+  r = sb.validateOutput(base.replace(parsed.raw, footer({ ...good, signal: 'BULLISH' === parsed.signal ? 'BEARISH' : 'BULLISH' })));
+  check(!r.ok && r.issues.some(i => i.includes('JSON footer signal')), 'JSON footer signal that disagrees with the box → fails', r.issues);
+  r = sb.validateOutput(base.replace(parsed.raw, `${parsed.raw}\n\n\`\`\`json\n{"investskill": "1", "score": 5.5,}\n\`\`\``));
+  check(!r.ok && r.issues.some(i => i.includes('not valid JSON')), 'JSON footer that is not valid JSON → fails', r.issues);
+}
 const verifiedNeutral = setField(base, 'Score', '7.1 / 10');
 check(sb.validateOutput(verifiedNeutral, { skill: 'fact-check' }).ok, 'fact-check: Verification Score 7.1 with a mirrored NEUTRAL passes (skill rule, not the Score Guide)');
 check(!sb.validateOutput(verifiedNeutral).ok, '…and the same box fails for an analysis skill (score → signal mapping)');

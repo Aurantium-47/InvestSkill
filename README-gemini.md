@@ -1,376 +1,150 @@
 # InvestSkill for Gemini CLI
 
-Professional investment analysis prompts for Gemini CLI. 21 universal frameworks for comprehensive stock market evaluation.
+Professional investment analysis prompts for Gemini CLI: 34 analysis frameworks as universal prompts, plus 3 aliases and the `report-generator` output tool.
 
-**For multi-platform setup**, see [README.md](README.md)
+**For other platforms**, see [README.md](README.md).
 
 ---
 
 ## Quick Start
 
-### Installation — one command
+### Install — one command
+
+Run this in the directory where you start `gemini`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yennanliu/InvestSkill/main/install.sh | bash -s -- -a gemini
 ```
 
-Appends an InvestSkill block to `GEMINI.md` (your existing content is kept) and installs the frameworks into `.investskill/prompts/`.
+It appends an InvestSkill block to `GEMINI.md` (your existing content is kept; re-running is a no-op) and copies every framework into `.investskill/prompts/`. Add `-g` to install for your user instead of one project.
 
-### Installation — clone the repo
-
-Gemini CLI automatically loads `GEMINI.md` when you run it in the project directory.
+### Or work inside a clone of the repo
 
 ```bash
-# Navigate to InvestSkill
-cd /path/to/InvestSkill
-
-# Start Gemini CLI
+git clone https://github.com/yennanliu/InvestSkill.git
+cd InvestSkill
 gemini
-
-# GEMINI.md auto-loaded!
 ```
 
-### First Analysis
+The repo's own `GEMINI.md` auto-loads and the prompts are in `prompts/` — use `@prompts/<name>.md` instead of `@.investskill/prompts/<name>.md` in the examples below.
 
-In Gemini CLI:
-
-```
-> @prompts/stock-eval.md Evaluate Apple (AAPL)
-```
-
-Or reference directly:
+### First analysis
 
 ```
-> @prompts/stock-valuation.md What's a fair valuation for Microsoft?
+> @.investskill/prompts/stock-eval.md Evaluate Apple (AAPL)
+```
+
+Or just ask — `GEMINI.md` tells Gemini the frameworks exist:
+
+```
+> Use the stock-valuation framework: what's a fair value for Microsoft?
 ```
 
 ---
 
-## All 21 Frameworks
+## All Frameworks
 
-### Core Analysis (6)
-```
-@prompts/stock-eval.md                  # Stock evaluation with quality scoring
-@prompts/stock-valuation.md             # Multi-method valuation (DCF + comps + EV)
-@prompts/fundamental-analysis.md        # Financial statement analysis
-@prompts/technical-analysis.md          # Chart patterns and indicators
-@prompts/dcf-valuation.md              # DCF intrinsic value model
-@prompts/economics-analysis.md          # Macro indicators and recession risk
-```
+### Core Stock Analysis (5)
+| Framework | Usage |
+|-----------|-------|
+| Stock Evaluation | `@.investskill/prompts/stock-eval.md AAPL` |
+| Technical Analysis | `@.investskill/prompts/technical-analysis.md TSLA` |
+| Stock Valuation | `@.investskill/prompts/stock-valuation.md MSFT` |
+| Economics Analysis | `@.investskill/prompts/economics-analysis.md` |
+| Head-to-Head Compare | `@.investskill/prompts/compare.md AAPL MSFT GOOGL` |
 
-### Financial Reports (3)
-```
-@prompts/financial-report-analyst.md    # 10-K, 10-Q, annual report analysis
-@prompts/10k-digest.md                  # Structured digest doc (EN or 繁體中文)
-@prompts/earnings-call-analysis.md      # Earnings call sentiment and themes
-```
+### Financial Reports (5)
+| Framework | Usage |
+|-----------|-------|
+| Financial Report Analyst | `@.investskill/prompts/financial-report-analyst.md AAPL 10-K` |
+| 10-K Digest | `@.investskill/prompts/10k-digest.md AAPL FY2024 --lang zh-TW` |
+| Earnings Call Analysis | `@.investskill/prompts/earnings-call-analysis.md AAPL` + transcript |
+| Forensic Accounting | `@.investskill/prompts/forensic-accounting.md XYZ` |
+| Credit Check | `@.investskill/prompts/credit-check.md XYZ` |
 
 ### Market Monitoring (4)
-```
-@prompts/insider-trading.md             # SEC Form 4 insider activity
-@prompts/institutional-ownership.md     # 13F institutional holdings tracking
-@prompts/dividend-analysis.md           # Dividend safety and yield analysis
-@prompts/short-interest.md              # Short squeeze potential
-```
+| Framework | Usage |
+|-----------|-------|
+| Insider Trading | `@.investskill/prompts/insider-trading.md TSLA` |
+| Institutional Ownership | `@.investskill/prompts/institutional-ownership.md META` |
+| Dividend Analysis | `@.investskill/prompts/dividend-analysis.md JNJ` |
+| Short Interest | `@.investskill/prompts/short-interest.md GME` |
 
-### Advanced Analysis (4)
-```
-@prompts/competitor-analysis.md         # Economic moat and Porter's Five Forces
-@prompts/options-analysis.md            # Options strategy selection
-@prompts/portfolio-review.md            # Portfolio allocation and optimization
-@prompts/sector-analysis.md             # Sector rotation opportunities
-```
+### Advanced Research (15)
+| Framework | Usage |
+|-----------|-------|
+| Competitor Analysis | `@.investskill/prompts/competitor-analysis.md AAPL` |
+| Industry Map | `@.investskill/prompts/industry-map.md "AI compute"` |
+| Options Analysis | `@.investskill/prompts/options-analysis.md AAPL` |
+| Portfolio Review | `@.investskill/prompts/portfolio-review.md` + holdings |
+| Sector Analysis | `@.investskill/prompts/sector-analysis.md` |
+| Stock Screener | `@.investskill/prompts/stock-screener.md AAPL,MSFT,NVDA,AMD` |
+| Catalyst Calendar | `@.investskill/prompts/catalyst-calendar.md NVDA` |
+| Bear Case | `@.investskill/prompts/bear-case.md TSLA` |
+| Position Ladder | `@.investskill/prompts/position-ladder.md NVDA` |
+| Thesis Tracker | `@.investskill/prompts/thesis-tracker.md AAPL` |
+| ETF Analysis | `@.investskill/prompts/etf-analysis.md VOO` |
+| Earnings Preview | `@.investskill/prompts/earnings-preview.md AAPL` |
+| Tax Lens | `@.investskill/prompts/tax-lens.md` + position or portfolio |
+| Risk Stress Test | `@.investskill/prompts/risk-stress-test.md` + holdings |
+| Trade Post-Mortem | `@.investskill/prompts/trade-postmortem.md` + closed trade(s) |
 
-### Comprehensive Research (3)
-```
-@prompts/research-bundle.md             # All frameworks combined
-@prompts/full-report.md                 # Interactive HTML report generation
-```
+### Meta & Output (5 + 1 output tool)
+| Framework | Usage |
+|-----------|-------|
+| Full Report | `@.investskill/prompts/full-report.md AAPL --depth standard` |
+| Chart Master | `@.investskill/prompts/chart-master.md` + data |
+| Result Validator | `@.investskill/prompts/result-validator.md` + an analysis |
+| Fact-Check | `@.investskill/prompts/fact-check.md` + a report |
+| Learning Coach | `@.investskill/prompts/learning-coach.md` + an analysis |
+| Report Generator (output tool) | `@.investskill/prompts/report-generator.md` + an analysis |
 
-### Meta-Analysis (3)
-```
-@prompts/result-validator.md            # Analysis confidence scoring
-@prompts/chart-master.md                # Data visualization
-@prompts/report-generator.md            # HTML/PDF report export
-```
+### Aliases (3, not counted as frameworks)
+`fundamental-analysis` → `stock-eval` · `dcf-valuation` → `stock-valuation` · `research-bundle` → `full-report`. They still work, but use the target skill for new work.
 
 ---
 
 ## Usage Examples
 
-### Basic Stock Analysis
-
+**Paste your own data** (the most accurate way to work):
 ```
-# Stock evaluation
-> @prompts/stock-eval.md Evaluate Apple (AAPL) using Piotroski F-Score
-
-# Valuation analysis
-> @prompts/stock-valuation.md What's a fair valuation for Microsoft?
-
-# Fundamental deep dive
-> @prompts/fundamental-analysis.md Deep analysis of NVIDIA's financials
-
-# Technical setup
-> @prompts/technical-analysis.md What are Tesla's key technical levels?
-
-# Economic context
-> @prompts/economics-analysis.md Is a recession likely in the next 12 months?
-```
-
-### Financial Data Analysis
-
-**Analyze 10-K filing:**
-```
-> @prompts/financial-report-analyst.md
+> @.investskill/prompts/financial-report-analyst.md
 [paste 10-K text here]
-
 Extract key accounting red flags and management quality indicators
 ```
 
-**Analyze earnings transcript:**
+**Earnings season:**
 ```
-> @prompts/earnings-call-analysis.md
-[paste earnings call transcript]
-
-What's the management tone and guidance outlook?
+> @.investskill/prompts/earnings-preview.md NVDA — what does the price already assume?
+> @.investskill/prompts/earnings-call-analysis.md [paste transcript] What's the guidance tone?
 ```
 
-**Review portfolio:**
+**Compare and rank:**
 ```
-> @prompts/portfolio-review.md
-AAPL: 30%
-MSFT: 25%
-NVDA: 20%
-JNJ: 15%
-TSLA: 10%
-
-Is my allocation optimal?
+> @.investskill/prompts/compare.md AAPL MSFT GOOGL
+> @.investskill/prompts/stock-screener.md AAPL,MSFT,GOOGL,AMZN,META,NVDA
 ```
 
-### Stock Comparison
-
+**One report:**
 ```
-# Compare valuations
-> @prompts/stock-valuation.md Compare AAPL vs MSFT valuations
-
-# Compare fundamentals
-> @prompts/fundamental-analysis.md Compare AAPL and MSFT balance sheets
-
-# Multi-stock research
-> @prompts/research-bundle.md Provide comprehensive analysis and comparison:
-- AAPL
-- MSFT
-- GOOGL
+> @.investskill/prompts/full-report.md AAPL --depth quick
 ```
 
-### Specialized Analysis
-
+**Chain frameworks and follow up:**
 ```
-# Dividend safety
-> @prompts/dividend-analysis.md Is the JNJ dividend safe?
-
-# Short squeeze
-> @prompts/short-interest.md What's the short squeeze potential in GME?
-
-# Options strategy
-> @prompts/options-analysis.md Find bullish option strategies for AAPL earnings
-
-# Competitive moat
-> @prompts/competitor-analysis.md Does Apple have a defensible moat?
-
-# Insider activity
-> @prompts/insider-trading.md What are insiders buying at Tesla?
-
-# Smart money tracking
-> @prompts/institutional-ownership.md Which institutions are rotating into tech?
-
-# Sector opportunities
-> @prompts/sector-analysis.md Which sectors should I rotate into?
+> @.investskill/prompts/stock-eval.md NVDA
+> Now apply @.investskill/prompts/bear-case.md to the same company
+> What would have to be true for the bear case to be wrong?
 ```
 
-### Full Research Bundle
-
-```
-# Complete analysis (all frameworks)
-> @prompts/research-bundle.md Provide complete analysis on Apple (AAPL)
-
-# Quick version
-> @prompts/research-bundle.md Quick analysis of Microsoft (MSFT)
-
-# Multi-stock comparison
-> @prompts/research-bundle.md Compare AAPL, MSFT, and GOOGL comprehensively
-```
-
----
-
-## Features
-
-✅ **18 Professional Analysis Frameworks**
-- Universal prompts (AI-agnostic)
-- No Gemini-specific syntax needed
-- Works with any AI model via Gemini CLI
-
-✅ **File Reference Support**
-- Use `@prompts/<name>.md` syntax
-- Auto-loads from project directory
-- Supports all 18 analysis types
-
-✅ **Financial Data Integration**
-- Paste SEC filings (10-K, 10-Q)
-- Paste earnings transcripts
-- Paste financial statements
-- Reference documents inline
-
-✅ **Session Memory**
-- Gemini CLI remembers conversation context
-- Ask follow-up questions naturally
-- Multi-turn analysis chains
-
-✅ **Model Agnostic**
-- Works with all Gemini models
-- Works with any Claude model
-- Works with any AI accessible via Gemini CLI
-
----
-
-## Installation & Troubleshooting
-
-### Verify Installation
-
-Check Gemini CLI is installed:
-```bash
-gemini --version
-```
-
-Check InvestSkill is accessible:
-```bash
-ls GEMINI.md     # Should exist
-ls prompts/      # Should have 18 files
-```
-
-### Common Issues
-
-**Prompts not found:**
-```bash
-# Make sure you're in InvestSkill directory
-pwd  # Should end with InvestSkill
-
-# Verify prompts/ directory
-ls prompts/ | wc -l  # Should show 17 (report-generator excluded)
-
-# Start fresh
-gemini
-```
-
-**@prompts/ references not working:**
-```bash
-# Verify file path
-ls prompts/stock-valuation.md  # Should exist
-
-# Check GEMINI.md exists
-ls GEMINI.md
-
-# Restart Gemini
-gemini
-```
-
-**Gemini CLI not installed:**
-```bash
-# Install via npm
-npm install -g @google/gemini-cli
-
-# Or check official docs
-# https://gemini.ai
-```
-
----
-
-## Advanced Usage
-
-### Multi-Framework Analysis
-
-Run multiple analyses in sequence:
-
-```
-> @prompts/stock-eval.md for NVDA
-
-> @prompts/technical-analysis.md for NVDA  
-
-> @prompts/institutional-ownership.md for NVDA
-
-Synthesize findings into consolidated investment view
-```
-
-### Scenario Analysis
-
-Ask follow-up questions within conversation:
-
-```
-> @prompts/dcf-valuation.md Build a DCF model for Microsoft
-
-Follow-up questions (in same session):
-> What if revenue growth slows to 8%?
-> How sensitive is valuation to WACC?
-> What's the downside case?
-> What's the bull/bear range?
-```
-
-### Custom Analysis Chains
-
-Build complete due diligence workflow:
-
-```
-> @prompts/stock-eval.md Quality evaluation for AAPL
-
-> @prompts/fundamental-analysis.md Financial analysis for AAPL
-
-> @prompts/technical-analysis.md Technical setup for AAPL
-
-> @prompts/stock-valuation.md Valuation for AAPL
-
-> @prompts/competitor-analysis.md Competitive moat for AAPL
-
-Provide integrated investment thesis
-```
-
-### Batch Analysis
-
-Analyze multiple companies:
-
-```
-> @prompts/research-bundle.md Analyze and compare:
-AAPL
-MSFT
-GOOGL
-NVDA
-
-Focus on valuation and competitive positioning
-```
+More recipes for every skill: the [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html).
 
 ---
 
 ## Output Format
 
-All analyses include:
+Every analysis opens with a **Data & Sources** header (as-of date, source, retrieval path, confidence) and ends with the standard Investment Signal block:
 
-### 1. Executive Summary
-- Key findings and thesis
-- Primary drivers (bullish/bearish)
-- Time horizon
-
-### 2. Quantitative Analysis
-- Specific metrics and numbers
-- Year-over-year comparisons
-- Industry benchmarking
-- Valuation multiples
-
-### 3. Qualitative Assessment
-- Management quality
-- Competitive positioning
-- Market opportunity
-- Risk factors
-
-### 4. Investment Signal Block
 ```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -387,146 +161,28 @@ All analyses include:
 
 ---
 
-## Tips & Best Practices
+## Troubleshooting
 
-### 1. Use File References
-```
-# Most reliable
-> @prompts/stock-valuation.md Analyze AAPL
+**`GEMINI.md` not loading?** Gemini CLI reads it from the directory you start in — `cd` to the project first, check the file is there (`head -20 GEMINI.md`), then restart `gemini`.
 
-# Also works (natural language)
-> What's the valuation for Apple?
-```
+**`@` references not resolving?** After `install.sh` the prompts live in `.investskill/prompts/` (`ls .investskill/prompts`); inside a repo clone they are in `prompts/`. File names use hyphens.
 
-### 2. Provide Context Data
-```
-> @prompts/dcf-valuation.md
-Analyze MSFT assuming:
-- Revenue growth: 10% CAGR
-- WACC: 8.5%
-- Terminal growth: 2.5%
-- Current price: $450/share
-```
+**Gemini CLI not installed?** See the official [Gemini CLI repository](https://github.com/google-gemini/gemini-cli).
 
-### 3. Paste Financial Data
-```
-> @prompts/fundamental-analysis.md
-[paste balance sheet and income statement]
+**Updating:** re-run the install command; it refreshes `.investskill/prompts/`.
 
-Analyze financial quality and trends
-```
-
-### 4. Chain Multiple Analyses
-```
-# Start first analysis
-> @prompts/stock-eval.md Evaluate NVDA quality
-
-# Add follow-up
-> Then @prompts/technical-analysis.md for NVDA chart patterns
-
-# Add more
-> Also @prompts/institutional-ownership.md for smart money positioning
-```
-
-### 5. Ask Follow-Up Questions
-Gemini CLI remembers conversation context:
-
-```
-> @prompts/stock-valuation.md Value Microsoft
-
-> What if cloud revenue growth slows?
-> How sensitive is valuation to margin assumptions?
-> What's the downside scenario?
-```
+More answers in the [FAQ](FAQ.md).
 
 ---
 
-## CLI Tips
+## More
 
-### Navigation
-```bash
-# See available prompts
-ls prompts/
-
-# View a specific prompt
-cat prompts/stock-valuation.md
-
-# Check line count
-wc -l prompts/*.md
-```
-
-### Piping to Other Tools
-```bash
-# Save analysis to file
-# In Gemini: > @prompts/stock-eval.md AAPL
-# Then: copy output to file.txt
-
-# Search output
-# grep "BULLISH" output.txt
-```
+- [README.md](README.md) — all platforms
+- [PLATFORM-COMPATIBILITY.md](PLATFORM-COMPATIBILITY.md) — feature matrix
+- [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) — walkthroughs and examples
+- [CHANGELOG.md](CHANGELOG.md) — what's new in each version
+- Issues: https://github.com/yennanliu/InvestSkill/issues · Discussions: https://github.com/yennanliu/InvestSkill/discussions
 
 ---
 
-## Documentation
-
-### Gemini Specific
-- This file (README-gemini.md)
-- [GEMINI.md](GEMINI.md) — Project instructions
-
-### All Platforms
-- [README.md](README.md) — Complete setup for all 5 platforms
-- [PLATFORM-COMPATIBILITY.md](PLATFORM-COMPATIBILITY.md) — Feature comparison
-- [CI-CD-GUIDE.md](CI-CD-GUIDE.md) — Release automation
-
-### Examples & Learning
-- [COOKBOOK.md](site/content/COOKBOOK.md) — Walkthroughs and examples
-- [CHANGELOG.md](CHANGELOG.md) — Feature updates
-- `prompts/` — Individual framework files
-
----
-
-## Support & Feedback
-
-### Report Issues
-- GitHub Issues: https://github.com/yennanliu/InvestSkill/issues
-- GitHub Discussions: https://github.com/yennanliu/InvestSkill/discussions
-
-### Feature Requests
-Open an issue with:
-- What analysis would help
-- Your use case
-- Example scenario
-
-### Troubleshooting
-
-**Gemini not responding:**
-- Check internet connection
-- Verify Gemini CLI is running
-- Try simpler prompt first
-
-**Prompts too long:**
-- Use specific sections
-- Break into multiple queries
-- Check token limits
-
----
-
-## Legal Disclaimer
-
-This toolkit provides **educational analysis only** and does **NOT constitute financial advice**.
-
-Always:
-- ✅ Consult qualified financial advisors
-- ✅ Do your own research (DYOR)
-- ✅ Verify analysis independently
-- ✅ Consider your risk tolerance
-
-Past performance does not guarantee future results.
-
----
-
-## More Information
-
-For complete documentation covering all platforms (Claude Code, Cursor, Copilot, Universal), see:
-
-📖 **[README.md](README.md)**
+**Educational analysis only — not financial advice.** Consult a qualified advisor, do your own research, and verify the analysis independently.

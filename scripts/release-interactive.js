@@ -1,281 +1,102 @@
 #!/usr/bin/env node
 /**
- * release-interactive.js
- * Interactive CLI for releasing new versions
- * Guides users through the release process with prompts
+ * release-interactive.js — cut a release: bump, stamp, commit, tag, push.
  *
- * Usage:
- *   node scripts/release-interactive.js
+ *   npm run release                         # asks for the release type, confirms each step
+ *   node scripts/release-interactive.js --type minor [--yes] [--no-push] [--skip-tests]
+ *
+ * What it does (CLAUDE.md › Version Consistency + Release Timing rules):
+ *   1. refuses unless the tree is clean, the branch is main, and main is up to
+ *      date with origin; [Unreleased] in CHANGELOG.md must have entries
+ *   2. runs `npm run pre-release` (pre-release-check + validate + npm test)
+ *   3. writes the new version into plugin.json, marketplace.json (metadata +
+ *      plugin entry) and package.json; turns [Unreleased] into
+ *      "## [X.Y.Z] - <today>"
+ *   4. commits "chore(release): vX.Y.Z" and creates the annotated tag vX.Y.Z
+ *   5. pushes main and the tag (asks first unless --yes; --no-push stops here)
+ *
+ * Pushing the tag triggers .github/workflows/release.yml, which re-runs the
+ * tests, packages the plugin and publishes the GitHub Release from the
+ * CHANGELOG section. Preview everything first with `npm run release:dry-run`.
  */
-
-const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const readline = require('readline');
+const rel = require('./lib/release');
 
 const ROOT = path.resolve(__dirname, '..');
+const argv = process.argv.slice(2);
+const flag = k => { const i = argv.indexOf(`--${k}`); return i >= 0 ? argv[i + 1] : undefined; };
+const has = k => argv.includes(`--${k}`);
 
-// Color codes for terminal output
-const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  red: '\x1b[31m',
-};
+const c = { reset: '\x1b[0m', bright: '\x1b[1m', green: '\x1b[32m', yellow: '\x1b[33m', blue: '\x1b[34m', red: '\x1b[31m' };
+const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim();
+const die = msg => { console.error(`\n${c.red}✗ ${msg}${c.reset}\n`); process.exit(1); };
+const step = msg => console.log(`\n${c.blue}▸ ${msg}${c.reset}`);
+const ok = msg => console.log(`${c.green}✓${c.reset} ${msg}`);
 
-/**
- * Create readline interface for user input
- */
-function createReader() {
-  return readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
+function ask(question) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise(resolve => rl.question(`${c.blue}?${c.reset} ${question} `, a => { rl.close(); resolve(a.trim()); }));
 }
+const confirm = async q => has('yes') || /^y(es)?$/i.test(await ask(`${q} (y/n)`));
 
-/**
- * Ask user a yes/no question
- */
-async function askYesNo(question) {
-  const rl = createReader();
-  return new Promise(resolve => {
-    rl.question(`${colors.blue}?${colors.reset} ${question} (y/n) `, answer => {
-      rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-    });
-  });
-}
-
-/**
- * Ask user to choose from options
- */
-async function askChoice(question, options) {
-  const rl = createReader();
-  return new Promise(resolve => {
-    console.log(`\n${colors.blue}?${colors.reset} ${question}`);
-    options.forEach((opt, idx) => {
-      console.log(`  ${idx + 1}) ${opt}`);
-    });
-
-    rl.question('\nEnter choice (1-' + options.length + '): ', answer => {
-      rl.close();
-      const idx = parseInt(answer) - 1;
-      resolve(idx >= 0 && idx < options.length ? options[idx] : null);
-    });
-  });
-}
-
-/**
- * Ask user for text input
- */
-async function askText(question) {
-  const rl = createReader();
-  return new Promise(resolve => {
-    rl.question(`${colors.blue}?${colors.reset} ${question}\n> `, answer => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
-
-/**
- * Get current version
- */
-function getCurrentVersion() {
-  const marketplacePath = path.join(ROOT, '.claude-plugin/marketplace.json');
-  const marketplace = JSON.parse(fs.readFileSync(marketplacePath, 'utf8'));
-  return marketplace.metadata.version;
-}
-
-/**
- * Increment version
- */
-function incrementVersion(version, type) {
-  const parts = version.split('.');
-  let major = parseInt(parts[0]);
-  let minor = parseInt(parts[1]);
-  let patch = parseInt(parts[2]);
-
-  switch (type) {
-    case 'major':
-      major++;
-      minor = 0;
-      patch = 0;
-      break;
-    case 'minor':
-      minor++;
-      patch = 0;
-      break;
-    case 'patch':
-      patch++;
-      break;
-  }
-
-  return `${major}.${minor}.${patch}`;
-}
-
-/**
- * Check if version is prerelease (beta, rc, alpha)
- */
-function isPrereleaseVersion(version) {
-  return /-(alpha|beta|rc)/.test(version);
-}
-
-/**
- * Validate input
- */
-function validateVersion(version) {
-  return /^\d+\.\d+\.\d+/.test(version);
-}
-
-/**
- * Show git status
- */
-function showGitStatus() {
-  try {
-    const status = execSync('git status --short', { cwd: ROOT }).toString();
-    if (status) {
-      console.log(`\n${colors.yellow}⚠️  Uncommitted changes:${colors.reset}`);
-      console.log(status);
-      return false;
-    }
-    console.log(`\n${colors.green}✓${colors.reset} Working directory clean`);
-    return true;
-  } catch (err) {
-    console.error('Error checking git status:', err.message);
-    return false;
-  }
-}
-
-/**
- * Show what would be changed
- */
-function showReleasePreview(newVersion, type, description) {
-  console.log(`\n${colors.bright}Release Preview${colors.reset}`);
-  console.log('═'.repeat(50));
-  console.log(`Version:     ${colors.green}${newVersion}${colors.reset}`);
-  console.log(`Type:        ${type}`);
-  console.log(`Prerelease:  ${isPrereleaseVersion(newVersion) ? colors.yellow + 'yes' + colors.reset : 'no'}`);
-  console.log(`Description: ${description}`);
-  console.log('');
-  console.log('Files that will be updated:');
-  console.log('  • .claude-plugin/marketplace.json');
-  console.log('  • plugins/us-stock-analysis/.claude-plugin/plugin.json');
-  console.log('  • CHANGELOG.md');
-  console.log('  • README.md');
-  console.log('  • README-*.md');
-  console.log('');
-  console.log('Actions that will be performed:');
-  console.log('  1. Update version in all config files');
-  console.log('  2. Create git commit with version bump');
-  console.log('  3. Create git tag (v' + newVersion + ')');
-  console.log('  4. Push to origin/main');
-  console.log('  5. Trigger auto-deploy workflow');
-  console.log('═'.repeat(50));
-}
-
-/**
- * Main interactive flow
- */
 async function main() {
-  console.log(`\n${colors.bright}${colors.green}🚀 InvestSkill Release Manager${colors.reset}`);
-  console.log('═'.repeat(50));
+  console.log(`\n${c.bright}InvestSkill release${c.reset}`);
+  const current = rel.currentVersion(ROOT);
+  console.log(`Current version: ${c.green}${current}${c.reset}`);
 
-  const currentVersion = getCurrentVersion();
-  console.log(`Current version: ${colors.green}${currentVersion}${colors.reset}`);
-  console.log('');
+  step('Preconditions');
+  if (git('status', '--porcelain')) die('working tree is not clean — commit or stash first');
+  const branch = git('rev-parse', '--abbrev-ref', 'HEAD');
+  if (branch !== 'main') die(`releases are cut from main (on "${branch}") — merge the PR first`);
+  git('fetch', '--quiet', 'origin', 'main', '--tags');
+  if (git('rev-parse', 'HEAD') !== git('rev-parse', 'origin/main')) die('main is not identical to origin/main — pull or push first');
+  const notes = rel.unreleasedNotes(require('fs').readFileSync(path.join(ROOT, 'CHANGELOG.md'), 'utf8'));
+  if (!notes) die('CHANGELOG.md [Unreleased] is empty — nothing to release');
+  ok(`clean main at ${git('rev-parse', '--short', 'HEAD')}, [Unreleased] has ${notes.split('\n').filter(l => /^- /.test(l)).length} entries`);
 
-  // Step 1: Check git status
-  console.log(`${colors.blue}Step 1: Checking git status...${colors.reset}`);
-  const gitClean = showGitStatus();
-  if (!gitClean) {
-    const proceed = await askYesNo('Proceed with uncommitted changes?');
-    if (!proceed) {
-      console.log(`${colors.yellow}Release cancelled.${colors.reset}`);
-      process.exit(0);
-    }
+  let type = flag('type');
+  if (!type) {
+    console.log('\n  patch — fixes, doc/site tweaks, prompt refinements');
+    console.log('  minor — a new skill or a meaningful new capability');
+    console.log('  major — breaking changes to skill names, output contracts or layout');
+    type = await ask('Release type (patch / minor / major / beta / rc, or an exact version):');
+  }
+  let version;
+  try { version = rel.nextVersion(current, type); } catch (e) { die(e.message); }
+  const tag = `v${version}`;
+  if (git('tag', '-l', tag)) die(`tag ${tag} already exists`);
+  const date = rel.today();
+  console.log(`\n  ${current} → ${c.green}${version}${c.reset}  ·  CHANGELOG [${version}] - ${date}  ·  tag ${tag}`);
+  if (!(await confirm('Proceed?'))) die('cancelled');
+
+  if (!has('skip-tests')) {
+    step('npm run pre-release');
+    try { execFileSync('npm', ['run', 'pre-release', '--silent'], { cwd: ROOT, stdio: 'inherit' }); } catch { die('pre-release checks failed — nothing was changed'); }
   }
 
-  // Step 2: Choose release type
-  console.log(`\n${colors.blue}Step 2: What type of release?${colors.reset}`);
-  const releaseType = await askChoice('Release type', [
-    'Major (1.0.0 → 2.0.0)',
-    'Minor (1.4.0 → 1.5.0)',
-    'Patch (1.4.0 → 1.4.1)',
-    'Prerelease Beta (1.4.0 → 1.4.0-beta.1)',
-    'Prerelease RC (1.4.0 → 1.4.0-rc.1)',
-  ]);
+  step('Bump and stamp');
+  const files = [...rel.bumpManifests(ROOT, version), rel.releaseChangelog(ROOT, version, date)];
+  files.forEach(f => ok(f));
 
-  if (!releaseType) {
-    console.log(`${colors.red}Invalid selection.${colors.reset}`);
-    process.exit(1);
+  step('Commit and tag');
+  git('add', ...files);
+  git('commit', '-m', `chore(release): ${tag}`);
+  git('tag', '-a', tag, '-m', `InvestSkill ${tag}`);
+  ok(`commit ${git('rev-parse', '--short', 'HEAD')} and tag ${tag}`);
+
+  if (has('no-push')) {
+    console.log(`\n${c.yellow}Not pushed.${c.reset} When ready: git push origin main ${tag}`);
+    return;
   }
-
-  let versionType = 'patch';
-  let suggestedVersion = incrementVersion(currentVersion, versionType);
-
-  if (releaseType.includes('Major')) {
-    versionType = 'major';
-    suggestedVersion = incrementVersion(currentVersion, versionType);
-  } else if (releaseType.includes('Minor')) {
-    versionType = 'minor';
-    suggestedVersion = incrementVersion(currentVersion, versionType);
-  } else if (releaseType.includes('Beta')) {
-    suggestedVersion = currentVersion + '-beta.1';
-  } else if (releaseType.includes('RC')) {
-    suggestedVersion = currentVersion + '-rc.1';
+  if (!(await confirm(`Push main and ${tag} to origin? (this publishes the release)`))) {
+    console.log(`\n${c.yellow}Not pushed.${c.reset} When ready: git push origin main ${tag}`);
+    return;
   }
-
-  // Step 3: Confirm version or enter custom
-  console.log(`\n${colors.blue}Step 3: Version number${colors.reset}`);
-  const useDefault = await askYesNo(`Use suggested version ${colors.green}${suggestedVersion}${colors.reset}?`);
-  let newVersion = suggestedVersion;
-
-  if (!useDefault) {
-    newVersion = await askText('Enter version number');
-    if (!validateVersion(newVersion)) {
-      console.log(`${colors.red}Invalid version format. Use: 1.4.0 or 1.4.0-beta.1${colors.reset}`);
-      process.exit(1);
-    }
-  }
-
-  // Step 4: Enter description
-  console.log(`\n${colors.blue}Step 4: Describe the changes${colors.reset}`);
-  const description = await askText('Brief description of changes (optional)');
-
-  // Step 5: Review and confirm
-  console.log(`\n${colors.blue}Step 5: Review release${colors.reset}`);
-  showReleasePreview(newVersion, versionType, description || '(none)');
-
-  const confirm = await askYesNo(`\n${colors.bright}Ready to release v${newVersion}?${colors.reset}`);
-  if (!confirm) {
-    console.log(`${colors.yellow}Release cancelled.${colors.reset}`);
-    process.exit(0);
-  }
-
-  // Step 6: Execute release
-  console.log(`\n${colors.blue}Step 6: Executing release...${colors.reset}`);
-  console.log(`${colors.green}✓${colors.reset} Version bumped to ${colors.green}${newVersion}${colors.reset}`);
-  console.log(`${colors.green}✓${colors.reset} Git commit created`);
-  console.log(`${colors.green}✓${colors.reset} Git tag created (v${newVersion})`);
-  console.log(`${colors.green}✓${colors.reset} Pushed to origin/main`);
-  console.log(`${colors.green}✓${colors.reset} Auto-deploy triggered`);
-
-  console.log(`\n${colors.bright}${colors.green}✨ Release v${newVersion} initiated!${colors.reset}`);
-  console.log('');
-  console.log('What happens next:');
-  console.log('  1. Test Suite runs (validate.yml)');
-  console.log('  2. If tests pass, auto-deploy triggers');
-  console.log('  3. Release published to all platforms');
-  console.log('  4. GitHub Release created with artifacts');
-  console.log('');
-  console.log(`Check progress: ${colors.blue}https://github.com/yennanliu/InvestSkill/actions${colors.reset}`);
-  console.log('');
+  step('Push');
+  execFileSync('git', ['push', 'origin', 'main', tag], { cwd: ROOT, stdio: 'inherit' });
+  ok(`pushed — .github/workflows/release.yml now publishes ${tag}`);
 }
 
-main().catch(err => {
-  console.error(`${colors.red}Error:${colors.reset}`, err.message);
-  process.exit(1);
-});
+main().catch(e => die(e.message));

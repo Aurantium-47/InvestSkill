@@ -1,6 +1,6 @@
 # Choose a Skill
 
-> 30 frameworks is a lot. This page maps your *goal* to the right skill — and clears up the overlaps people ask about most. New here? Start with `stock-eval`; it touches quality, value, and risk in one pass.
+> 34 frameworks is a lot. This page maps your *goal* to the right skill — and clears up the overlaps people ask about most. New here? Start with `stock-eval`; it touches quality, value, and risk in one pass.
 
 ---
 
@@ -13,7 +13,11 @@
 | Know if it's *cheap or expensive* | `stock-valuation` | `bear-case` |
 | Get a rigorous *intrinsic value* | `stock-valuation` (its DCF method + sensitivity table) | `result-validator` |
 | Read a 10-K / 10-Q for red flags | `financial-report-analyst` | `earnings-call-analysis` |
+| Get a *structured summary* of a 10-K, section by section (EN or 繁中) | `10k-digest` | `financial-report-analyst` |
+| Check whether the *reported earnings can be trusted* | `forensic-accounting` | `financial-report-analyst` |
+| Know if the company can *pay its debts and refinance* | `credit-check` | `dividend-analysis` |
 | Judge an earnings call | `earnings-call-analysis` | `options-analysis` |
+| See the *dated events* that could move a stock over the next 90 days | `catalyst-calendar` | `thesis-tracker` |
 | Check if a *dividend is safe* | `dividend-analysis` | `portfolio-review` |
 | *Time an entry / exit* | `technical-analysis` | `chart-master` |
 | Assess the *competitive moat* | `competitor-analysis` | `industry-map` |
@@ -27,6 +31,8 @@
 | Pick an *options* strategy | `options-analysis` | `technical-analysis` |
 | Read the *macro* environment | `economics-analysis` | `sector-analysis` |
 | Find *sector rotation* opportunities | `sector-analysis` | `stock-eval` |
+| *Pick between* two to five stocks, side by side | `compare` | `bear-case` |
+| *Rank a longer list* of tickers to find the best candidates | `stock-screener` | `compare` |
 | Review my *whole portfolio* | `portfolio-review` | `dividend-analysis` |
 | Build *one full investment thesis* | `full-report` | `result-validator` |
 | Export a *polished HTML report* | `full-report` | `report-generator` |
@@ -38,6 +44,7 @@
 | See the *tax consequences* of a trade or a portfolio (US, or as a non-US investor) | `tax-lens` | — |
 | Know how much my *portfolio could lose* in a bad regime | `risk-stress-test` | — |
 | *Understand* an analysis I just got (and learn the concepts behind it) | `learning-coach` | — |
+| *Learn from a closed trade* (process vs. outcome) | `trade-postmortem` | `thesis-tracker` |
 
 ---
 
@@ -105,7 +112,7 @@ Use them together: `thesis-tracker` says whether adding is still allowed; `posit
 Run `fact-check` first when the stakes are real — a well-built analysis on wrong inputs is still wrong. The validator's Data Quality score is capped by the fact-check result.
 
 ### Aliases — `fundamental-analysis`, `dcf-valuation`, `research-bundle`
-These three still work but are **redirects**, not separate frameworks, and are not counted in the 30:
+These three still work but are **redirects**, not separate frameworks, and are not counted in the 34:
 
 | Alias | Now lives in | Why it merged |
 |-------|--------------|---------------|

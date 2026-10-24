@@ -193,6 +193,26 @@ When signals disagree — say, great fundamentals but a broken chart and a hosti
 
 ---
 
+## Check yourself
+
+1. What is a golden cross, and does it predict a turn in the trend?
+2. Why is a cluster of insider *buying* a stronger signal than insider *selling*?
+3. A stock has 12 million shares sold short and trades 1.5 million shares a day on average. What is its days-to-cover, and what does a higher number mean?
+4. The central bank is raising rates to fight inflation and the yield curve has just inverted. Which kind of stock tends to face the biggest headwind, and what does the lesson say to do about it?
+5. A stock has great fundamentals and a cheap valuation, but a broken chart and a hostile macro backdrop. How should that conflict change your decision?
+
+<details><summary>Answers</summary>
+
+1. The 50-day moving average crossing *above* the 200-day — a bullish reading that momentum is turning up. It does not predict: moving-average crosses are **lagging** signals that confirm a turn after it has begun.
+2. Insiders sell for many reasons — taxes, a house, diversification — but they generally buy for only one: they think the stock is cheap. Buying with their own cash, especially after a price drop, is a meaningful vote of confidence.
+3. 12M ÷ 1.5M = **8 days**. The higher the figure, the longer shorts would need to buy back, and the more fuel for a short squeeze if the price starts rising.
+4. **Long-duration growth stocks** (and rate-sensitive sectors such as real estate and utilities), whose value depends on profits far in the future. It does not mean "sell everything": demand a higher margin of safety on richly valued growth names and weigh the macro against your thesis.
+5. Don't ignore the conflict — **lower your confidence**, size smaller, or wait. Confidence should be highest when fundamentals, valuation, and market signals agree, and fall when they conflict.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - Market signals are about **probability, timing, and positioning** — not certainty, and never a substitute for valuing the business.

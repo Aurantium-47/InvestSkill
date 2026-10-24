@@ -1,260 +1,217 @@
 # FAQ & Troubleshooting
 
-Frequently asked questions and solutions for common issues with InvestSkill.
+Frequently asked questions and fixes for common issues with InvestSkill. A Traditional Chinese version is on the site: [常見問題](https://yennj12.js.org/InvestSkill/faq-zh-tw.html).
 
 ---
 
 ## Table of Contents
 
-- [Installation Issues](#installation-issues)
-- [Platform-Specific Questions](#platform-specific-questions)
-- [Usage & Features](#usage--features)
-- [Compatibility & Versions](#compatibility--versions)
-- [Bug Reports & Feature Requests](#bug-reports--feature-requests)
-- [Advanced Questions](#advanced-questions)
+- [Installation](#installation)
+- [Platforms](#platforms)
+- [Choosing and Using Skills](#choosing-and-using-skills)
+- [Data and Accuracy](#data-and-accuracy)
+- [Output and Reports](#output-and-reports)
+- [Versions and Updates](#versions-and-updates)
+- [Bugs, Features and Help](#bugs-features-and-help)
+- [Advanced](#advanced)
 
 ---
 
-## Installation Issues
+## Installation
 
-### Claude Code
+**Q: What is the quickest way to install InvestSkill?**
 
-**Q: How do I install the InvestSkill plugin?**
+A: One command, from the project directory where you want to use it. Pick your agent with `-a`:
 
-A: 
+```bash
+curl -fsSL https://raw.githubusercontent.com/yennanliu/InvestSkill/main/install.sh | bash -s -- -a claude
+# agents: claude · cursor · copilot · gemini · codex · opencode · any
+```
+
+The installer copies every framework into `.investskill/prompts/` and wires up your agent's own entry point:
+
+| `-a` | Wires up |
+|------|----------|
+| `claude` | `.claude/skills/<skill>/SKILL.md` (slash commands) |
+| `cursor` | `.cursor/rules/investskill.mdc` |
+| `copilot` | `.github/copilot-instructions.md` |
+| `gemini` | `GEMINI.md` |
+| `codex`, `opencode` | `AGENTS.md` |
+| `any` | `.investskill/prompts/` only — paste into any LLM |
+
+Run it with `-l` to print this list, `-h` for every option.
+
+**Q: How do I install it in Claude Code as a plugin?**
+
+A: Through the plugin marketplace:
+
 ```bash
 claude
 /plugin marketplace add yennanliu/InvestSkill
-/plugin install us-stock-analysis
-/plugin list  # Verify installation
+/plugin install us-stock-analysis@invest-skill
+/us-stock-analysis:stock-eval AAPL
 ```
 
-**Q: The plugin doesn't appear after installation**
+The marketplace install gives namespaced commands (`/us-stock-analysis:<skill>`); `install.sh -a claude` installs project-level skills you call as `/<skill>`. Use either — not both in the same project, or every skill will appear twice.
 
-A: 
-1. Restart Claude Code: `exit` and re-run `claude`
-2. Clear cache: `/plugin marketplace remove yennanliu/InvestSkill` then re-add
-3. Check version: `/plugin list` should show `us-stock-analysis v1.4.0`
+**Q: Is it safe to pipe the installer to `bash`?**
 
-**Q: I get "plugin not found" error**
+A: It only copies markdown files and appends a marked block to your agent's config file. It never overwrites an existing file — instruction files are appended to between `<!-- InvestSkill:begin -->` and `<!-- InvestSkill:end -->` markers — and running it a second time changes nothing. If you'd rather check first, read [install.sh](install.sh) or download it and run it locally.
 
-A:
-- Verify marketplace is added: `/plugin marketplace list`
-- Try adding marketplace again: `/plugin marketplace add yennanliu/InvestSkill`
-- Check internet connection
-- Restart Claude Code
+**Q: Can I install for my user account instead of one project?**
 
-**Q: Can I use it locally without internet?**
+A: Yes — add `-g` to install into your home directory instead of the current project, or `-d DIR` to target another directory. `-r REF` installs from a specific branch or tag.
 
-A: No. InvestSkill requires internet for:
-- Marketplace lookup
-- Fetching current financial data
-- Live market prices
-
-### Cursor IDE
-
-**Q: How do I set up InvestSkill in Cursor?**
-
-A: Simply open the repository in Cursor — rules auto-load:
-```bash
-git clone https://github.com/yennanliu/InvestSkill.git
-cd InvestSkill
-cursor .
-```
-
-The `.cursor/rules/invest-skill.mdc` file auto-loads in Cursor AI Chat.
-
-**Q: Rules not appearing in Cursor AI Chat**
+**Q: The plugin doesn't appear after installing it in Claude Code.**
 
 A:
-1. Verify `.cursor/rules/invest-skill.mdc` exists: `ls .cursor/rules/invest-skill.mdc`
-2. Check file isn't empty: `wc -l .cursor/rules/invest-skill.mdc` (should be 100+)
-3. Restart Cursor: Close and reopen
-4. Verify rules are loaded: Ask "What analysis frameworks are available?" in Cursor Chat
+1. Restart Claude Code (`exit`, then `claude` again).
+2. Check it is listed: `/plugin list` should show `us-stock-analysis`.
+3. If not, remove and re-add the marketplace: `/plugin marketplace remove invest-skill`, then `/plugin marketplace add yennanliu/InvestSkill` and install again.
 
-**Q: @prompts/ references not working**
+**Q: I get a "plugin not found" error.**
 
-A:
-1. Ensure you're in the InvestSkill directory: `pwd` should end with `/InvestSkill`
-2. Verify prompts/ directory exists: `ls prompts/ | wc -l` (should show 17)
-3. Check file name spelling: `@prompts/stock-eval.md` (not `stock_eval`)
-4. Try full path: `@prompts/stock-valuation.md`
+A: Check the marketplace is registered with `/plugin marketplace list`, then install with the full name `us-stock-analysis@invest-skill`. A network problem during `marketplace add` is the other common cause — re-run it.
 
-### Gemini CLI
+**Q: How do I update or uninstall?**
 
-**Q: How do I use InvestSkill with Gemini CLI?**
-
-A:
-```bash
-cd /path/to/InvestSkill
-gemini
-# GEMINI.md auto-loads
-> @prompts/stock-eval.md Evaluate AAPL
-```
-
-**Q: GEMINI.md not auto-loading**
-
-A:
-1. Verify you're in InvestSkill directory: `pwd`
-2. Check GEMINI.md exists and is valid: `head -20 GEMINI.md`
-3. Verify Gemini CLI is installed: `gemini --version`
-4. Start fresh: `exit` and re-run `gemini`
-
-**Q: Can I use InvestSkill outside the project directory?**
-
-A: No. Gemini CLI only auto-loads `.md` files from the current directory. You can:
-- Always `cd` to InvestSkill before running `gemini`
-- Copy `prompts/` to your working directory
-- Use `@` to reference files by full path if your Gemini version supports it
-
-### GitHub Copilot
-
-**Q: How do I set up Copilot for InvestSkill?**
-
-A: 
-- In VS Code: `.github/copilot-instructions.md` auto-loads
-- In JetBrains: Same file auto-loads
-- No manual setup needed
-
-**Q: Copilot doesn't understand investment frameworks**
-
-A:
-1. Verify `.github/copilot-instructions.md` exists
-2. Restart IDE
-3. Ask explicitly: "Reference @prompts/stock-eval.md to analyze AAPL"
+A: In Claude Code, `/plugin marketplace update invest-skill` pulls the latest version; `/plugin uninstall us-stock-analysis` removes it. For `install.sh` installs, re-run the same command to update (it refreshes `.investskill/prompts/`); to uninstall, delete `.investskill/` and the `InvestSkill:begin … InvestSkill:end` block (or the `.claude/skills/` / `.cursor/rules/investskill.mdc` files it created).
 
 ---
 
-## Platform-Specific Questions
+## Platforms
 
-### Can I use skills across different platforms?
+**Q: Which platforms are supported?**
 
-**Q: If I start analysis in Claude Code, can I continue in Cursor?**
+A: Claude Code, Cursor, GitHub Copilot, Gemini CLI, Codex, OpenCode, and any chat LLM (ChatGPT, Claude.ai, Gemini web, local models through [Ollama](README-ollama.md)). The skills are plain markdown, so anything that can read a prompt can use them. See [Platform Compatibility](PLATFORM-COMPATIBILITY.md) for a side-by-side.
 
-A: Not directly. Each platform has its own session. However:
-- The **same frameworks** are available on all platforms
-- You can **copy results** from one platform to another
-- Use the `full-report` skill for a complete analysis you can share as one HTML file
+**Q: Are all 38 skills available on every platform?**
 
-### Do all platforms have the same skills?
+A: Yes. Every platform gets the same 38 skills: 34 analysis frameworks, 3 aliases (`fundamental-analysis`, `dcf-valuation`, `research-bundle`, which redirect to the skill that absorbed them), and the `report-generator` output tool.
+- **Claude Code**: all 38 skills as slash commands
+- **Cursor, Gemini CLI, Codex, OpenCode**: all 38 skills as `@.investskill/prompts/<skill>.md` files (or `@prompts/<skill>.md` inside a clone of the repo)
+- **Copilot**: all 38 skills, referenced from `.github/copilot-instructions.md`
+- **Any LLM**: 38 prompts in `prompts/`, one per skill
 
-**Q: Are all 34 skills available on every platform?**
+**Q: Why is the advertised count 34 and not 38?**
 
-A: Yes — every platform gets the same 34 skills: 30 analysis frameworks, 3 aliases (`fundamental-analysis`, `dcf-valuation`, `research-bundle`, which redirect to the skill that absorbed them), and the `report-generator` output tool.
-- **Claude Code**: ✅ All 34 skills as `/skill-name` commands
-- **Cursor**: ✅ All 34 skills as `@prompts/skill-name.md` files
-- **Gemini CLI**: ✅ All 34 skills as `@prompts/skill-name.md` files
-- **Copilot**: ✅ All 30 frameworks via `.github/copilot-instructions.md`
-- **Universal**: ✅ 34 prompts in `prompts/`, one per skill
+A: `report-generator` is an output tool (it renders other skills' results as HTML/PDF), not an analysis framework, and the three aliases are kept only so old commands keep working. They ship with the plugin but aren't counted.
 
-**Why isn't report-generator counted as a framework?**
+**Q: How do I use a skill in Cursor, Gemini CLI, Codex or OpenCode?**
 
-Report-generator is an output tool (it renders other skills' results as HTML/PDF), not an analysis framework, so the advertised count is 30 even though 34 files ship. The three aliases are likewise installed but not counted.
+A: After `install.sh`, reference the prompt file in chat:
 
-### Version differences between platforms
-
-**Q: Are all platforms on the same version?**
-
-A: 
-```bash
-# Check all versions
-jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json  # Claude Code
-jq '.metadata.version' .claude-plugin/marketplace.json               # Marketplace
-grep "version" GEMINI.md | head -1                                   # Gemini
-grep "version" .cursor/rules/invest-skill.mdc | head -1             # Cursor
+```
+@.investskill/prompts/stock-eval.md Evaluate AAPL
 ```
 
-All should show **1.4.0** (as of latest release).
+The rule / instructions file the installer wrote tells the agent the frameworks exist, so you can also just ask ("run the bear-case framework on TSLA").
 
-If they differ:
-```bash
-npm run pre-release  # Run validation
-git log --oneline | head -5  # Check recent commits
-```
+**Q: Cursor or Gemini doesn't seem to load the rules.**
+
+A:
+1. Check the file exists: `.cursor/rules/investskill.mdc` (Cursor) or `GEMINI.md` (Gemini) in the project root.
+2. Make sure you opened / started the agent **in that directory** — Gemini CLI only reads `GEMINI.md` from where it was started.
+3. Restart the editor or CLI session.
+4. Ask "What InvestSkill frameworks are available?" — the agent should list them.
+
+**Q: `@` file references don't resolve.**
+
+A: Check the path: after `install.sh` the prompts are in `.investskill/prompts/`, not `prompts/`. File names use hyphens (`stock-eval.md`, not `stock_eval.md`).
+
+**Q: How do I use it in ChatGPT, Claude.ai or another chat app?**
+
+A: Paste the contents of a prompt file as your first message (or as a custom instruction / project prompt), then ask for the analysis: `cat .investskill/prompts/stock-eval.md | pbcopy` on macOS.
+
+**Q: Can I run it fully offline?**
+
+A: Yes, with a local model — see the [Ollama guide](README-ollama.md). The frameworks themselves need no network; only fetching live market data does, and with a local model you paste that data in yourself.
+
+**Q: If I start an analysis in Claude Code, can I continue it in Cursor?**
+
+A: Not as one session — each platform keeps its own context. The frameworks are identical everywhere, so copy the output across, or use `full-report` to produce a single HTML file you can share.
 
 ---
 
-## Usage & Features
+## Choosing and Using Skills
 
-### Stock Analysis
+**Q: Which skill should I start with?**
 
-**Q: What's the difference between stock-eval and fundamental-analysis?**
+A: `stock-eval` — it covers quality, value and risk in one pass and ends with a go/no-go signal. The [Choose a Skill](site/content/CHOOSE-A-SKILL.md) page maps every goal to the right framework.
 
-A:
-- **stock-eval**: Quick quality scoring (Piotroski F-Score, ROIC/WACC, risk matrix)
-  - Use when: You need a fast go/no-go decision
-  - Output: Single 0-10 score with verdict
-  
-- **fundamental-analysis**: Deep financial statement dive
-  - Use when: You want detailed financial quality analysis
-  - Output: Multi-section analysis with visualizations
+**Q: What happened to `fundamental-analysis`, `dcf-valuation` and `research-bundle`?**
+
+A: They were merged into larger skills and are now aliases: `fundamental-analysis` → `stock-eval`, `dcf-valuation` → `stock-valuation` (DCF is its Method 1), `research-bundle` → `full-report` (`--depth quick / standard / comprehensive`). The old commands still work and point you to the new skill.
 
 **Q: Which skill should I use for valuation?**
 
-A:
-- **dcf-valuation**: Single intrinsic value model with sensitivity
-  - Use when: You want DCF-based fair value
-  
-- **stock-valuation**: Multi-method valuation (DCF + CCA + EV/EBITDA + P/E)
-  - Use when: You want multiple valuation perspectives
-  
-- **fundamental-analysis**: Can include basic valuation
-  - Use when: You're already doing comprehensive fundamental review
+A: `stock-valuation` — DCF, comparable companies, EV multiples and residual income in one model, with a sensitivity table. Pair it with `bear-case` to stress the assumptions.
 
-**Q: Can I use InvestSkill for crypto/forex/commodities?**
+**Q: How do I compare several stocks?**
 
-A: No. InvestSkill is designed specifically for **US stocks**. It won't work reliably for:
-- Cryptocurrencies
-- Forex pairs
-- Commodities (oil, gold, etc.)
-- International stocks (outside US)
-- Options directly (but has options-analysis for equity options)
+A: `compare` puts 2–5 tickers on one table and argues the pick (`/compare AAPL MSFT GOOGL`). For a wider list, `stock-screener` ranks many tickers across valuation, quality, momentum, sentiment and growth.
 
-**Q: What if a stock doesn't exist or is delisted?**
+**Q: How do I check whether a company's earnings or balance sheet can be trusted?**
 
-A:
-- Models may return errors or zero data
-- Framework will note missing data
-- Always verify ticker symbol before analysis
-- Use `stock-eval AAPL` not `Apple` — must use ticker
+A: `forensic-accounting` scores manipulation risk (Beneish M-Score, Altman Z, accruals, cash-vs-earnings divergence). `credit-check` looks at solvency and refinancing risk — the debt maturity wall, interest coverage and liquidity runway.
 
-### Data & Inputs
+**Q: What should I run around earnings?**
 
-**Q: Can I paste my own financial data?**
+A: Before the print: `earnings-preview` (consensus vs. whisper, implied move, a three-scenario grid). After: `earnings-call-analysis` on the transcript, then `thesis-tracker --update` to see whether your thesis still holds.
 
-A: Yes! Skills support:
-- **Paste financial statements**: Balance sheet, income statement, cash flow
-- **Paste SEC filings**: 10-K, 10-Q, 8-K text
-- **Paste earnings transcripts**: Earnings call transcripts
-- **Paste your portfolio**: Holdings list with allocations
+**Q: Does it cover ETFs, taxes and portfolio risk?**
 
-Example:
-```
-@prompts/fundamental-analysis.md
-[paste balance sheet and income statement]
-Analyze financial quality and trends
-```
+A: Yes — `etf-analysis` (cost, tracking, overlap, structure), `tax-lens` (US tax mechanics, plus a `--non-us` module for foreign investors; educational, never tax advice), `portfolio-review` (allocation and rebalancing) and `risk-stress-test` (scenario replay, VaR/CVaR, liquidity).
 
-**Q: What timeframe of data should I provide?**
+**Q: How do I learn from my own trades?**
 
-A:
-- **Minimum**: Last 2 years (2 annual reports)
-- **Recommended**: Last 5 years (for trend analysis)
-- **Ideal**: Last 10 years (for cyclical analysis)
+A: Write the thesis with `thesis-tracker` when you buy, then run `trade-postmortem` after you sell — it separates process from outcome and pulls out one lesson for your journal. `learning-coach` explains any skill's output metric by metric.
+
+**Q: Can I use InvestSkill for crypto, forex, commodities or non-US stocks?**
+
+A: Not reliably. The frameworks are built around US-listed equities and SEC filings. ETFs, US-listed ADRs and equity options (`options-analysis`) are covered; crypto, forex and commodities are not.
+
+**Q: What if the ticker doesn't exist or is delisted?**
+
+A: The skill will report missing data rather than invent it — every analysis skill has a data-validation gate. Always use the ticker (`AAPL`), not the company name.
+
+---
+
+## Data and Accuracy
 
 **Q: Does InvestSkill fetch live market data?**
 
-A: 
-- Depends on platform and model
-- May use training data (knowledge cutoff)
-- For latest prices, provide current data in your query
-- Always verify prices are up-to-date before making decisions
+A: InvestSkill itself fetches nothing — it has no runtime. If your assistant can browse or call tools, the skills tell it which primary sources to read; otherwise it falls back to training data, which is out of date. Every analysis opens with a **Data & Sources** header so you can see which it used. For current prices, paste them in.
 
-### Output & Reports
+**Q: Can I paste my own financial data?**
 
-**Q: What's the Investment Signal Block?**
+A: Yes, and it is the most accurate way to work. Paste statements, a 10-K / 10-Q / 8-K, an earnings-call transcript or your holdings, then ask for the analysis:
 
-A: Standardized output format at end of every analysis:
+```
+@.investskill/prompts/financial-report-analyst.md
+[paste the 10-K text]
+Analyze financial quality and red flags
+```
+
+**Q: My assistant can't browse. How do I get the filing?**
+
+A: Two optional zero-dependency scripts in the repo fetch the primary source for you to paste: `node scripts/fetch-edgar.js AAPL --form 10-K` saves the filing as text, and `node scripts/fetch-fundamentals.js AAPL` builds a reconciled statement pack from the SEC's XBRL data. They are not part of the plugin. See [Data & Accuracy](site/content/DATA-AND-ACCURACY.md).
+
+**Q: How much history should I provide?**
+
+A: At least two years of annual reports; five years for trend analysis; ten for cyclical businesses.
+
+**Q: How do I check an analysis for hallucinated numbers?**
+
+A: Run `fact-check` on it — it checks every figure against a primary source, recomputes derived numbers and re-issues the report with citations. `result-validator` then scores data quality, methodology and signal consistency.
+
+---
+
+## Output and Reports
+
+**Q: What is the Investment Signal block?**
+
+A: Every skill ends with the same box, so results are comparable across skills:
 
 ```
 ╔══════════════════════════════════════════════╗
@@ -270,224 +227,92 @@ A: Standardized output format at end of every analysis:
 ╚══════════════════════════════════════════════╝
 ```
 
-Use the **Action** field (BUY/HOLD/SELL) as decision guidance.
+The Score maps to the Signal (8–10 strongly bullish … 0–1.9 strongly bearish). Confidence should be LOW when the data is thin or from model memory. It is an educational summary, not a recommendation.
 
-**Q: Can I generate HTML/PDF reports?**
+**Q: Can I get an HTML or PDF report?**
 
-A: Yes, with Claude Code:
-```bash
-/us-stock-analysis:report-generator
-# Outputs HTML file that you can print to PDF
-```
+A: Yes. `full-report AAPL` runs several modules and saves a standalone HTML report to `output/`; `report-generator` turns any analysis into HTML you can print to PDF. Both work on any platform that can write files; in a chat app, copy the HTML into a file yourself.
 
-For other platforms, copy analysis output to a document editor.
+**Q: Can I get charts?**
+
+A: `chart-master` produces Mermaid, ASCII or Chart.js charts (moving averages, candlesticks, RSI/MACD and more) from the data in your analysis.
+
+**Q: Can I get the output in Traditional Chinese?**
+
+A: Ask for it in your request. `10k-digest` and `learning-coach` have an explicit `--lang zh-TW` option.
 
 ---
 
-## Compatibility & Versions
+## Versions and Updates
 
-### Version & Support
+**Q: Which version am I on?**
 
-**Q: What version of InvestSkill is current?**
+A: In Claude Code, `/plugin list` shows the installed version. In a clone of the repo, `jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json`. The latest release and what changed in each version are in [CHANGELOG.md](CHANGELOG.md) and on the [Releases page](https://github.com/yennanliu/InvestSkill/releases).
 
-A: **v1.4.0** (released 2026-02-27)
+**Q: Which versions are supported?**
 
-Check your version:
-```bash
-# Claude Code
-/plugin list | grep us-stock-analysis
+A: The latest minor release. Fixes ship as a new patch release rather than as backports — see [SECURITY.md](SECURITY.md).
 
-# Cursor/Gemini (in repository)
-jq '.version' plugins/us-stock-analysis/.claude-plugin/plugin.json
-```
+**Q: How are versions numbered?**
 
-**Q: Is my version supported?**
-
-A:
-- ✅ v1.4.0 and above: Full support
-- ✅ v1.3.0: Full support (cross-AI features)
-- ⚠️  v1.2.0 and below: Limited support (missing skills)
-
-**Q: How often are new versions released?**
-
-A:
-- **Major versions** (1.0 → 2.0): As needed for significant changes
-- **Minor versions** (1.3 → 1.4): Every 2-4 weeks
-- **Patch versions** (1.4.0 → 1.4.1): As needed for bug fixes
+A: SemVer. A new skill or capability is a minor release (1.12 → 1.13), fixes and prompt refinements are a patch, and breaking changes to skill names or the output contract are a major release.
 
 **Q: Will my analysis change if I upgrade?**
 
-A: Unlikely, but possible:
-- Frameworks may be refined (more accurate results)
-- Signal scoring may adjust (same direction, possibly different confidence)
-- New prompts won't affect old analysis
-- **Always verify important decisions independently**
+A: It can — frameworks are refined between releases, so scores and confidence may shift. The signal block format stays the same within a major version. Re-run anything you rely on after an upgrade, and always verify important decisions independently.
 
-### Platform Compatibility
+**Q: Which Claude Code, Cursor or model version do I need?**
 
-**Q: Which Claude Code version do I need?**
-
-A:
-- **Minimum**: Claude Code v1.0+
-- **Recommended**: Latest version
-- **Check**: Run `claude --version`
-
-**Q: Which Claude models does InvestSkill work with?**
-
-A: Any. InvestSkill is plain markdown, so it runs on whichever model your Claude Code session uses, and on any other LLM via the universal prompts in `prompts/`. More capable models handle multi-module runs like `full-report` best.
-
-**Q: Which Cursor version do I need?**
-
-A:
-- **Minimum**: Cursor 0.30+
-- **Recommended**: Latest version
-- **Check**: Cursor Settings → About
-
-**Q: Can I use InvestSkill with other Cursor extensions?**
-
-A: Yes! The `.cursor/rules/` approach works alongside other extensions:
-- Other rules files auto-load together
-- InvestSkill rules don't conflict with standard Cursor features
-- Safe to use with other analysis tools
+A: A recent version of your tool with skill / rules support; there's no hard minimum beyond that. InvestSkill is plain markdown and runs on any model — more capable models handle multi-module runs like `full-report` best.
 
 ---
 
-## Bug Reports & Feature Requests
+## Bugs, Features and Help
 
-### How to Report a Bug
+**Q: How do I report a bug?**
 
-**Q: I found a bug. How do I report it?**
+A: Open a [GitHub Issue](https://github.com/yennanliu/InvestSkill/issues) with the platform, the version, the exact command, what you expected, and what you got (paste the output in a code block).
 
-A: Open a [GitHub Issue](https://github.com/yennanliu/InvestSkill/issues) with:
+**Q: How do I suggest a feature?**
 
-1. **Title**: Brief description (e.g., "stock-eval fails for NVDA")
-2. **Platform**: Claude Code / Cursor / Gemini / Copilot / Other
-3. **Version**: Output of version check command
-4. **Steps to reproduce**:
-   ```
-   1. Run /stock-eval NVDA
-   2. Observe error message
-   3. Expected behavior: [what should happen]
-   ```
-5. **Error message**: Full error text (use code block)
-6. **System info**: OS (macOS/Linux/Windows), Claude Code version, etc.
+A: Start a [GitHub Discussion](https://github.com/yennanliu/InvestSkill/discussions) with the use case and an example of how you'd use it.
 
-### How to Request Features
+**Q: Where do I ask questions?**
 
-**Q: I have a feature idea. How do I suggest it?**
-
-A: Open a [GitHub Discussion](https://github.com/yennanliu/InvestSkill/discussions) with:
-
-1. **Title**: Feature summary (e.g., "Add cryptocurrency analysis skills")
-2. **Use case**: Why you need this feature
-3. **Example**: How you'd use it
-4. **Why InvestSkill**: Why this belongs in InvestSkill vs. other tools
-
-**Q: What features are planned?**
-
-A: See [CHANGELOG.md](CHANGELOG.md) for:
-- What's in the current release
-- What was added in each version
-- Check GitHub Issues for planned features
-
-### Getting Help
-
-**Q: Where can I ask questions?**
-
-A:
-- 💬 **GitHub Discussions**: Best for general questions
-- 🐛 **GitHub Issues**: For bugs and feature requests
-- 📖 **Documentation**: Check README.md, COOKBOOK.md, this FAQ
-- 🤔 **Ask in prompts**: You can ask Claude/Gemini how to use skills
+A: [GitHub Discussions](https://github.com/yennanliu/InvestSkill/discussions) for questions, [Issues](https://github.com/yennanliu/InvestSkill/issues) for bugs. The [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) has worked examples for every skill.
 
 ---
 
-## Advanced Questions
+## Advanced
 
-### Customization
+**Q: Can I modify a framework?**
 
-**Q: Can I modify the frameworks?**
+A: Yes — copy a prompt from `prompts/` (or `.investskill/prompts/`) and edit it. Keep the closing Investment Signal block if you want results to stay comparable.
 
-A: You can customize locally:
+**Q: Can I add my own skill or contribute one?**
 
-```bash
-# Copy framework to your project
-cp prompts/stock-eval.md my-custom-stock-eval.md
+A: Yes. `node scripts/new-skill.js <name> --category … --title … --desc …` scaffolds the skill with the full output contract and wires it into every file; see [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md) and [CONTRIBUTING.md](CONTRIBUTING.md), then open a PR.
 
-# Modify it
-nano my-custom-stock-eval.md
+**Q: Why is an analysis slow?**
 
-# Use your version in Claude Code
-# Copy content to clipboard and paste into chat
-```
+A: Multi-module skills (`full-report --depth comprehensive`) do far more work than a single skill like `stock-eval`. Use `--depth quick` or a single skill when you need a fast answer, or switch to a faster model.
 
-**Q: Can I create my own skills?**
+**Q: Can I use the prompts programmatically?**
 
-A: Yes! See [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md) for:
-- Step-by-step walkthrough
-- File structure
-- Testing procedures
-- Platform sync checklist
+A: Yes — load a prompt as the system message:
 
-**Q: Can I contribute my skills to InvestSkill?**
-
-A: Absolutely! Follow the [ADDING-NEW-SKILLS.md](ADDING-NEW-SKILLS.md) guide and open a PR. We welcome contributions!
-
-### Performance & Optimization
-
-**Q: Why is analysis slow sometimes?**
-
-A:
-- Model latency (depends on Claude Code server)
-- Complex analysis (research-bundle is slower than stock-eval)
-- Network latency (if fetching external data)
-- Model capacity (during peak hours)
-
-Optimization:
-- Use simpler skills for quick decisions (stock-eval)
-- Use research-bundle when you need comprehensive analysis
-- Switch to a faster model with `/model` when speed matters more than depth
-
-**Q: Can I batch analyze multiple stocks?**
-
-A: Yes, with `research-bundle`:
-```bash
-/us-stock-analysis:research-bundle AAPL,MSFT,GOOGL
-```
-
-Or manually in sequence:
-```bash
-/stock-eval AAPL
-/stock-eval MSFT
-/stock-eval GOOGL
-# Then ask for comparison summary
-```
-
-### Integration & API
-
-**Q: Can I use InvestSkill programmatically?**
-
-A:
-- **Claude Code plugin**: No direct API (use Claude API + plugin context)
-- **Universal prompts**: Use Claude API with prompts as system message
-- **Gemini CLI**: Run from scripts that call `gemini` command
-
-**Q: Can I integrate with my own tools?**
-
-A: Yes! Copy the prompts into your tool:
 ```python
-# In your Python code
-with open('prompts/stock-eval.md') as f:
+import anthropic
+
+with open("prompts/stock-eval.md") as f:
     framework = f.read()
 
-# Use with Claude API
-import anthropic
 client = anthropic.Anthropic()
 response = client.messages.create(
     model="claude-opus-5",
     max_tokens=16000,
     system=framework,
-    messages=[{"role": "user", "content": "Evaluate AAPL"}]
+    messages=[{"role": "user", "content": "Evaluate AAPL"}],
 )
 ```
 
@@ -495,15 +320,7 @@ response = client.messages.create(
 
 ## Still Need Help?
 
-- 📚 **[Documentation](README.md)** — Complete setup guides
-- 📖 **[Cookbook](site/content/COOKBOOK.md)** — Examples and walkthroughs
-- 🎯 **[Platform Guides](README-claude-code.md)** — Platform-specific instructions
-- 💬 **[GitHub Discussions](https://github.com/yennanliu/InvestSkill/discussions)** — Ask questions
-- 🐛 **[GitHub Issues](https://github.com/yennanliu/InvestSkill/issues)** — Report problems
-
----
-
-**Last Updated**: 2026-04-11  
-**FAQ Version**: 1.0  
-**Covered Skills**: 18  
-**Covered Platforms**: 5
+- [README](README.md) — overview and install
+- [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) — examples for every skill
+- [Platform guides](README-claude-code.md) — Claude Code, [Cursor](README-cursor.md), [Gemini CLI](README-gemini.md), [Ollama](README-ollama.md)
+- [GitHub Discussions](https://github.com/yennanliu/InvestSkill/discussions) · [GitHub Issues](https://github.com/yennanliu/InvestSkill/issues)

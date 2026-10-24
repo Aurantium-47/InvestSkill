@@ -214,9 +214,9 @@ function checkUniversalPrompts() {
     // Check for key frameworks
     const keyFrameworks = [
       'stock-valuation.md',
-      'fundamental-analysis.md',
+      'stock-eval.md',
       'technical-analysis.md',
-      'research-bundle.md'
+      'full-report.md'
     ];
 
     const hasKeyFrameworks = keyFrameworks.every(f => prompts.includes(f));
@@ -303,7 +303,7 @@ function generateRecommendations() {
 
   if (checks.success >= 8) {
     recommendations.push('✅ InvestSkill is properly installed!');
-    recommendations.push('🚀 You can now use all 18 analysis frameworks');
+    recommendations.push(`🚀 You can now use all ${require('./lib/skill-registry').frameworkCount()} analysis frameworks`);
   }
 
   recommendations.forEach(rec => console.log(`   ${rec}`));

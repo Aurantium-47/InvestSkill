@@ -15,6 +15,7 @@ on:
     paths:
       - 'install.sh'
       - 'scripts/test-install.js'
+      - 'scripts/lib/**'
       - '.github/workflows/install-script.yml'
       - 'prompts/**'
       - 'plugins/**'

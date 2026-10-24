@@ -57,6 +57,11 @@ function lineDiff(a, b) {
 }
 
 function main() {
+const unknown = only.filter(n => !skills.includes(n));
+if (unknown.length) {
+  process.stderr.write(`  ✗ no such skill: ${unknown.join(', ')} (skills live in plugins/us-stock-analysis/skills/)\n`);
+  process.exit(1);
+}
 let drift = 0, written = 0, unchanged = 0;
 for (const skill of skills) {
   if (only.length && !only.includes(skill)) continue;
@@ -76,6 +81,15 @@ for (const skill of skills) {
     written++;
     process.stdout.write(`  ✍️  prompts/${skill}.md — ${current === null ? 'created' : 'regenerated'}\n`);
   }
+}
+
+// A prompt whose skill was deleted or renamed would keep shipping to every
+// non-Claude platform. Report it in --check; delete it on a full regenerate.
+const orphans = only.length ? [] : reg.listPromptNames().filter(n => !skills.includes(n));
+for (const o of orphans) {
+  drift++;
+  if (CHECK || DIFF) process.stdout.write(`  ❌ prompts/${o}.md — orphan: no skills/${o}/SKILL.md\n`);
+  else { fs.unlinkSync(path.join(reg.PROMPTS_DIR, `${o}.md`)); process.stdout.write(`  🗑️  prompts/${o}.md — removed (no matching skill)\n`); }
 }
 
 if (CHECK || DIFF) {

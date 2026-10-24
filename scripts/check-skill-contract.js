@@ -10,6 +10,10 @@
  *   3. define a Thesis Invalidation section
  *   4. carry the standard Investment Signal block
  *   5. carry the "Not financial advice" disclaimer
+ *   6. define the machine-readable JSON footer that follows the box
+ *      ({"investskill": "1", "skill": …, "signal": …, "score": …, …})
+ *   7. keep the signal block's code fence to the box alone — no heading inside
+ *      it (a fence opened too early once swallowed Thesis Invalidation in 19 skills)
  *
  * Exemptions live in scripts/lib/skill-registry.js (CONTRACT_EXEMPT): output
  * tools render other skills' results, aliases are redirect stubs, and meta
@@ -32,6 +36,8 @@ const CHECKS = [
   { key: 'thesisInvalidation', label: 'Thesis Invalidation',      test: sb.hasThesisInvalidation },
   { key: 'signalBlock',        label: 'Investment Signal block',  test: sb.hasSignalBlockTemplate },
   { key: 'disclaimer',         label: 'disclaimer',               test: sb.hasDisclaimer },
+  { key: 'jsonFooter',         label: 'JSON footer template',     test: sb.hasJsonFooterTemplate },
+  { key: 'signalFence',        label: 'signal fence holding only the box (no heading inside it)', test: sb.signalFenceIsClean },
 ];
 
 const results = [];
@@ -80,4 +86,4 @@ if (JSON_OUT) {
   process.stdout.write(`\n  ${passed} checks passed, ${failed} failed, ${exempt} exempt (${kinds})\n`);
   process.stdout.write(`  Frameworks advertised: ${reg.frameworkCount()} of ${reg.listSkillDirs().length} skills\n\n`);
 }
-process.exit(failed ? 1 : 0);
+process.exitCode = failed ? 1 : 0;   // not process.exit(): a piped --json report larger than 64 KB would be cut off

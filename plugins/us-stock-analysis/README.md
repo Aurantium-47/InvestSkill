@@ -1,6 +1,6 @@
 # us-stock-analysis
 
-Structured investment-analysis frameworks for US stocks, ETFs and portfolios — **30 analysis frameworks** (+ 3 aliases, 1 output tool) covering fundamental, technical, valuation, financial-report, capital-allocation, ownership, options, risk, tax and position-management analysis. Every framework ends with the same Investment Signal block (signal, 0–10 score, confidence, horizon), so results are comparable across skills.
+Structured investment-analysis frameworks for US stocks, ETFs and portfolios — **34 analysis frameworks** (+ 3 aliases, 1 output tool) covering fundamental, technical, valuation, financial-report, forensic-accounting, credit, capital-allocation, ownership, options, risk, tax and position-management analysis. Every framework ends with the same Investment Signal block (signal, 0–10 score, confidence, horizon), so results are comparable across skills.
 
 Part of [InvestSkill](https://github.com/yennanliu/InvestSkill). Full documentation: <https://yennj12.js.org/InvestSkill/>.
 
@@ -27,11 +27,11 @@ For local development, point the marketplace at a clone: `/plugin marketplace ad
 
 | Area | Skills |
 |------|--------|
-| Core evaluation | `stock-eval`, `stock-valuation`, `technical-analysis`, `competitor-analysis`, `bear-case` |
-| Filings & earnings | `financial-report-analyst`, `10k-digest`, `earnings-call-analysis`, `earnings-preview`, `fact-check` |
+| Core evaluation | `stock-eval`, `stock-valuation`, `technical-analysis`, `competitor-analysis`, `compare`, `bear-case` |
+| Filings & earnings | `financial-report-analyst`, `10k-digest`, `forensic-accounting`, `credit-check`, `earnings-call-analysis`, `earnings-preview`, `fact-check` |
 | Ownership & flows | `insider-trading`, `institutional-ownership`, `short-interest`, `options-analysis` |
 | Market & macro | `economics-analysis`, `sector-analysis`, `industry-map`, `catalyst-calendar`, `etf-analysis` |
-| Portfolio & position | `portfolio-review`, `risk-stress-test`, `position-ladder`, `dividend-analysis`, `tax-lens`, `stock-screener`, `thesis-tracker` |
+| Portfolio & position | `portfolio-review`, `risk-stress-test`, `position-ladder`, `dividend-analysis`, `tax-lens`, `stock-screener`, `thesis-tracker`, `trade-postmortem` |
 | Quality & learning | `result-validator`, `learning-coach`, `chart-master`, `full-report` |
 | Output tool | `report-generator` |
 | Aliases | `fundamental-analysis` → `stock-eval`, `dcf-valuation` → `stock-valuation`, `research-bundle` → `full-report` |

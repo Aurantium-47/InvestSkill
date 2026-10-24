@@ -1,343 +1,156 @@
 # InvestSkill for Claude Code
 
-Professional investment analysis plugin for Claude Code. 18 analysis frameworks for comprehensive stock market evaluation.
+Professional investment analysis plugin for Claude Code: 34 analysis frameworks as native slash commands, plus 3 aliases and the `report-generator` output tool (38 skills in all).
 
-**For multi-platform setup**, see [README.md](README.md)
+**For other platforms**, see [README.md](README.md).
 
 ---
 
 ## Quick Start
 
-### Installation — one command
+### Install — plugin marketplace
+
+```bash
+claude
+/plugin marketplace add yennanliu/InvestSkill
+/plugin install us-stock-analysis@invest-skill
+/plugin list        # should list us-stock-analysis
+```
+
+Commands are namespaced: `/us-stock-analysis:<skill>`.
+
+### Install — one command (project skills)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yennanliu/InvestSkill/main/install.sh | bash -s -- -a claude
 ```
 
-Installs every skill into `.claude/skills/` (add `-g` for `~/.claude/skills/`), so slash commands work immediately.
+Installs every skill into `.claude/skills/` (add `-g` for `~/.claude/skills/`), so `/<skill>` commands work immediately. Pick one install method per project — with both, every skill appears twice.
 
-### Installation — plugin marketplace
-
-```bash
-# Open Claude Code
-claude
-
-# Add marketplace
-/plugin marketplace add yennanliu/InvestSkill
-
-# Install plugin
-/plugin install us-stock-analysis
-
-# Verify installation
-/plugin list
-```
-
-### First Analysis
+### First analysis
 
 ```bash
-# Evaluate a stock
-/us-stock-analysis:stock-eval AAPL
-
-# Get valuation
-/us-stock-analysis:stock-valuation MSFT
-
-# Full analysis
-/us-stock-analysis:research-bundle GOOGL
+/us-stock-analysis:stock-eval AAPL                  # quality, value and risk in one pass
+/us-stock-analysis:stock-valuation MSFT             # DCF + comps + EV multiples
+/us-stock-analysis:full-report GOOGL --depth quick  # several modules → HTML report in output/
 ```
 
 ---
 
-## All 18 Skills
+## All 38 Skills
 
-### Core Analysis (6)
+The examples below use the marketplace prefix; with `install.sh` drop `us-stock-analysis:`.
+
+### Core Stock Analysis (5)
 ```bash
-/us-stock-analysis:stock-eval AAPL              # Piotroski F-Score, quality metrics
-/us-stock-analysis:fundamental-analysis MSFT   # Financial statement analysis
-/us-stock-analysis:technical-analysis TSLA     # Chart patterns, indicators
-/us-stock-analysis:economics-analysis           # Macro indicators
-/us-stock-analysis:dcf-valuation GOOGL         # Intrinsic value model
-/us-stock-analysis:stock-valuation NVDA       # DCF + comps + EV multiples
+/us-stock-analysis:stock-eval AAPL               # Piotroski F-Score, ROIC, quality rating, go/no-go
+/us-stock-analysis:technical-analysis TSLA       # MA chart, patterns, RSI/MACD, entry/target/stop
+/us-stock-analysis:stock-valuation NVDA          # DCF, comparables, EV multiples, residual income
+/us-stock-analysis:economics-analysis            # Macro indicators, recession probability
+/us-stock-analysis:compare AAPL MSFT GOOGL       # 2–5 stocks head to head, then the pick
 ```
 
-### Financial Reports (3)
+### Financial Reports (5)
 ```bash
-/us-stock-analysis:financial-report-analyst AAPL 10-K    # 10-K/10-Q analysis
-/us-stock-analysis:10k-digest NVDA FY2024 --lang zh-TW   # Structured digest doc (EN or 繁中)
-/us-stock-analysis:earnings-call-analysis AAPL           # Earnings transcript analysis
+/us-stock-analysis:financial-report-analyst AAPL 10-K    # 10-K/10-Q findings and red flags
+/us-stock-analysis:10k-digest NVDA FY2024 --lang zh-TW   # Structured digest document (EN or 繁中)
+/us-stock-analysis:earnings-call-analysis AAPL           # Transcript tone and guidance [paste transcript]
+/us-stock-analysis:forensic-accounting XYZ               # Earnings-quality forensics, Manipulation Risk Score
+/us-stock-analysis:credit-check XYZ                      # Debt maturity wall, coverage, Credit Health Score
 ```
 
 ### Market Monitoring (4)
 ```bash
-/us-stock-analysis:insider-trading TSLA                   # Form 4 insider activity
-/us-stock-analysis:institutional-ownership META          # 13F institutional tracking
-/us-stock-analysis:dividend-analysis JNJ                 # Dividend safety
-/us-stock-analysis:short-interest GME                    # Short squeeze potential
+/us-stock-analysis:insider-trading TSLA          # Form 4 insider activity
+/us-stock-analysis:institutional-ownership META  # 13F institutional flows
+/us-stock-analysis:dividend-analysis JNJ         # Payout safety, capital allocation
+/us-stock-analysis:short-interest GME            # Short ratio, squeeze potential
 ```
 
-### Advanced Analysis (4)
+### Advanced Research (15)
 ```bash
-/us-stock-analysis:competitor-analysis AAPL              # Economic moat analysis
-/us-stock-analysis:options-analysis AAPL                 # Options strategy selection
-/us-stock-analysis:portfolio-review                      # Portfolio optimization
-/us-stock-analysis:sector-analysis                       # Sector rotation
+/us-stock-analysis:competitor-analysis AAPL      # Moat, Porter's Five Forces
+/us-stock-analysis:industry-map "AI compute"     # Supply/value-chain graph, chokepoints
+/us-stock-analysis:options-analysis AAPL         # Greeks, IV, strategy selection
+/us-stock-analysis:portfolio-review              # Allocation and rebalancing [paste holdings]
+/us-stock-analysis:sector-analysis               # Sector rotation
+/us-stock-analysis:stock-screener AAPL,MSFT,NVDA,AMD   # Multi-ticker ranking
+/us-stock-analysis:catalyst-calendar NVDA        # 90-day event calendar
+/us-stock-analysis:bear-case TSLA                # Short-seller red-team
+/us-stock-analysis:position-ladder NVDA          # Staged entry, trim/re-add cycle
+/us-stock-analysis:thesis-tracker AAPL           # Write a thesis; --update re-checks it
+/us-stock-analysis:etf-analysis VOO              # ETF due diligence, ETF Fitness Score
+/us-stock-analysis:earnings-preview AAPL         # Before-earnings scenario grid
+/us-stock-analysis:tax-lens                      # US tax mechanics (--non-us for foreign investors)
+/us-stock-analysis:risk-stress-test              # Scenario replay, VaR/CVaR, Risk Budget Score
+/us-stock-analysis:trade-postmortem              # Review closed trades: process vs. outcome
 ```
 
-### Comprehensive Research (2)
+### Meta & Output (5 + 1 output tool)
 ```bash
-/us-stock-analysis:research-bundle AAPL                  # All frameworks combined
-/us-stock-analysis:report-generator                      # HTML/PDF reports
+/us-stock-analysis:full-report AAPL --depth standard  # Configurable multi-module HTML report
+/us-stock-analysis:chart-master                  # Mermaid / ASCII / Chart.js charts
+/us-stock-analysis:result-validator              # Score an analysis for data quality and consistency
+/us-stock-analysis:fact-check                    # Verify every claim against a primary source
+/us-stock-analysis:learning-coach                # Explain any output like a mentor
+/us-stock-analysis:report-generator              # Output tool: analysis → HTML/PDF
 ```
+
+### Aliases (3, not counted as frameworks)
+
+| Alias | Redirects to |
+|-------|--------------|
+| `fundamental-analysis` | `stock-eval` |
+| `dcf-valuation` | `stock-valuation` |
+| `research-bundle` | `full-report` (`--depth quick / standard / comprehensive`) |
+
+The aliases still run so old commands keep working, but use the target skill for new work.
 
 ---
 
-## Usage Examples
+## Workflows
 
-### Basic Stock Analysis
+**Complete due diligence**
 ```bash
-# Quick evaluation
 /us-stock-analysis:stock-eval AAPL
-
-# Detailed fundamentals
-/us-stock-analysis:fundamental-analysis MSFT --visual
-
-# Technical chart analysis
-/us-stock-analysis:technical-analysis TSLA --chart
-
-# Valuation analysis
-/us-stock-analysis:stock-valuation NVDA
-```
-
-### Financial Data Analysis
-```bash
-# Analyze 10-K filing for investment signals
-/us-stock-analysis:financial-report-analyst AAPL 10-K
-
-# Generate structured 10-K digest document (EN or Traditional Chinese)
-/us-stock-analysis:10k-digest AAPL FY2024 --lang zh-TW
-
-# Analyze earnings call transcript
-/us-stock-analysis:earnings-call-analysis AAPL
-# [paste transcript text]
-
-# Review portfolio
-/us-stock-analysis:portfolio-review
-# [paste your holdings]
-```
-
-### Advanced Analysis
-```bash
-# DCF valuation with scenarios
-/us-stock-analysis:dcf-valuation MSFT --scenarios
-
-# Insider trading analysis
-/us-stock-analysis:insider-trading TSLA
-
-# Dividend safety
-/us-stock-analysis:dividend-analysis JNJ
-
-# Short squeeze potential
-/us-stock-analysis:short-interest GME
-
-# Competitive moat
+/us-stock-analysis:stock-valuation AAPL --methods all
 /us-stock-analysis:competitor-analysis AAPL
+/us-stock-analysis:bear-case AAPL
+/us-stock-analysis:thesis-tracker AAPL
 ```
 
-### Comprehensive Research
+**One command**
 ```bash
-# Full multi-framework analysis
-/us-stock-analysis:research-bundle AAPL
-
-# Quick version
-/us-stock-analysis:research-bundle MSFT --quick
-
-# Compare multiple stocks
-/us-stock-analysis:research-bundle AAPL,MSFT,GOOGL --compare
+/us-stock-analysis:full-report AAPL --depth comprehensive
 ```
 
-### Report Generation
+**Earnings season**
 ```bash
-# Step 1: Generate analysis with visualization
-/us-stock-analysis:fundamental-analysis AAPL --visual
-
-# Step 2: Generate HTML report
-/us-stock-analysis:report-generator
-
-# Step 3: Export to PDF
-# Open generated HTML → Print → Save as PDF
+/us-stock-analysis:earnings-preview TICKER          # before the print
+/us-stock-analysis:earnings-call-analysis TICKER    # after [paste transcript]
+/us-stock-analysis:thesis-tracker TICKER --update   # is the thesis still intact?
 ```
 
----
-
-## Features
-
-✅ **18 Professional Analysis Frameworks**
-- Comprehensive stock evaluation
-- Multi-method valuation (DCF, comparable companies, EV multiples)
-- Deep fundamental analysis
-- Technical chart pattern recognition
-- Economic context analysis
-- Portfolio optimization
-
-✅ **Financial Data Processing**
-- 10-K/10-Q analysis
-- Earnings call sentiment analysis
-- Insider trading tracking
-- Institutional ownership monitoring
-
-✅ **Advanced Analysis**
-- Dividend safety scoring
-- Short squeeze potential
-- Options strategy selection
-- Competitive moat analysis
-- Sector rotation analysis
-
-✅ **Report Generation**
-- HTML reports with charts
-- PDF export (via browser print)
-- Professional formatting
-- Interactive visualizations
-
-✅ **Standardized Output**
-- All analyses include INVESTMENT SIGNAL block
-- Confidence levels (HIGH/MEDIUM/LOW)
-- Time horizon (SHORT/MEDIUM/LONG-TERM)
-- Actionable recommendations (BUY/HOLD/SELL)
-
----
-
-## Installation & Troubleshooting
-
-### Installation Issues
-
-**Plugin not appearing?**
+**Comparing stocks**
 ```bash
-# Refresh plugin list
-/plugin list
-
-# Try re-adding marketplace
-/plugin marketplace remove yennanliu/InvestSkill
-/plugin marketplace add yennanliu/InvestSkill
+/us-stock-analysis:compare AAPL MSFT GOOGL         # 2–5 names, one pick
+/us-stock-analysis:stock-screener AAPL,MSFT,GOOGL,AMZN,META,NVDA   # rank a longer list
 ```
 
-**Can't run skills?**
+**Report export**
 ```bash
-# Verify installation
-/plugin list
-
-# Should show: us-stock-analysis v1.4.0 (or latest)
-```
-
-### Data Requirements
-
-Skills work best with:
-- ✅ Stock ticker symbols (AAPL, MSFT, etc.)
-- ✅ Current market data (fetched automatically)
-- ✅ SEC filing data (10-K, 10-Q text)
-- ✅ Earnings call transcripts
-- ✅ Your portfolio holdings
-
-### Output Quality
-
-**For best results:**
-1. Use valid stock tickers (check if publicly traded)
-2. Provide recent financial data when pasting
-3. Include full context for specialized analyses
-4. Ask follow-up questions for deeper dives
-
----
-
-## Advanced Usage
-
-### Custom Parameters
-
-Some skills support parameters:
-
-```bash
-# Fundamental analysis with visualization
-/us-stock-analysis:fundamental-analysis AAPL --visual
-
-# Technical analysis with chart generation
-/us-stock-analysis:technical-analysis TSLA --chart
-
-# DCF with scenario analysis
-/us-stock-analysis:dcf-valuation MSFT --scenarios
-
-# Research bundle quick version
-/us-stock-analysis:research-bundle AAPL --quick
-```
-
-### Multi-Skill Workflows
-
-**Complete due diligence:**
-```bash
-# 1. Stock quality evaluation
 /us-stock-analysis:stock-eval AAPL
-
-# 2. Fundamental analysis
-/us-stock-analysis:fundamental-analysis AAPL --visual
-
-# 3. Technical analysis
-/us-stock-analysis:technical-analysis AAPL --chart
-
-# 4. Valuation
-/us-stock-analysis:stock-valuation AAPL
-
-# 5. Competitive position
-/us-stock-analysis:competitor-analysis AAPL
-
-# 6. Generate report
-/us-stock-analysis:report-generator
+/us-stock-analysis:report-generator                # then open the HTML → Print → Save as PDF
 ```
 
-**Quick analysis:**
-```bash
-# Single command comprehensive analysis
-/us-stock-analysis:research-bundle AAPL
-```
-
-### Batch Analysis
-
-**Compare multiple stocks:**
-```bash
-# Research multiple stocks
-/us-stock-analysis:research-bundle AAPL,MSFT,GOOGL --compare
-```
-
-**Portfolio analysis:**
-```bash
-# Review entire portfolio
-/us-stock-analysis:portfolio-review
-# AAPL: 30%
-# MSFT: 25%
-# NVDA: 20%
-# JNJ: 15%
-# TSLA: 10%
-```
+More recipes for every skill: the [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html).
 
 ---
 
 ## Output Format
 
-All analyses include:
+Every analysis opens with a **Data & Sources** header (as-of date, source, retrieval path, confidence) and ends with the standard Investment Signal block:
 
-### 1. Executive Summary
-- Key findings
-- Investment thesis
-- Primary drivers (bullish/bearish)
-
-### 2. Quantitative Analysis
-- Specific metrics and numbers
-- Year-over-year comparisons
-- Industry benchmarking
-- Valuation multiples
-
-### 3. Qualitative Assessment
-- Management quality
-- Competitive positioning
-- Market opportunity
-- Risk factors
-
-### 4. Investment Signal Block
 ```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
@@ -354,82 +167,34 @@ All analyses include:
 
 ---
 
+## Troubleshooting
+
+**Plugin not appearing?** Restart Claude Code, then check `/plugin list`. If it's still missing, `/plugin marketplace remove invest-skill`, re-add with `/plugin marketplace add yennanliu/InvestSkill`, and install `us-stock-analysis@invest-skill` again.
+
+**Updating:** `/plugin marketplace update invest-skill`. For `install.sh` installs, re-run the install command.
+
+**Which version am I on?** `/plugin list` shows it; the latest release and its changes are in [CHANGELOG.md](CHANGELOG.md).
+
+**Data:** InvestSkill fetches nothing itself. With web access Claude Code follows the skills' primary-source recipes; without it, paste filings, transcripts or holdings. See [Data & Accuracy](site/content/DATA-AND-ACCURACY.md).
+
+More answers in the [FAQ](FAQ.md).
+
+---
+
 ## Model Support
 
 Works with whichever model your Claude Code session runs (`/model` shows and switches it). Multi-module runs such as `full-report --depth comprehensive` benefit most from the most capable model available to you.
 
 ---
 
-## Updates & Versions
+## More
 
-**Current Version**: v1.4.0
-
-Latest features:
-- ✅ 18 professional analysis skills
-- ✅ Multi-platform support
-- ✅ Report generation
-- ✅ Cross-AI compatibility
-
-**Check for updates:**
-```bash
-/plugin marketplace view yennanliu/InvestSkill
-```
+- [README.md](README.md) — all platforms
+- [PLATFORM-COMPATIBILITY.md](PLATFORM-COMPATIBILITY.md) — feature matrix
+- [Cookbook](https://yennj12.js.org/InvestSkill/cookbook.html) — examples and walkthroughs
+- [CHANGELOG.md](CHANGELOG.md) — what's new in each version
+- Issues: https://github.com/yennanliu/InvestSkill/issues · Discussions: https://github.com/yennanliu/InvestSkill/discussions
 
 ---
 
-## Documentation
-
-### Claude Code Specific
-- This file (README-claude-code.md)
-
-### All Platforms
-- [README.md](README.md) — Complete setup for all 5 platforms
-- [PLATFORM-COMPATIBILITY.md](PLATFORM-COMPATIBILITY.md) — Feature matrix
-- [CI-CD-GUIDE.md](CI-CD-GUIDE.md) — Release automation
-
-### Other Resources
-- [COOKBOOK.md](site/content/COOKBOOK.md) — Examples and walkthroughs
-- [CHANGELOG.md](CHANGELOG.md) — What's new in each version
-- [LICENSE](LICENSE) — MIT License
-
----
-
-## Support & Feedback
-
-### Report Issues
-- GitHub Issues: https://github.com/yennanliu/InvestSkill/issues
-- GitHub Discussions: https://github.com/yennanliu/InvestSkill/discussions
-
-### Suggestions
-We welcome feature requests! Open an issue with:
-- What analysis would be helpful
-- Why you need it
-- Example use case
-
-### Known Limitations
-- Requires internet connection for market data
-- Stock prices reflect last available market data
-- Not real-time (use financial websites for live data)
-- Educational analysis only (not financial advice)
-
----
-
-## Legal Disclaimer
-
-This plugin provides **educational analysis only** and does **NOT constitute financial advice**. 
-
-Always:
-- ✅ Consult qualified financial advisors
-- ✅ Do your own research (DYOR)
-- ✅ Verify analysis independently
-- ✅ Consider your risk tolerance
-
-Past performance does not guarantee future results.
-
----
-
-## More Information
-
-For complete documentation covering all platforms (Cursor, Gemini, Copilot, Universal), see:
-
-📖 **[README.md](README.md)**
+**Educational analysis only — not financial advice.** Consult a qualified advisor, do your own research, and verify the analysis independently.

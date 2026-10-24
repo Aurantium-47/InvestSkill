@@ -509,6 +509,10 @@ const COUNT_DOCS = [
   'site/content/CHOOSE-A-SKILL.md', 'site/content/CHOOSE-A-SKILL-zh-TW.md',
   'site/content/COOKBOOK.md', 'site/content/COOKBOOK-zh-TW.md',
   'FAQ.md', 'PLATFORM-COMPATIBILITY.md', 'CONTRIBUTING.md',
+  // The per-platform guides README links to (they said 18 / 21 for months)
+  'README-claude-code.md', 'README-cursor.md', 'README-gemini.md', 'README-ollama.md',
+  'ADDING-NEW-SKILLS.md', 'SECURITY.md', 'site/content/FAQ-zh-TW.md',
+  'plugins/us-stock-analysis/README.md',   // the Claude directory listing description
 ];
 const claimPatterns = [
   /\b(\d+)\s+(?:[A-Za-z-]+\s+){0,3}frameworks?\b/gi,   // "23 (structured analysis) frameworks"
@@ -687,6 +691,85 @@ ALIAS_SKILLS.forEach(alias => {
     fail(`${alias} — not in the Aliases category of SKILL_CATEGORIES (site/build/build-site.js)`);
   }
 });
+
+// ─── Test 15: Live Skills Point at Frameworks, Not Aliases ───────────────────
+
+section('15. Live skills reference frameworks, not aliases');
+
+// An alias only redirects. A live skill that tells the model or the user to run
+// one sends them through a stub — name the target framework instead.
+const aliasRe = new RegExp(`\\b(${ALIAS_SKILLS.join('|')})\\b`, 'g');
+let aliasRefs = 0;
+actualSkillDirs.filter(n => !ALIAS_SKILLS.includes(n)).forEach(name => {
+  const content = readFile(path.join(SKILLS_DIR, name, 'SKILL.md')) || '';
+  const hits = [...new Set((content.match(aliasRe) || []))];
+  if (hits.length) { aliasRefs++; fail(`${name} — references alias skill(s) ${hits.join(', ')}; point at the framework they redirect to`); }
+});
+if (!aliasRefs) pass('No live skill references an alias');
+
+// ─── Test 16: Every Framework Is Discoverable on Choose-a-Skill ──────────────
+
+section('16. Choose-a-Skill lists every framework (both languages)');
+
+['site/content/CHOOSE-A-SKILL.md', 'site/content/CHOOSE-A-SKILL-zh-TW.md'].forEach(file => {
+  const content = readFile(path.join(ROOT, file)) || '';
+  const missing = actualSkillDirs.filter(n => registry.isFramework(n) && !content.includes(`\`${n}\``));
+  if (missing.length) fail(`${file} — no "goal → skill" entry for: ${missing.join(', ')}`);
+  else pass(`${file} — every framework listed`);
+});
+
+// The plugin README is the directory listing: it must name every skill.
+{
+  const listing = readFile(path.join(ROOT, 'plugins/us-stock-analysis/README.md')) || '';
+  const missing = actualSkillDirs.filter(n => !listing.includes(`\`${n}\``));
+  if (missing.length) fail(`plugins/us-stock-analysis/README.md — skills missing from the listing: ${missing.join(', ')}`);
+  else pass('plugins/us-stock-analysis/README.md — lists every skill');
+}
+
+// ─── Test 17: Code Fences Are Balanced ───────────────────────────────────────
+
+section('17. Code fences are balanced (skills, prompts, site content, root docs)');
+
+// A fence opened inside another (```bash inside an open ```) or left open
+// swallows the headings after it: the zh Cookbook once lost §3.10 this way,
+// and 19 skills once hid Thesis Invalidation inside the signal-block fence.
+const { fenceProblems } = require('./lib/fences');
+const fenceFiles = [
+  ...actualSkillDirs.map(n => path.join('plugins/us-stock-analysis/skills', n, 'SKILL.md')),
+  ...fs.readdirSync(path.join(ROOT, 'prompts')).filter(f => f.endsWith('.md')).map(f => path.join('prompts', f)),
+  ...fs.readdirSync(path.join(ROOT, 'site/content')).filter(f => f.endsWith('.md')).map(f => path.join('site/content', f)),
+  ...fs.readdirSync(ROOT).filter(f => f.endsWith('.md')),
+];
+let fenceBad = 0;
+fenceFiles.forEach(rel => {
+  const problems = fenceProblems(readFile(path.join(ROOT, rel)) || '');
+  if (problems.length) { fenceBad++; fail(`${rel} — ${problems.slice(0, 3).join('; ')}`); }
+});
+if (!fenceBad) pass(`Code fences balanced in ${fenceFiles.length} markdown files`);
+
+// ─── Test 18: No Stale "Current Version" Claims ──────────────────────────────
+
+section('18. Docs never pin a stale "current version"');
+
+// FAQ, SECURITY and PLATFORM-COMPATIBILITY called v1.4.0 "current" for nine
+// releases. Docs should say "latest" or point at CHANGELOG; any version a doc
+// does call current must be the manifest version.
+const VERSION_DOCS = ['README.md', 'README-zh-TW.md', 'README-claude-code.md', 'README-cursor.md', 'README-gemini.md', 'README-ollama.md',
+  'FAQ.md', 'site/content/FAQ-zh-TW.md', 'SECURITY.md', 'PLATFORM-COMPATIBILITY.md', 'CONTRIBUTING.md', 'ADDING-NEW-SKILLS.md'];
+const currentVersionRes = [
+  /(?:current(?:ly)?(?:\s+version)?|latest(?:\s+version)?|目前版本|最新版本)\s*\**\s*[:：]?\s*\**\s*v?(\d+\.\d+\.\d+)/gi,  // "Current Version: v1.4.0"
+  /Last Tested\**\s*[:：]?\s*\**\s*v?(\d+\.\d+\.\d+)/gi,                       // "**Last Tested**: v1.4.0"
+  /us-stock-analysis\s+v(\d+\.\d+\.\d+)/g,                                       // "/plugin list should show us-stock-analysis v1.4.0"
+  /\|\s*v?(\d+\.\d+\.\d+)\s*\|\s*✅\s*Current/gi,                                  // SECURITY support table row
+];
+let versionClaims = 0;
+VERSION_DOCS.forEach(file => {
+  const content = readFile(path.join(ROOT, file));
+  if (!content) return;
+  const stale = currentVersionRes.flatMap(re => [...content.matchAll(re)]).filter(m => m[1] !== versions["plugin.json"]).map(m => `"${m[0].trim()}"`);
+  if (stale.length) { versionClaims++; fail(`${file} — calls a non-current version current: ${stale.slice(0, 3).join(', ')} (manifest: ${versions["plugin.json"]})`); }
+});
+if (!versionClaims) pass(`No doc calls a version other than ${versions["plugin.json"]} current (${VERSION_DOCS.length} docs)`);
 
 // ─── Final Summary ───────────────────────────────────────────────────────────
 

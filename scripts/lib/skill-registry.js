@@ -34,6 +34,8 @@ const CONTRACT_EXEMPT = {
   dataSources:        [...OUTPUT_TOOLS, ...ALIAS_SKILLS, ...META_SKILLS],
   thesisInvalidation: [...OUTPUT_TOOLS, ...ALIAS_SKILLS, ...META_SKILLS],
   disclaimer:         [...OUTPUT_TOOLS],
+  signalFence:        [...OUTPUT_TOOLS],
+  jsonFooter:         [...OUTPUT_TOOLS],
 };
 
 function listSkillDirs() {

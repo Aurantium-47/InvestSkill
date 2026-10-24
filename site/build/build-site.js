@@ -47,6 +47,8 @@ const NAV = {
         { label: '11 · Taxes & Account Types', href: 'learning-taxes.html', page: 'learning-taxes' },
         { label: '12 · Earnings Season, Explained', href: 'learning-earnings.html', page: 'learning-earnings' },
         { label: '13 · Psychology & Process', href: 'learning-psychology.html', page: 'learning-psychology' },
+        { label: '14 · Macro & the Fed Cycle', href: 'learning-macro.html', page: 'learning-macro' },
+        { label: '15 · Options for Stock Investors', href: 'learning-options.html', page: 'learning-options' },
         { label: 'Case Study: When the Answer Is No', href: 'learning-case-pass.html', page: 'learning-case-pass' },
       ],
     },
@@ -57,6 +59,8 @@ const NAV = {
         { label: 'Glossary',        href: 'glossary.html',      page: 'glossary' },
         { label: 'Choose a Skill',  href: 'choose-a-skill.html', page: 'choose-a-skill' },
         { label: 'Use Cases',       href: 'use-cases.html',     page: 'use-cases' },
+        { label: 'Cheat Sheet',     href: 'cheatsheet.html',    page: 'cheatsheet' },
+        { label: 'FAQ',             href: 'faq.html',           page: 'faq' },
       ],
     },
     {
@@ -116,6 +120,8 @@ const NAV = {
         { label: '11 · 稅與帳戶類型', href: 'learning-taxes-zh-tw.html', page: 'learning-taxes-zh-tw' },
         { label: '12 · 財報季解析', href: 'learning-earnings-zh-tw.html', page: 'learning-earnings-zh-tw' },
         { label: '13 · 心理與流程', href: 'learning-psychology-zh-tw.html', page: 'learning-psychology-zh-tw' },
+        { label: '14 · 總體經濟與聯準會循環', href: 'learning-macro-zh-tw.html', page: 'learning-macro-zh-tw' },
+        { label: '15 · 給股票投資人的選擇權', href: 'learning-options-zh-tw.html', page: 'learning-options-zh-tw' },
         { label: '案例研究：當答案是「不」', href: 'learning-case-pass-zh-tw.html', page: 'learning-case-pass-zh-tw' },
       ],
     },
@@ -126,6 +132,8 @@ const NAV = {
         { label: '術語表',           href: 'glossary-zh-tw.html',      page: 'glossary-zh-tw' },
         { label: '選擇技能',         href: 'choose-a-skill-zh-tw.html', page: 'choose-a-skill-zh-tw' },
         { label: '使用情境',         href: 'use-cases-zh-tw.html',      page: 'use-cases-zh-tw' },
+        { label: '投資速查表',       href: 'cheatsheet-zh-tw.html',     page: 'cheatsheet-zh-tw' },
+        { label: '常見問題',         href: 'faq-zh-tw.html',            page: 'faq-zh-tw' },
       ],
     },
     {
@@ -173,6 +181,10 @@ const LANG_PAIRS = [
   ['learning-earnings.html', 'learning-earnings-zh-tw.html'],
   ['learning-psychology.html', 'learning-psychology-zh-tw.html'],
   ['learning-case-pass.html', 'learning-case-pass-zh-tw.html'],
+  ['learning-macro.html', 'learning-macro-zh-tw.html'],
+  ['learning-options.html', 'learning-options-zh-tw.html'],
+  ['cheatsheet.html', 'cheatsheet-zh-tw.html'],
+  ['faq.html', 'faq-zh-tw.html'],
   ['concepts.html', 'concepts-zh-tw.html'],
   ['glossary.html', 'glossary-zh-tw.html'],
   ['choose-a-skill.html', 'choose-a-skill-zh-tw.html'],
@@ -257,6 +269,10 @@ const MD_TO_HTML = {
   'LEARNING-EARNINGS.md': 'learning-earnings.html',
   'LEARNING-PSYCHOLOGY.md': 'learning-psychology.html',
   'LEARNING-CASE-PASS.md': 'learning-case-pass.html',
+  'LEARNING-MACRO.md': 'learning-macro.html',
+  'LEARNING-OPTIONS.md': 'learning-options.html',
+  'CHEATSHEET.md': 'cheatsheet.html',
+  'FAQ.md': 'faq.html',
   'LEARNING-zh-TW.md':              'learning-zh-tw.html',
   'LEARNING-FOUNDATIONS-zh-TW.md':  'learning-foundations-zh-tw.html',
   'LEARNING-STATEMENTS-zh-TW.md':   'learning-statements-zh-tw.html',
@@ -272,6 +288,10 @@ const MD_TO_HTML = {
   'LEARNING-EARNINGS-zh-TW.md': 'learning-earnings-zh-tw.html',
   'LEARNING-PSYCHOLOGY-zh-TW.md': 'learning-psychology-zh-tw.html',
   'LEARNING-CASE-PASS-zh-TW.md': 'learning-case-pass-zh-tw.html',
+  'LEARNING-MACRO-zh-TW.md': 'learning-macro-zh-tw.html',
+  'LEARNING-OPTIONS-zh-TW.md': 'learning-options-zh-tw.html',
+  'CHEATSHEET-zh-TW.md': 'cheatsheet-zh-tw.html',
+  'FAQ-zh-TW.md': 'faq-zh-tw.html',
 };
 
 // Assets we actually serve — any other relative link is sent to GitHub.
@@ -291,6 +311,21 @@ const SERVED = new Set(['index.html','cookbook.html','cookbook-zh-tw.html',
   'learning-quality-zh-tw.html','learning-valuation-zh-tw.html','learning-market-zh-tw.html',
   'learning-portfolio-zh-tw.html','learning-playbook-zh-tw.html','learning-case-amd-zh-tw.html',
   'learning-setup-zh-tw.html','learning-etfs-zh-tw.html','learning-taxes-zh-tw.html','learning-earnings-zh-tw.html','learning-psychology-zh-tw.html','learning-case-pass-zh-tw.html']);
+
+// Intrinsic size of a local PNG or WebP (null for anything else / unreadable).
+function imageSize(file) {
+  try {
+    const b = fs.readFileSync(file);
+    if (b.slice(1, 4).toString() === 'PNG') return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    if (b.slice(0, 4).toString() === 'RIFF' && b.slice(8, 12).toString() === 'WEBP') {
+      const kind = b.slice(12, 16).toString();
+      if (kind === 'VP8 ') return { w: b.readUInt16LE(26) & 0x3fff, h: b.readUInt16LE(28) & 0x3fff };
+      if (kind === 'VP8L') return { w: 1 + (b[21] | ((b[22] & 0x3f) << 8)), h: 1 + ((b[22] >> 6) | (b[23] << 2) | ((b[24] & 0x0f) << 10)) };
+      if (kind === 'VP8X') return { w: 1 + b.readUIntLE(24, 3), h: 1 + b.readUIntLE(27, 3) };
+    }
+  } catch { /* fall through */ }
+  return null;
+}
 
 // Rewrite links in rendered HTML:
 //  - relative paths for served assets  → leave alone
@@ -321,6 +356,13 @@ function rewriteLinks(html) {
   // Images in site/content/*.md use ../assets/ so they also render on GitHub;
   // on the site, assets are served from the root.
   html = html.replace(/src="\.\.\/assets\//g, 'src="assets/');
+  // Lazy-load every image and give local ones their intrinsic size, so long
+  // demo pages don't fetch every screenshot up front or shift as they load.
+  html = html.replace(/<img (?![^>]*\bloading=)([^>]*?)src="([^"]+)"([^>]*)>/g, (m, pre, src, post) => {
+    const size = src.startsWith('assets/') ? imageSize(path.join(__dirname, '..', src)) : null;
+    const dims = size && !/\bwidth=/.test(pre + post) ? ` width="${size.w}" height="${size.h}"` : '';
+    return `<img ${pre}src="${src}"${post} loading="lazy" decoding="async"${dims}>`;
+  });
 
   // Replace old GitHub Pages domain with new custom domain
   html = html.replace(new RegExp(OLD_SITE.replace(/\./g, '\\.'), 'g'), SITE_BASE);
@@ -334,10 +376,10 @@ function rewriteLinks(html) {
 // Display categories for the index, mirroring README. Any skill not listed
 // here falls into "Other" so new skills still appear without code changes.
 const SKILL_CATEGORIES = [
-  { title: 'Core Stock Analysis', skills: ['stock-eval','technical-analysis','stock-valuation','economics-analysis'] },
-  { title: 'Financial Reports',   skills: ['financial-report-analyst','10k-digest','earnings-call-analysis'] },
+  { title: 'Core Stock Analysis', skills: ['stock-eval','technical-analysis','stock-valuation','economics-analysis','compare'] },
+  { title: 'Financial Reports',   skills: ['financial-report-analyst','10k-digest','earnings-call-analysis','forensic-accounting','credit-check'] },
   { title: 'Market Monitoring',   skills: ['insider-trading','institutional-ownership','dividend-analysis','short-interest'] },
-  { title: 'Advanced Research',   skills: ['competitor-analysis','industry-map','options-analysis','portfolio-review','sector-analysis','stock-screener','catalyst-calendar','bear-case','position-ladder','thesis-tracker','etf-analysis','earnings-preview','tax-lens','risk-stress-test'] },
+  { title: 'Advanced Research',   skills: ['competitor-analysis','industry-map','options-analysis','portfolio-review','sector-analysis','stock-screener','catalyst-calendar','bear-case','position-ladder','thesis-tracker','etf-analysis','earnings-preview','tax-lens','risk-stress-test','trade-postmortem'] },
   { title: 'Meta & Output',       skills: ['full-report','report-generator','chart-master','result-validator','learning-coach','fact-check'] },
   // Redirect stubs kept for backwards compatibility — installed, but not counted as frameworks.
   { title: 'Aliases (redirects)', skills: ['fundamental-analysis','dcf-valuation','research-bundle'] },
@@ -548,6 +590,20 @@ const PAGES = [
     subtitle: 'Lesson 13 · Process vs. outcome, the biases and their antidotes, pre-mortems, journals, sell rules',
   },
   {
+    key: 'learning-macro',
+    outFile: 'learning-macro.html',
+    srcFile: 'site/content/LEARNING-MACRO.md',
+    title: 'Macro & the Fed Cycle',
+    subtitle: 'Lesson 14 · The dual mandate, how rates reach your stock, the yield curve, CPI vs. core PCE, cycle phases and sectors, leading indicators, FOMC mechanics',
+  },
+  {
+    key: 'learning-options',
+    outFile: 'learning-options.html',
+    srcFile: 'site/content/LEARNING-OPTIONS.md',
+    title: 'Options for Stock Investors',
+    subtitle: 'Lesson 15 · Calls and puts, the Greeks in plain words, IV and the expected move, covered calls, cash-secured and protective puts, and what not to do',
+  },
+  {
     key: 'learning-case-pass',
     outFile: 'learning-case-pass.html',
     srcFile: 'site/content/LEARNING-CASE-PASS.md',
@@ -653,11 +709,53 @@ const PAGES = [
     subtitle: '第 13 課 · 程序 vs. 結果、偏誤與解方、事前驗屍、日誌、賣出規則',
   },
   {
+    key: 'learning-macro-zh-tw',
+    outFile: 'learning-macro-zh-tw.html',
+    srcFile: 'site/content/LEARNING-MACRO-zh-TW.md',
+    title: '總體經濟與聯準會循環',
+    subtitle: '第 14 課 · 雙重使命、利率如何傳到股票、殖利率曲線、CPI 與核心 PCE、景氣階段與類股、領先指標、FOMC 運作',
+  },
+  {
+    key: 'learning-options-zh-tw',
+    outFile: 'learning-options-zh-tw.html',
+    srcFile: 'site/content/LEARNING-OPTIONS-zh-TW.md',
+    title: '給股票投資人的選擇權',
+    subtitle: '第 15 課 · 買權與賣權、白話希臘字母、IV 與預期波動、掩護性買權、現金擔保與保護性賣權，以及不該做的事',
+  },
+  {
     key: 'learning-case-pass-zh-tw',
     outFile: 'learning-case-pass-zh-tw.html',
     srcFile: 'site/content/LEARNING-CASE-PASS-zh-TW.md',
     title: '案例研究：當答案是「不」',
     subtitle: '總整理 · 專業流程以「放棄」收尾——PFE（價值陷阱）與 UPST（不交易）',
+  },
+  {
+    key: 'cheatsheet',
+    outFile: 'cheatsheet.html',
+    srcFile: 'site/content/CHEATSHEET.md',
+    title: "Investor's Cheat Sheet",
+    subtitle: 'One printable page: the signal block decoded, the metrics that matter with good/bad ranges, the pre-trade checklist, which skill to use, and the red flags',
+  },
+  {
+    key: 'cheatsheet-zh-tw',
+    outFile: 'cheatsheet-zh-tw.html',
+    srcFile: 'site/content/CHEATSHEET-zh-TW.md',
+    title: '投資速查表',
+    subtitle: '一頁可列印的總整理：訊號區塊解碼、關鍵指標與好壞區間、交易前檢查表、技能對照與警訊',
+  },
+  {
+    key: 'faq',
+    outFile: 'faq.html',
+    srcFile: 'FAQ.md',
+    title: 'FAQ',
+    subtitle: 'Installing, running, trusting and contributing — the questions people actually ask',
+  },
+  {
+    key: 'faq-zh-tw',
+    outFile: 'faq-zh-tw.html',
+    srcFile: 'site/content/FAQ-zh-TW.md',
+    title: '常見問題',
+    subtitle: '安裝、執行、資料可信度與貢獻——大家真正會問的問題',
   },
   {
     key: 'concepts',
@@ -1506,6 +1604,23 @@ function buildSkillsIndex() {
   return { html, text };
 }
 
+// <link rel="alternate" hreflang> for a page that has a counterpart in the other language.
+function hreflangLinks(outFile) {
+  const en = ZH_TO_EN[outFile] || (EN_TO_ZH[outFile] ? outFile : null);
+  const zh = EN_TO_ZH[outFile] || (ZH_TO_EN[outFile] ? outFile : null);
+  if (!en || !zh) return '';
+  return [`  <link rel="alternate" hreflang="en" href="${SITE_BASE}/${en}">`,
+    `  <link rel="alternate" hreflang="zh-Hant" href="${SITE_BASE}/${zh}">`,
+    `  <link rel="alternate" hreflang="x-default" href="${SITE_BASE}/${en}">`].join('\n');
+}
+
+// The page hero already renders the title as the page's <h1>; a leading
+// markdown "# Title" would be a second one. Keep its id (old links to
+// page#title still land) and drop the heading.
+function demoteLeadingH1(html) {
+  return html.replace(/^\s*<h1( id="[^"]*")?[^>]*>[\s\S]*?<\/h1>/, (m, id) => (id ? `<span${id}></span>` : ''));
+}
+
 function htmlPage(page, content) {
   const lang = langOf(page.outFile);
   const U = UI[lang];
@@ -1563,7 +1678,16 @@ function htmlPage(page, content) {
   <meta property="og:title" content="${escapeHtml(docTitle)}">
   <meta property="og:description" content="${escapeHtml(description)}">
   <meta property="og:url" content="${SITE_BASE}/${page.outFile}">
+  <meta property="og:image" content="${SITE_BASE}/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="${lang === 'zh' ? 'zh_TW' : 'en_US'}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHtml(docTitle)}">
+  <meta name="twitter:description" content="${escapeHtml(description)}">
+  <meta name="twitter:image" content="${SITE_BASE}/assets/og-image.png">
   <link rel="canonical" href="${SITE_BASE}/${page.outFile}">
+${hreflangLinks(page.outFile)}
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23e8664e'/%3E%3Cpath d='M8 22l5-7 4 4 7-10' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <script>(function(){try{var t=localStorage.getItem('is-theme');if(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1572,6 +1696,7 @@ function htmlPage(page, content) {
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<a class="skip-link" href="#main">${lang === 'zh' ? '跳到主要內容' : 'Skip to content'}</a>
 <div class="progress" id="progress" aria-hidden="true"></div>
 
 <header class="site-header">
@@ -1623,7 +1748,7 @@ ${nav}
     </nav>
   </aside>
 
-  <main class="${pageContentClass}">
+  <main class="${pageContentClass}" id="main" tabindex="-1">
 ${pageHero}
 ${landing}${extras}
 ${readmeHead}
@@ -1651,6 +1776,9 @@ ${footer}
 </html>`;
 }
 
+// Every configured page is served, so links to it are never sent to GitHub.
+PAGES.forEach(p => SERVED.add(p.outFile));
+
 // ---------------------------------------------------------------------------
 // Build all pages
 // ---------------------------------------------------------------------------
@@ -1671,12 +1799,28 @@ if (fs.existsSync(assetsDir)) {
 
 // Client-side search index (built as pages render).
 const searchIndex = [];
-const toText = (html) => html
+const toText = (html, max = 1600) => html
   .replace(/<[^>]+>/g, ' ')
   .replace(/&[a-z]+;/gi, ' ')
   .replace(/\s+/g, ' ')
   .trim()
-  .slice(0, 1600);
+  .slice(0, max);
+
+// One search entry per page (its opening text) plus one per H2/H3 section, so
+// a term deep in a long page (a glossary entry, a cookbook recipe) is found and
+// the result links straight to its heading.
+const SECTION_TEXT = 280;
+function indexPage({ title, url, lang, section }, html) {
+  searchIndex.push({ title, url, lang, section, text: toText(html, 600) });
+  const parts = html.split(/(?=<h[23] id=")/);
+  for (const part of parts) {
+    const m = part.match(/^<h[23] id="([^"]+)"[^>]*>([\s\S]*?)<\/h[23]>/);
+    if (!m) continue;
+    const heading = toText(m[2], 120);
+    if (!heading) continue;
+    searchIndex.push({ title: heading, url: `${url}#${m[1]}`, lang, section: `${section} · ${title}`, text: toText(part.slice(m[0].length), SECTION_TEXT) });
+  }
+}
 
 // Generate pages
 for (const page of PAGES) {
@@ -1686,16 +1830,10 @@ for (const page of PAGES) {
   }
   let raw = fs.readFileSync(page.srcFile, 'utf8');
   if (page.key === 'home' || page.key === 'zh-tw') raw = stripReadmeHeader(raw);
-  const content = wrapTables(rewriteLinks(md.render(raw)));
+  const content = demoteLeadingH1(wrapTables(rewriteLinks(md.render(raw))));
   const html    = htmlPage(page, content);
   fs.writeFileSync(path.join(outDir, page.outFile), html);
-  searchIndex.push({
-    title: page.title,
-    url: page.outFile,
-    lang: langOf(page.outFile),
-    section: eyebrowFor(langOf(page.outFile), page.key),
-    text: toText(content),
-  });
+  indexPage({ title: page.title, url: page.outFile, lang: langOf(page.outFile), section: eyebrowFor(langOf(page.outFile), page.key) }, content);
   console.log(`✓ ${page.outFile}`);
 }
 
@@ -1724,13 +1862,7 @@ for (const name of promptFiles) {
   };
   const content = wrapTables(rewriteLinks(md.render(body)));
   fs.writeFileSync(path.join(outDir, page.outFile), htmlPage(page, content));
-  searchIndex.push({
-    title: page.title,
-    url: page.outFile,
-    lang: 'en',
-    section: 'Skill Reference',
-    text: toText(content),
-  });
+  indexPage({ title: page.title, url: page.outFile, lang: 'en', section: 'Skill Reference' }, content);
 }
 console.log(`✓ ${promptFiles.length} per-skill reference pages`);
 
@@ -1751,6 +1883,7 @@ const html404 = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 · InvestSkill</title>
+  <meta name="robots" content="noindex">
   <script>(function(){try{var t=localStorage.getItem('is-theme');if(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
   <link rel="stylesheet" href="/InvestSkill/style.css">
 </head>
@@ -1758,12 +1891,29 @@ const html404 = `<!DOCTYPE html>
   <div class="card-404">
     <p class="num-404">404</p>
     <p>That page doesn't exist — but the frameworks do.</p>
-    <div class="page-actions"><a class="btn btn-primary" href="/InvestSkill/">Go home</a><a class="btn" href="/InvestSkill/skills.html">Skill Reference</a></div>
+    <p lang="zh-Hant">找不到這個頁面——不過分析框架都還在。</p>
+    <div class="page-actions"><a class="btn btn-primary" href="/InvestSkill/">Go home</a><a class="btn" href="/InvestSkill/skills.html">Skill Reference</a><a class="btn" href="/InvestSkill/learning.html">Learning</a></div>
+    <div class="page-actions" lang="zh-Hant"><a class="btn btn-primary" href="/InvestSkill/zh-tw.html">回到首頁</a><a class="btn" href="/InvestSkill/choose-a-skill-zh-tw.html">選擇技能</a><a class="btn" href="/InvestSkill/learning-zh-tw.html">學習中心</a></div>
+    <p class="search-hint">Tip: press <kbd>⌘</kbd> <kbd>K</kbd> on any page to search every lesson, skill and glossary term · 在任何頁面按 ⌘ K 可搜尋所有課程、技能與術語。</p>
   </div>
 </body>
 </html>`;
 fs.writeFileSync(path.join(outDir, '404.html'), html404);
 console.log('✓ 404.html');
+
+// sitemap.xml (every HTML page, with its language alternates) and robots.txt.
+{
+  const pages = fs.readdirSync(outDir).filter(f => f.endsWith('.html') && f !== '404.html').sort();
+  const alt = f => {
+    const en = ZH_TO_EN[f] || (EN_TO_ZH[f] ? f : null);
+    const zh = EN_TO_ZH[f] || (ZH_TO_EN[f] ? f : null);
+    return en && zh ? `\n    <xhtml:link rel="alternate" hreflang="en" href="${SITE_BASE}/${en}"/>\n    <xhtml:link rel="alternate" hreflang="zh-Hant" href="${SITE_BASE}/${zh}"/>` : '';
+  };
+  const urls = pages.map(f => `  <url>\n    <loc>${SITE_BASE}/${f}</loc>${alt(f)}\n  </url>`).join('\n');
+  fs.writeFileSync(path.join(outDir, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`);
+  fs.writeFileSync(path.join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_BASE}/sitemap.xml\n`);
+  console.log(`✓ sitemap.xml (${pages.length} pages) + robots.txt`);
+}
 
 // Write the client-side search index.
 fs.writeFileSync(path.join(outDir, 'search-index.json'), JSON.stringify(searchIndex));

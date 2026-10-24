@@ -9,7 +9,7 @@ description: Plan a staged position — entry ladder, share-count floor/ceiling,
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — the current price and recent ATR or volatility for rung spacing, the user's lots (dates, prices, shares), cash available, and the thesis invalidation level the ladder must respect.
 3. **State your data source** — fill in the `Data & Sources` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -56,7 +56,7 @@ State all three, then produce the plan. Never present the ladder as a way to gua
 
 Answer the question the rest of the catalog does not: **"I own this — now what is my execution plan?"**
 
-The other frameworks decide *what* to own (`stock-eval`, `fundamental-analysis`), *what it is worth* (`stock-valuation`, `dcf-valuation`), and *when* to enter (`technical-analysis`). None of them manages a position across its life. This one does. It takes a holding — or a planned holding — and produces:
+The other frameworks decide *what* to own (`stock-eval`), *what it is worth* (`stock-valuation`), and *when* to enter (`technical-analysis`). None of them manages a position across its life. This one does. It takes a holding — or a planned holding — and produces:
 
 - A **share-count band**: a floor (core position you always keep) and a ceiling (the hard cap on adding).
 - An **entry ladder**: pre-committed rungs between today's price and the bottom of the build zone, with the size of each.
@@ -373,19 +373,12 @@ Round share counts to whole shares (or state that fractional shares are assumed)
 
 ## Notes
 
-- **Complements, does not replace**: run `stock-eval` or `fundamental-analysis` first to establish the thesis, `technical-analysis` for the support levels that make the best rungs, `bear-case` for the gate in Phase 6, and `portfolio-review` for the concentration cap that sets the ceiling.
+- **Complements, does not replace**: run `stock-eval` first to establish the thesis, `technical-analysis` for the support levels that make the best rungs, `bear-case` for the gate in Phase 6, and `portfolio-review` for the concentration cap that sets the ceiling.
 - **The strategy is regime-dependent, and the regime is not knowable in advance.** Present it as a bounded, rules-based way to build a position — not as an edge that works everywhere.
 - **Do not raise the ceiling mid-drawdown.** If the analysis concludes the position should be bigger, that is a new decision requiring a fresh thesis, not a ladder adjustment.
 - **Fractional-share brokers change the math** — equal-dollar sizing becomes exact. Say which assumption is in force.
 - Tax treatment is modeled at a high level for **US taxable accounts only**. It is not tax advice; recommend a tax professional for anything material.
 
-## Signal Output
-
-This skill measures **execution suitability, not price direction** — so state the mapping explicitly. The Ladder Suitability Score drives the block: a high score means staged accumulation inside the band is appropriate and the plan should be executed as modeled; a low score means the thesis, regime, or concentration test failed and the correct action is to stop adding. `Action: BUY` here means "continue laddering within the stated cap" — never "buy without limit." `Action: SELL` means the gate failed, not that a short is warranted. Read the direction of the underlying stock from `stock-eval` or `bear-case`, not from this block.
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -407,6 +400,19 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Signal Output
+
+This skill measures **execution suitability, not price direction** — so state the mapping explicitly. The Ladder Suitability Score drives the block: a high score means staged accumulation inside the band is appropriate and the plan should be executed as modeled; a low score means the thesis, regime, or concentration test failed and the correct action is to stop adding. `Action: BUY` here means "continue laddering within the stated cap" — never "buy without limit." `Action: SELL` means the gate failed, not that a short is warranted. Read the direction of the underlying stock from `stock-eval` or `bear-case`, not from this block.
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "position-ladder", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

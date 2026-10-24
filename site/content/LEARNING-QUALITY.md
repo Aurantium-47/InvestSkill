@@ -210,6 +210,26 @@ Both earn the same profit, but **Company A** creates value (ROIC 20% > WACC 8%),
 
 ---
 
+## Check yourself
+
+1. A company earns an ROIC of 6% against a WACC of 9% and is growing revenue 20% a year. Is that growth creating value?
+2. Two companies both report a 20% ROE. Company A's ROA is 12% with little debt; Company B's ROA is 3%. What explains B's ROE, and which one is riskier?
+3. A company has EBIT of $60M, interest expense of $20M, net debt of $300M, and EBITDA of $80M. Work out its interest coverage and net debt / EBITDA, and read each against the lesson's rough ranges.
+4. Management says the company has a wide moat. Over five years its ROIC has slid from 22% to 10% (WACC 9%) and gross margin from 55% to 44%. What do you conclude?
+5. The stock trades well above your estimate of intrinsic value, and the company announces a large buyback. Is that good for shareholders?
+
+<details><summary>Answers</summary>
+
+1. No. With **ROIC below WACC**, every dollar of growth destroys value — the business earns less than its capital costs. Growing faster only destroys value faster.
+2. Leverage. A high ROE with a low ROA means borrowing is doing the heavy lifting — in DuPont terms, B's financial-leverage multiplier is about 20% ÷ 3% ≈ 6.7× assets per dollar of equity. B is the riskier one; A earns its return through margins and turnover.
+3. Interest coverage = 60 ÷ 20 = **3×** — between fragile (below ~2×) and healthy (above ~5×). Net debt / EBITDA = 300 ÷ 80 = **3.75×** — past comfortable (~2×) and close to stretched (~4×). A balance sheet that could turn a rough patch into a crisis.
+4. The moat is **narrowing**, whatever the story. A real moat leaves fingerprints — persistently high ROIC above WACC and stable or rising gross margins — and both are eroding toward the cost of capital.
+5. No. Buybacks create value **only when the stock trades below intrinsic value**; buying back overpriced stock destroys value just as surely as an overpriced acquisition.
+
+</details>
+
+---
+
 ## Key takeaways
 
 - Quality is about returns on capital, not the size of profits — a business creates value only when **ROIC > WACC**.

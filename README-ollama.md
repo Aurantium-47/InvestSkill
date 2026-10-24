@@ -1,6 +1,6 @@
 # InvestSkill for Ollama
 
-Run all 25 InvestSkill frameworks on **local open-source models** (Qwen, Llama, DeepSeek, Mistral…) via [Ollama](https://ollama.com) — no API key, no per-token cost, and your data stays on your machine.
+Run all 34 InvestSkill frameworks on **local open-source models** (Qwen, Llama, DeepSeek, Mistral…) via [Ollama](https://ollama.com) — no API key, no per-token cost, and your data stays on your machine.
 
 **For multi-platform setup**, see [README.md](README.md).
 
@@ -47,7 +47,7 @@ ollama run qwen2.5:32b
 Paste a framework, then the data it asks for:
 
 ```
->>> [paste the contents of prompts/stock-eval.md]
+>>> [paste the contents of .investskill/prompts/stock-eval.md]
 
 Evaluate Apple (AAPL). Live data (source: Google Finance, 2026-07-18):
 - Price: $XXX   P/E: XX   Revenue: $XXB   [paste the figures the framework requests]
@@ -70,7 +70,7 @@ ollama run invest-eval "Evaluate AAPL. Data below: ..."
 
 ### Path B — automatic data (tool-capable client)
 
-Point any tool-capable client at Ollama's OpenAI-compatible endpoint (`http://localhost:11434/v1`), enable its web-search/fetch tool, and load a `prompts/*.md` file as the system prompt. The model then fetches prices and filings itself — matching the Claude Code / Gemini experience. Common clients: **Open WebUI** (built-in web search), **Continue.dev**, **Cline**.
+Point any tool-capable client at Ollama's OpenAI-compatible endpoint (`http://localhost:11434/v1`), enable its web-search/fetch tool, and load a `.investskill/prompts/*.md` file as the system prompt. The model then fetches prices and filings itself — matching the Claude Code / Gemini experience. Common clients: **Open WebUI** (built-in web search), **Continue.dev**, **Cline**.
 
 ---
 
@@ -99,7 +99,7 @@ Bigger is better here: the frameworks are long (500–4,200 words) and demand di
 
 - [README.md](README.md) — all platforms
 - [PLATFORM-COMPATIBILITY.md](PLATFORM-COMPATIBILITY.md) — feature comparison
-- [`prompts/`](prompts/) — the 30 framework files (+ 3 aliases, 1 output tool)
+- [`prompts/`](prompts/) — the 34 framework files (+ 3 aliases, 1 output tool)
 
 ---
 

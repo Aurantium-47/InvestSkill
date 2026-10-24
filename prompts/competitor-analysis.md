@@ -5,7 +5,7 @@
 Before running any analysis, always retrieve the latest market data for the ticker:
 
 1. **Fetch current price** — use web search or ask the user for the live price, 52-week range, and market cap. Never assume a price from training data.
-2. **Confirm key figures** — recent earnings, revenue, key ratios (P/E, P/S, etc.) as applicable to this skill.
+2. **Confirm key figures** — revenue, segment mix, gross and operating margin, ROIC and market share for the company **and each rival** from the same period (latest fiscal year or TTM), so the comparison is like for like.
 3. **State your data source** — fill in the `Data & Sources` header (next section) so the origin, as-of date, retrieval path, and confidence of every figure are explicit at the top of the output.
 4. **Flag stale data explicitly** — if live data is unavailable, display this warning before proceeding:
 
@@ -42,7 +42,7 @@ Competitive analysis answers the fundamental question: **"Does this company have
 
 A company with a wide, widening moat deserves a premium P/E and P/FCF multiple because its excess returns on capital are durable. A company with no moat, or a narrowing moat, should trade at or below sector multiples regardless of near-term earnings momentum. Understanding the moat is the single most important determinant of a stock's long-term investment return — more important than any individual quarterly earnings figure.
 
-This skill provides a structured, repeatable framework for moat identification, industry attractiveness scoring, competitive benchmarking, and innovation positioning. Output feeds directly into `dcf-valuation` (to set appropriate WACC and terminal growth rate) and `fundamental-analysis` (to contextualize ROIC and margin trends).
+This skill provides a structured, repeatable framework for moat identification, industry attractiveness scoring, competitive benchmarking, and innovation positioning. Output feeds directly into `stock-valuation` (to set appropriate WACC and terminal growth rate) and `stock-eval` (to contextualize ROIC and margin trends). To weigh this company against two to four rivals as *investments* rather than as businesses, use `compare`.
 
 ---
 
@@ -431,11 +431,6 @@ Provide a comprehensive competitive analysis report with:
 - Moat score components horizontal bar chart data
 - Chart specifications for HTML report generation via `report-generator`
 
-## Standard Signal Output
-
-All analysis concludes with this standardized block:
-
-```
 ## Thesis Invalidation
 
 After delivering the analysis signal, specify what would reverse it:
@@ -454,6 +449,17 @@ After delivering the analysis signal, specify what would reverse it:
 - [ ] 60 days have elapsed
 - [ ] Material news event (acquisition, leadership change, regulatory decision)
 
+## Standard Signal Output
+
+All analysis concludes with this standardized block:
+
+In the output, the box below is followed immediately by this machine-readable footer — the same values as the box, filled in (no placeholders, no comments), so tools can read the result without parsing the box:
+
+```json
+{"investskill": "1", "skill": "competitor-analysis", "ticker": "<TICKER, or null for a portfolio / market-wide view>", "as_of": "<YYYY-MM-DD from Data & Sources>", "signal": "<BULLISH | NEUTRAL | BEARISH>", "confidence": "<HIGH | MEDIUM | LOW>", "horizon": "<SHORT-TERM | MEDIUM-TERM | LONG-TERM>", "score": 0.0, "action": "<BUY | HOLD | SELL>", "conviction": "<STRONG | MODERATE | WEAK>", "retrieval": "<pasted by user | web/tool retrieval | model memory>", "sources": ["<each primary source, dated>"]}
+```
+
+```
 ╔══════════════════════════════════════════════╗
 ║              INVESTMENT SIGNAL               ║
 ╠══════════════════════════════════════════════╣

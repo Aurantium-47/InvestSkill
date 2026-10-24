@@ -1,253 +1,75 @@
 #!/usr/bin/env node
 /**
- * release-dry-run.js
- * Performs a dry-run of the release process without publishing
- * Shows what would happen without making any changes
+ * release-dry-run.js — preview a release without changing anything.
  *
- * Usage:
- *   node scripts/release-dry-run.js               # Check current version
- *   node scripts/release-dry-run.js v1.4.1        # Check specific version
+ *   npm run release:dry-run                  # assumes a minor release
+ *   node scripts/release-dry-run.js --type patch
+ *
+ * Shows the version change, the files `npm run release` would edit, the
+ * CHANGELOG section it would publish, the skill/framework counts, recent tags,
+ * and anything that would make the release refuse to run. Exit code 1 when a
+ * precondition fails, so it doubles as a pre-flight check.
  */
-
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const rel = require('./lib/release');
+const reg = require('./lib/skill-registry');
 
 const ROOT = path.resolve(__dirname, '..');
+const argv = process.argv.slice(2);
+const i = argv.indexOf('--type');
+const type = i >= 0 ? argv[i + 1] : 'minor';
 
-// Color codes
-const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m',
-};
+const c = { reset: '\x1b[0m', bright: '\x1b[1m', green: '\x1b[32m', yellow: '\x1b[33m', cyan: '\x1b[36m', red: '\x1b[31m' };
+const git = (...args) => { try { return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8' }).trim(); } catch { return ''; } };
+const problems = [];
 
-/**
- * Get current version
- */
-function getCurrentVersion() {
-  const marketplacePath = path.join(ROOT, '.claude-plugin/marketplace.json');
-  const marketplace = JSON.parse(fs.readFileSync(marketplacePath, 'utf8'));
-  return marketplace.metadata.version;
+console.log(`\n${c.bright}Release dry run${c.reset} (nothing is changed)\n`);
+
+const fields = rel.versions(ROOT);
+const distinct = [...new Set(Object.values(fields))];
+if (distinct.length !== 1) problems.push(`version fields disagree: ${JSON.stringify(fields)}`);
+const current = distinct[0];
+let next = '?';
+try { next = rel.nextVersion(current, type); } catch (e) { problems.push(e.message); }
+console.log(`  Version:     ${current} → ${c.green}${next}${c.reset} (${type})`);
+console.log(`  Tag:         v${next}${git('tag', '-l', `v${next}`) ? `  ${c.red}(already exists)${c.reset}` : ''}`);
+if (git('tag', '-l', `v${next}`)) problems.push(`tag v${next} already exists`);
+console.log(`  Date:        ${rel.today()}`);
+
+const skills = reg.listSkillDirs();
+console.log(`  Skills:      ${skills.length} directories · ${reg.frameworkCount()} advertised frameworks · ${reg.listPromptNames().length} prompts`);
+if (skills.length !== reg.listPromptNames().length) problems.push('skill directories and prompts/ differ — run node scripts/sync-prompts.js');
+
+console.log('\n  Files `npm run release` edits:');
+Object.values(rel.MANIFESTS).concat('CHANGELOG.md').forEach(f => console.log(`    • ${f}`));
+
+const changelog = fs.readFileSync(path.join(ROOT, 'CHANGELOG.md'), 'utf8');
+const notes = rel.unreleasedNotes(changelog);
+if (!notes) problems.push('CHANGELOG.md [Unreleased] is empty');
+else {
+  try { rel.stampChangelog(changelog, next, rel.today()); } catch (e) { problems.push(e.message); }
+  const lines = notes.split('\n');
+  console.log(`\n  Release notes ([Unreleased] → [${next}], ${lines.filter(l => /^- /.test(l)).length} entries):`);
+  lines.slice(0, 25).forEach(l => console.log(`    ${l}`));
+  if (lines.length > 25) console.log(`    … ${lines.length - 25} more lines`);
 }
 
-/**
- * Get all config versions
- */
-function getAllVersions() {
-  const marketplace = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude-plugin/marketplace.json'), 'utf8'));
-  const plugin = JSON.parse(fs.readFileSync(path.join(ROOT, 'plugins/us-stock-analysis/.claude-plugin/plugin.json'), 'utf8'));
+const branch = git('rev-parse', '--abbrev-ref', 'HEAD');
+const dirty = git('status', '--porcelain');
+console.log(`\n  Branch:      ${branch}${branch === 'main' ? '' : `  ${c.yellow}(releases are cut from main)${c.reset}`}`);
+console.log(`  Tree:        ${dirty ? `${c.yellow}uncommitted changes${c.reset}` : 'clean'}`);
+console.log(`  Recent tags: ${git('tag', '-l', 'v*', '--sort=-version:refname').split('\n').filter(Boolean).slice(0, 5).join(', ') || '(none)'}`);
 
-  return {
-    marketplace: marketplace.metadata.version,
-    plugin: plugin.version,
-  };
+console.log(`\n  After the tag is pushed: ${c.cyan}.github/workflows/release.yml${c.reset} runs npm test, packages`);
+console.log(`  invest-skill-marketplace-${next}.tar.gz + us-stock-analysis-${next}.tar.gz + checksums,`);
+console.log('  and publishes the GitHub Release with the CHANGELOG section above.');
+
+if (problems.length) {
+  console.log(`\n${c.red}Would refuse:${c.reset}`);
+  problems.forEach(p => console.log(`  ✗ ${p}`));
+  process.exit(1);
 }
-
-/**
- * Check if version is prerelease
- */
-function isPrereleaseVersion(version) {
-  return /-(alpha|beta|rc)/.test(version);
-}
-
-/**
- * Count skills
- */
-function countSkills() {
-  const pluginPath = path.join(ROOT, 'plugins/us-stock-analysis/.claude-plugin/plugin.json');
-  const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
-  return plugin.skills.length;
-}
-
-/**
- * Count prompts
- */
-function countPrompts() {
-  const promptsPath = path.join(ROOT, 'prompts');
-  return fs.readdirSync(promptsPath).filter(f => f.endsWith('.md')).length;
-}
-
-/**
- * Get release notes from CHANGELOG
- */
-function getReleaseNotes(version) {
-  try {
-    const changelogPath = path.join(ROOT, 'CHANGELOG.md');
-    const content = fs.readFileSync(changelogPath, 'utf8');
-    
-    const versionRegex = new RegExp(`## \\[${version}\\]([\\s\\S]*?)(?=## \\[|$)`);
-    const match = content.match(versionRegex);
-    
-    if (match && match[1]) {
-      return match[1].trim();
-    }
-  } catch (err) {
-    return null;
-  }
-  return null;
-}
-
-/**
- * Check git tags
- */
-function getExistingTags() {
-  try {
-    const tags = execSync('git tag -l "v*" --sort=-version:refname', { cwd: ROOT }).toString().trim().split('\n').filter(t => t);
-    return tags.slice(0, 5);  // Last 5 tags
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Calculate what artifacts would be created
- */
-function getArtifactInfo(version) {
-  return [
-    {
-      name: `invest-skill-marketplace-${version}.tar.gz`,
-      description: 'Full marketplace (all platforms)',
-      size: '~2MB (estimated)',
-    },
-    {
-      name: `us-stock-analysis-${version}.tar.gz`,
-      description: 'Claude Code plugin only',
-      size: '~1MB (estimated)',
-    },
-    {
-      name: 'checksums.txt',
-      description: 'SHA-256 verification file',
-      size: '~200B',
-    },
-  ];
-}
-
-/**
- * Main function
- */
-function main() {
-  const args = process.argv.slice(2);
-  const targetVersion = args[0] || getCurrentVersion();
-
-  console.log(`\n${colors.bright}${colors.cyan}📋 Release Dry-Run Report${colors.reset}`);
-  console.log('═'.repeat(70));
-
-  // Section 1: Current Status
-  console.log(`\n${colors.blue}Current Status${colors.reset}`);
-  console.log(`  Version:  ${colors.green}${getCurrentVersion()}${colors.reset}`);
-  console.log(`  Skills:   ${countSkills()}`);
-  console.log(`  Prompts:  ${countPrompts()}`);
-
-  // Section 2: Version Verification
-  console.log(`\n${colors.blue}Version Consistency Check${colors.reset}`);
-  const versions = getAllVersions();
-  const versionMatch = versions.marketplace === versions.plugin;
-  
-  console.log(`  Marketplace: ${versions.marketplace} ${versionMatch ? colors.green + '✓' + colors.reset : colors.yellow + '⚠' + colors.reset}`);
-  console.log(`  Plugin:      ${versions.plugin} ${versionMatch ? colors.green + '✓' + colors.reset : colors.yellow + '⚠' + colors.reset}`);
-  
-  if (!versionMatch) {
-    console.log(`  ${colors.yellow}⚠ Version mismatch detected!${colors.reset}`);
-  }
-
-  // Section 3: Target Release Info
-  console.log(`\n${colors.blue}Release Preview (v${targetVersion})${colors.reset}`);
-  
-  const isPrerelease = isPrereleaseVersion(targetVersion);
-  console.log(`  Target Version:  ${colors.green}${targetVersion}${colors.reset}`);
-  console.log(`  Release Type:    ${isPrerelease ? colors.yellow + 'PRERELEASE' + colors.reset : 'STABLE'}`);
-  console.log(`  GitHub Action:   ${colors.cyan}auto-deploy.yml${colors.reset}`);
-
-  // Section 4: Changelog
-  const releaseNotes = getReleaseNotes(targetVersion);
-  if (releaseNotes) {
-    console.log(`\n${colors.blue}Release Notes (from CHANGELOG.md)${colors.reset}`);
-    const lines = releaseNotes.split('\n').slice(0, 10);
-    lines.forEach(line => {
-      if (line.trim()) {
-        console.log(`  ${line}`);
-      }
-    });
-    if (releaseNotes.split('\n').length > 10) {
-      console.log(`  ...(${releaseNotes.split('\n').length - 10} more lines)`);
-    }
-  } else {
-    console.log(`\n${colors.yellow}⚠ No release notes found for v${targetVersion}${colors.reset}`);
-  }
-
-  // Section 5: Artifacts
-  console.log(`\n${colors.blue}Artifacts That Would Be Created${colors.reset}`);
-  const artifacts = getArtifactInfo(targetVersion);
-  artifacts.forEach(artifact => {
-    console.log(`  • ${artifact.name}`);
-    console.log(`    ${artifact.description} (${artifact.size})`);
-  });
-
-  // Section 6: Deployment Targets
-  console.log(`\n${colors.blue}Deployment Targets${colors.reset}`);
-  console.log(`  ✅ Claude Code Plugin (GitHub Release)`);
-  console.log(`  ✅ Cursor IDE Rules (Cursor Registry)`);
-  console.log(`  ✅ Gemini CLI (Repository + Package)`);
-  console.log(`  ✅ GitHub Copilot (.github/copilot-instructions.md)`);
-  console.log(`  ✅ Universal (File-based: prompts/)`);
-
-  // Section 7: Process
-  console.log(`\n${colors.blue}Release Process${colors.reset}`);
-  console.log(`  1. Test Suite validates all files`);
-  console.log(`  2. Version bump detected (v${targetVersion})`);
-  console.log(`  3. Pre-deploy validation runs`);
-  console.log(`  4. Release packages created (.tar.gz + checksums)`);
-  console.log(`  5. GitHub Release published`);
-  console.log(`  6. Tag created (v${targetVersion})`);
-  console.log(`  7. Cursor rules published`);
-  console.log(`  8. Gemini package published`);
-  console.log(`  9. Release notes generated`);
-  console.log(`  10. Deployment recorded in DEPLOYMENTS.md`);
-
-  // Section 8: Timeline
-  console.log(`\n${colors.blue}Recent Releases${colors.reset}`);
-  const tags = getExistingTags();
-  if (tags.length > 0) {
-    tags.forEach(tag => {
-      console.log(`  ${tag}`);
-    });
-  } else {
-    console.log(`  (No previous releases)`);
-  }
-
-  // Section 9: Next Steps
-  console.log(`\n${colors.blue}Next Steps${colors.reset}`);
-  console.log(`  To proceed with v${targetVersion}:`);
-  console.log(`  `);
-  console.log(`    ${colors.cyan}npm run release${colors.reset}           # Interactive release`);
-  console.log(`    OR`);
-  console.log(`    ${colors.cyan}git tag -a v${targetVersion}${colors.reset}      # Manual tag`);
-  console.log(`    ${colors.cyan}git push origin v${targetVersion}${colors.reset}`);
-
-  // Summary
-  console.log(`\n${colors.bright}Summary${colors.reset}`);
-  console.log(`═`.repeat(70));
-  
-  if (versionMatch) {
-    console.log(`${colors.green}✓${colors.reset} Version consistency: OK`);
-  } else {
-    console.log(`${colors.yellow}⚠${colors.reset} Version mismatch detected — please fix before release`);
-  }
-  
-  if (releaseNotes) {
-    console.log(`${colors.green}✓${colors.reset} Changelog entry: Found`);
-  } else {
-    console.log(`${colors.yellow}⚠${colors.reset} Changelog entry: Missing — add v${targetVersion} section to CHANGELOG.md`);
-  }
-  
-  console.log(`${colors.green}✓${colors.reset} ${colors.countSkills} skills registered`);
-  console.log(`${colors.green}✓${colors.reset} ${countPrompts()} universal prompts available`);
-
-  console.log(`\n${colors.bright}This was a dry-run. No changes were made.${colors.reset}\n`);
-}
-
-main();
+const advisories = [branch !== 'main' && 'switch to main', dirty && 'commit or stash changes'].filter(Boolean);
+console.log(`\n${c.green}✓ Ready${c.reset}${advisories.length ? ` once you ${advisories.join(' and ')}` : ''} — run ${c.bright}npm run release${c.reset}\n`);
