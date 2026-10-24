@@ -632,7 +632,7 @@ button { font-family: inherit; }
 .markdown-body tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 55%, transparent); }
 .markdown-body tr:hover td { background: var(--accent-light); color: var(--text); }
 .markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 2.25rem 0; }
-.markdown-body img { max-width: 100%; border-radius: 10px; display: inline; vertical-align: middle; }
+.markdown-body img { max-width: 100%; height: auto; border-radius: 10px; display: inline; vertical-align: middle; }   /* height:auto — the build adds width/height attributes, and without it a scaled-down image keeps its full height */
 
 /* Home "Start learning" card (README) */
 .markdown-body .home-card { display: flex; align-items: flex-start; gap: 1rem; margin: 1.75rem 0; padding: 1.15rem 1.35rem; background: var(--accent-light); border: 1px solid var(--border-strong); border-left: 3px solid var(--accent); border-radius: 12px; }
