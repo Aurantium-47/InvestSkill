@@ -214,6 +214,14 @@ const CNV_FACTS = {
   },
 };
 
+if (process.env.EDGAR_MOCK_REPEATED_SHARES === '1') {
+  const shares = AAPL_FACTS.facts.dei.EntityCommonStockSharesOutstanding.units.shares;
+  const repeated = shares.filter(p => p.end === '2025-10-17').map(p => ({
+    ...p, form: '10-K/A', filed: '2025-11-14', accn: '0000320193-25-000080'
+  }));
+  shares.unshift(...repeated);
+}
+
 const TICKERS = {
   0: { cik_str: 320193, ticker: 'AAPL', title: 'Apple Inc.' },
   1: { cik_str: 1067983, ticker: 'BRK-B', title: 'BERKSHIRE HATHAWAY INC' },

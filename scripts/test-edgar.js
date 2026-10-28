@@ -361,6 +361,13 @@ async function main() {
   includes(body, 'Not tagged for FY2025: interest_expense, goodwill', 'pack body: lists untagged concepts honestly');
   excludes(body, '| Revenue | n/a', 'pack body: no n/a where facts exist');
 
+  // Repeated cover-page facts from another filing are not additional shares.
+  r = run(FETCH_FUND, fundArgs(['AAPL', '--stdout']), { EDGAR_MOCK_REPEATED_SHARES: '1' });
+  eq(r.status, 0, 'fetch-fundamentals repeated shares: exit 0');
+  const repeatedShares = parseFixture(r.stdout);
+  eq(repeatedShares && repeatedShares.meta.shares_out_m, 14800, 'pack: repeated filings do not double the shares outstanding');
+  includes(repeatedShares && repeatedShares.body, 'cover page of the 10-K filed 2025-10-31', 'pack: share-count label follows the selected original filing');
+
   // --fy: older year via the older revenue tag, no prior year available
   r = run(FETCH_FUND, fundArgs(['AAPL', '--fy', '2023', '--stdout']));
   eq(r.status, 0, 'fetch-fundamentals --fy 2023 --stdout: exit 0');

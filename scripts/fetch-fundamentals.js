@@ -298,10 +298,12 @@ async function main() {
   let sharesOut = null;
   const so = dei.EntityCommonStockSharesOutstanding && dei.EntityCommonStockSharesOutstanding.units && dei.EntityCommonStockSharesOutstanding.units.shares;
   if (so && so.length) {
-    // Several share classes may be tagged for the same date; sum them.
+    // Sum same-date facts within one filing; other filings can repeat them.
     const latest = so.reduce((a, b) => (a.end > b.end ? a : b)).end;
     const pts = so.filter(x => x.end === latest);
-    sharesOut = { asOf: latest, value: pts.reduce((s, x) => s + x.val, 0), form: pts[0].form, filed: pts[0].filed };
+    const filing = original(pts);
+    const selected = pts.filter(x => x.accn === filing.accn);
+    sharesOut = { asOf: latest, value: selected.reduce((s, x) => s + x.val, 0), form: filing.form, filed: filing.filed };
   }
 
   // Helper facts read only to build or annotate total debt aren't line items.
