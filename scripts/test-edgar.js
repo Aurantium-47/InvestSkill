@@ -327,7 +327,7 @@ async function main() {
   eq(m2.fiscal_year, 'FY2025', 'pack: fiscal_year label');
   eq(m2.source_accession, '0000320193-25-000079', 'pack: source accession');
   eq(m2.price, '', 'pack: price line present but empty (SEC has no quotes) and parser-safe');
-  eq(m2.shares_out_m, 14800, 'pack: shares_out_m sums share classes tagged on the same date');
+  eq(m2.shares_out_m, 14776, 'pack: AAPL FY2025 cover-page common shares rounded to millions');
   eq(m2.revenue_m, 416161, 'pack: revenue_m');
   eq(m2.revenue_prior_m, 391035, 'pack: revenue_prior_m from the prior fiscal year');
   eq(m2.gross_profit_m, 195201, 'pack: gross_profit_m');
@@ -365,8 +365,17 @@ async function main() {
   r = run(FETCH_FUND, fundArgs(['AAPL', '--stdout']), { EDGAR_MOCK_REPEATED_SHARES: '1' });
   eq(r.status, 0, 'fetch-fundamentals repeated shares: exit 0');
   const repeatedShares = parseFixture(r.stdout);
-  eq(repeatedShares && repeatedShares.meta.shares_out_m, 14800, 'pack: repeated filings do not double the shares outstanding');
+  eq(repeatedShares && repeatedShares.meta.shares_out_m, 14776, 'pack: repeated filings do not double the shares outstanding');
   includes(repeatedShares && repeatedShares.body, 'cover page of the 10-K filed 2025-10-31', 'pack: share-count label follows the selected original filing');
+
+  // Multi-class coverage belongs to an explicitly fictional company, not AAPL.
+  for (const repeated of ['0', '1']) {
+    r = run(FETCH_FUND, fundArgs(['MULTI', '--stdout']), { EDGAR_MOCK_REPEATED_SHARES: repeated });
+    eq(r.status, 0, `fetch-fundamentals MULTI (repeated=${repeated}): exit 0`);
+    const multi = parseFixture(r.stdout);
+    eq(multi && multi.meta.shares_out_m, 14800, `pack MULTI (repeated=${repeated}): sums both latest-date classes from one filing only`);
+    includes(multi && multi.body, 'cover page of the 10-K filed 2026-02-20, as of 2026-02-10', `pack MULTI (repeated=${repeated}): share-count label follows the selected original filing and latest date`);
+  }
 
   // --fy: older year via the older revenue tag, no prior year available
   r = run(FETCH_FUND, fundArgs(['AAPL', '--fy', '2023', '--stdout']));
@@ -387,6 +396,8 @@ async function main() {
   const jf = path.join(FIX, 'AAPL.json');
   check(fs.existsSync(jf), 'fetch-fundamentals --json: raw figures written');
   const raw = fs.existsSync(jf) ? JSON.parse(fs.readFileSync(jf, 'utf8')) : {};
+  eq(raw.shares_outstanding && raw.shares_outstanding.value, 14776353000, 'fetch-fundamentals --json: AAPL cover-page count in raw shares');
+  eq(raw.shares_outstanding && raw.shares_outstanding.asOf, '2025-10-17', 'fetch-fundamentals --json: cover-page date, not fiscal year end');
   eq(raw.current && raw.current.revenue, 416161e6, 'fetch-fundamentals --json: current.revenue in dollars');
   eq(raw.prior && raw.prior.net_income, 93736e6, 'fetch-fundamentals --json: prior.net_income as first reported');
 

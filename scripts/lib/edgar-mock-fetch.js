@@ -18,6 +18,7 @@
  *                          and a mis-scaled comparative to test "as first reported")
  *   BRK-B   (CIK 1067983) — ticker-normalisation case (BRK.B → BRK-B)
  *   TSM     (CIK 1046179) — foreign private issuer: 20-F / 6-K only, IFRS facts
+ *   MULTI   (CIK 666)     — fictional company with two same-date share classes
  *   NOFACTS (CIK 999)     — has filings, but companyfacts returns 404
  *   FLAKY   (CIK 500)     — submissions 503 on the first call, then 200; its
  *                          10-K document is a 404
@@ -108,8 +109,9 @@ const AAPL_FACTS = {
   facts: {
     dei: {
       EntityCommonStockSharesOutstanding: { units: { shares: [
-        { end: '2025-10-17', val: 14_000_000_000, form: '10-K', filed: '2025-10-31', accn: '0000320193-25-000079', fy: 2025, fp: 'FY' },
-        { end: '2025-10-17', val: 800_000_000, form: '10-K', filed: '2025-10-31', accn: '0000320193-25-000079', fy: 2025, fp: 'FY' }, // second class, same date → summed
+        // FY2025 10-K cover-page common shares (raw shares, not millions):
+        // https://www.sec.gov/Archives/edgar/data/320193/000032019325000079/aapl-20250927.htm
+        { end: '2025-10-17', val: 14_776_353_000, form: '10-K', filed: '2025-10-31', accn: '0000320193-25-000079', fy: 2025, fp: 'FY' },
         { end: '2024-10-18', val: 15_115_823_000, form: '10-K', filed: '2024-11-01', accn: '0000320193-24-000123', fy: 2024, fp: 'FY' },
       ] } },
     },
@@ -214,12 +216,32 @@ const CNV_FACTS = {
   },
 };
 
+// Explicitly fictional: same-date share-class aggregation is not an AAPL fact.
+const MULTI = { cik: '0000000666', name: 'FICTIONAL MULTI CLASS CORP', recent: [{ form: '10-K', filed: '2026-02-20', period: '2025-12-31', accn: '0000000666-26-000001', doc: 'multi-20251231.htm' }] };
+const MULTI_K = ['10-K', '2026-02-20', '0000000666-26-000001', 2025];
+const MULTI_FACTS = {
+  cik: 666, entityName: 'Fictional Multi Class Corp',
+  facts: {
+    dei: { EntityCommonStockSharesOutstanding: { units: { shares: [
+      inst('2026-02-10', 14_000_000_000, ...MULTI_K), // first class
+      inst('2026-02-10', 800_000_000, ...MULTI_K), // second class, same filing/date
+      inst('2025-02-10', 16_000_000_000, '10-K', '2025-02-20', '0000000666-25-000001', 2024),
+    ] } } },
+    'us-gaap': { Revenues: usd([dur('2025-01-01', '2025-12-31', M(5000), ...MULTI_K)]) },
+  },
+};
+
+// Synthetic amendments for the regression, not additional real AAPL filings.
 if (process.env.EDGAR_MOCK_REPEATED_SHARES === '1') {
   const shares = AAPL_FACTS.facts.dei.EntityCommonStockSharesOutstanding.units.shares;
   const repeated = shares.filter(p => p.end === '2025-10-17').map(p => ({
     ...p, form: '10-K/A', filed: '2025-11-14', accn: '0000320193-25-000080'
   }));
   shares.unshift(...repeated);
+  const multiShares = MULTI_FACTS.facts.dei.EntityCommonStockSharesOutstanding.units.shares;
+  multiShares.unshift(...multiShares.filter(p => p.end === '2026-02-10').map(p => ({
+    ...p, form: '10-K/A', filed: '2026-03-01', accn: '0000000666-26-000002'
+  })));
 }
 
 const TICKERS = {
@@ -230,6 +252,7 @@ const TICKERS = {
   4: { cik_str: 500, ticker: 'FLAKY', title: 'FLAKY HOLDINGS' },
   5: { cik_str: 777, ticker: 'LTD', title: 'LEVERAGED TEST CORP' },
   6: { cik_str: 888, ticker: 'CNV', title: 'CONVERTIBLE TEST CORP' },
+  7: { cik_str: 666, ticker: 'MULTI', title: 'FICTIONAL MULTI CLASS CORP' },
 };
 
 /** A `data.sec.gov/submissions/CIK...json` payload for a synthetic company. */
@@ -279,6 +302,8 @@ function route(url) {
     return state.flakyCalls === 1 ? response(503, 'Service Unavailable', 'text') : response(200, submissions(FLAKY));
   }
 
+  if (url === `${DATA}/submissions/CIK0000000666.json`) return response(200, submissions(MULTI));
+  if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000666.json`) return response(200, MULTI_FACTS);
   if (url === `${DATA}/submissions/CIK0000000777.json`) return response(200, submissions(LTD));
   if (url === `${DATA}/submissions/CIK0000000888.json`) return response(200, submissions(CNV));
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000888.json`) return response(200, CNV_FACTS);
