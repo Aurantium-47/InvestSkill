@@ -18,7 +18,7 @@
  *                          and a mis-scaled comparative to test "as first reported")
  *   BRK-B   (CIK 1067983) — ticker-normalisation case (BRK.B → BRK-B)
  *   TSM     (CIK 1046179) — foreign private issuer: 20-F / 6-K only, IFRS facts
- *   MULTI   (CIK 666)     — fictional company with two same-date share classes
+ *   MULTI   (CIK 666)     — synthetic same-date rows (not SEC dimensional class data)
  *   NOFACTS (CIK 999)     — has filings, but companyfacts returns 404
  *   FLAKY   (CIK 500)     — submissions 503 on the first call, then 200; its
  *                          10-K document is a 404
@@ -216,7 +216,9 @@ const CNV_FACTS = {
   },
 };
 
-// Explicitly fictional: same-date share-class aggregation is not an AAPL fact.
+// Adversarial compatibility case only, not a representative SEC response:
+// companyfacts excludes dimensional share-class facts. Real multi-class
+// behavior is covered separately by the Berkshire companyfacts subset.
 const MULTI = { cik: '0000000666', name: 'FICTIONAL MULTI CLASS CORP', recent: [{ form: '10-K', filed: '2026-02-20', period: '2025-12-31', accn: '0000000666-26-000001', doc: 'multi-20251231.htm' }] };
 const MULTI_K = ['10-K', '2026-02-20', '0000000666-26-000001', 2025];
 const MULTI_FACTS = {
@@ -230,6 +232,13 @@ const MULTI_FACTS = {
     'us-gaap': { Revenues: usd([dur('2025-01-01', '2025-12-31', M(5000), ...MULTI_K)]) },
   },
 };
+
+// Synthetic boundary cases for the selected fiscal-year-end freshness floor.
+if (process.env.EDGAR_MOCK_SHARE_DATE) {
+  const shares = MULTI_FACTS.facts.dei.EntityCommonStockSharesOutstanding.units;
+  shares.shares = process.env.EDGAR_MOCK_SHARE_DATE === 'absent' ? []
+    : [{ ...shares.shares[0], end: process.env.EDGAR_MOCK_SHARE_DATE }];
+}
 
 // Synthetic amendments for the regression, not additional real AAPL filings.
 if (process.env.EDGAR_MOCK_REPEATED_SHARES === '1') {
@@ -307,6 +316,9 @@ function route(url) {
   if (url === `${DATA}/submissions/CIK0000000777.json`) return response(200, submissions(LTD));
   if (url === `${DATA}/submissions/CIK0000000888.json`) return response(200, submissions(CNV));
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000888.json`) return response(200, CNV_FACTS);
+  // SEC snapshot, 2026-11-02: full DEI share series plus one annual revenue fact.
+  // https://data.sec.gov/api/xbrl/companyfacts/CIK0001067983.json
+  if (url === `${DATA}/api/xbrl/companyfacts/CIK0001067983.json`) return response(200, require('../../tests/fixtures/edgar/brkb-companyfacts-subset.json'));
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000320193.json`) return response(200, AAPL_FACTS);
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0000000777.json`) return response(200, LTD_FACTS);
   if (url === `${DATA}/api/xbrl/companyfacts/CIK0001046179.json`) return response(200, TSM_FACTS);

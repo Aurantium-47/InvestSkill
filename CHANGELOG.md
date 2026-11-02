@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- `fetch-fundamentals` leaves shares outstanding unavailable when SEC companyfacts has no cover-page instant on or after the selected fiscal year end, rather than reusing a stale historical count. Dimensional share classes remain outside the API; a representative Berkshire snapshot and date-boundary regressions cover this limitation.
 - **SEC share counts:** select one filing for the latest share-count date so
   repeated facts in annual and amended filings are not added together.
 - **Site language switcher (文A) no longer drops you on the home page.** A page with no counterpart in the other language — every `skill-<name>.html` reference page and the English-only demos — used to link 文A to the other language's home page. It now goes to the parent index (the zh Skill Reference, the zh demo overview); only pages with neither a twin nor a parent (changelog, contributing) still land on home. The current language is marked `aria-current`. The routing rule moved to `site/build/lang-pairs.js` and is unit-tested by `scripts/test-site.js` (`npm run test:site`, part of `npm test`), which also builds the site and checks the rendered switcher on every page; CI's site job re-runs it on the deployed build.

@@ -219,8 +219,8 @@ function totalDebt(r, concept) {
 
 /**
  * Where the share count comes from. EDGAR's companyfacts carries the cover-page count
- * of every filing, and the newest is often a 10-Q filed after the 10-K, so the label
- * names the filing instead of implying it is the annual report's cover page.
+ * when tagged for the entire entity. The newest is often a later 10-Q, so the
+ * label names the filing rather than implying it is the annual report's cover.
  */
 function sharesLabel(so, fy) {
   const later = so.filed > fy.filed ? ` (later than the ${fy.form})` : '';
@@ -297,10 +297,14 @@ async function main() {
   // Shares outstanding: the cover-page dei fact, most recent instant.
   let sharesOut = null;
   const so = dei.EntityCommonStockSharesOutstanding && dei.EntityCommonStockSharesOutstanding.units && dei.EntityCommonStockSharesOutstanding.units.shares;
-  if (so && so.length) {
+  // A cover-page instant predating this reporting period cannot supply its
+  // outstanding shares. companyfacts omits dimensional share-class facts, so
+  // its latest available point can be years older than the selected annual data.
+  const currentShares = (so || []).filter(x => x.end >= cur.end);
+  if (currentShares.length) {
     // Sum same-date facts within one filing; other filings can repeat them.
-    const latest = so.reduce((a, b) => (a.end > b.end ? a : b)).end;
-    const pts = so.filter(x => x.end === latest);
+    const latest = currentShares.reduce((a, b) => (a.end > b.end ? a : b)).end;
+    const pts = currentShares.filter(x => x.end === latest);
     const filing = original(pts);
     const selected = pts.filter(x => x.accn === filing.accn);
     sharesOut = { asOf: latest, value: selected.reduce((s, x) => s + x.val, 0), form: filing.form, filed: filing.filed };
@@ -373,6 +377,8 @@ async function main() {
   b.push(`| Diluted weighted-average shares (${fyLabel}) | ${c.shares_diluted !== null ? `${(c.shares_diluted / 1e6).toLocaleString('en-US', { maximumFractionDigits: 0 })} M` : 'n/a'} |`);
   b.push(`| Industry (SIC) | ${facts.sic ? `${facts.sic} — ${facts.sicDescription || ''}` : 'see filing cover page'} |`);
   b.push('');
+  if (!sharesOut) b.push(`> Shares outstanding unavailable: no entity-wide cover-page count dated on or after ${cur.end} in SEC companyfacts. Check the filing's share classes and their economic rights before computing market cap; do not substitute weighted-average diluted shares.`);
+  if (!sharesOut) b.push('');
   b.push(`## Income statement — fiscal years ended ${cur.end}${prior ? ` and ${prior.end}` : ''} ($ M)`);
   b.push('');
   b.push(`| Line | ${fyLabel} | ${priorLabel} |`);
@@ -419,7 +425,7 @@ async function main() {
   b.push('');
   b.push('## Notes');
   b.push('');
-  b.push('- Figures are US-GAAP as tagged by the company; "n/a" means the company did not tag that concept for the period (it may still appear in the filing under a different line).');
+  b.push('- Figures are US-GAAP as tagged by the company; "n/a" means no usable fact is available here for the period (the filing may report it under another tag or a dimensional context omitted by companyfacts).');
   b.push(`- Gross profit is the tagged value where available, otherwise revenue − cost of revenue. Total debt = ${c.total_debt_note}; leases are excluded unless the company tags them as debt.`);
   for (const n of c.debt_notes) b.push(`- ${n}`);
   for (const n of c.notes) b.push(`- ${n}`);
